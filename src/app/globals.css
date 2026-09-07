@@ -1,26 +1,147 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-heading);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-gold: var(--gold);
+  --color-gold-deep: var(--gold-deep);
+  --color-plum: var(--plum);
+  --font-script: var(--font-script);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* GlowNest — warm ivory, antique gold and plum, taken from the salon's own logo. */
+  --background: #fbf8f3;
+  --foreground: #241e1a;
+  --card: #ffffff;
+  --card-foreground: #241e1a;
+  --popover: #ffffff;
+  --popover-foreground: #241e1a;
+  --primary: #6b2c8f;
+  --primary-foreground: #ffffff;
+  --secondary: #f4eee5;
+  --secondary-foreground: #241e1a;
+  --muted: #f2ece3;
+  --muted-foreground: #6a6058;
+  --accent: #f3e9f7;
+  --accent-foreground: #5a2478;
+  --destructive: #b3261e;
+  --border: #e4dccf;
+  --input: #d9cfbe;
+  --ring: #6b2c8f;
+  --chart-1: #6b2c8f;
+  --chart-2: #b58648;
+  --chart-3: #a67f9c;
+  --chart-4: #6a6058;
+  --chart-5: #241e1a;
+  --radius: 0.5rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #241e1a;
+  --sidebar-primary: #6b2c8f;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f4eee5;
+  --sidebar-accent-foreground: #241e1a;
+  --sidebar-border: #e4dccf;
+  --sidebar-ring: #6b2c8f;
+  /* Decorative gold for rules and icons; gold-deep is the readable-on-ivory text tone. */
+  --gold: #b58648;
+  --gold-deep: #8a6329;
+  --plum: #6b2c8f;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+  /* Navigation chrome shouldn't feel like selectable web text on a phone. */
+  header,
+  nav {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Sits above the iPhone home indicator when pinned to the bottom of the screen. */
+@utility safe-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
+}
+
+@layer components {
+  /* Small gold label that sits above a section heading. */
+  .eyebrow {
+    @apply text-gold-deep text-xs font-semibold tracking-[0.2em] uppercase;
+  }
+  /* Thin gold rule used as a divider under headings. */
+  .rule-gold {
+    @apply bg-gold/60 h-px w-16;
+  }
+  /* Horizontal day/time pickers: snap like a native control, no visible scrollbar. */
+  .snap-row {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .snap-row::-webkit-scrollbar {
+    display: none;
+  }
+  .snap-row > * {
+    scroll-snap-align: start;
+  }
 }
