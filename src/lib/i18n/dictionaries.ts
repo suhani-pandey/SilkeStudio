@@ -52,6 +52,10 @@ const en = {
     title: "Recent visits",
     instagram: "Follow on Instagram →",
   },
+  testimonials: {
+    eyebrow: "Kind words",
+    title: "What clients say",
+  },
   visit: {
     eyebrow: "Visit us",
     title: "Find GlowNest",
@@ -74,6 +78,9 @@ const en = {
     bookLink: "Book an appointment",
     myAppointmentsLink: "My appointments",
     visit: "Visit",
+    findBooking: "Find your booking",
+    privacy: "Privacy policy",
+    terms: "Booking terms",
     rights: "All rights reserved.",
   },
   servicesPage: {
@@ -113,6 +120,7 @@ const en = {
     services: "services",
     loadError: "Couldn't load available times. Please try again.",
     submitError: "Something went wrong. Please try again.",
+    dateFormat: "EEEE d MMMM 'at' HH:mm",
   },
   confirmation: {
     thanks: "Thank you",
@@ -125,6 +133,10 @@ const en = {
     notFoundTitle: "No booking found",
     notFoundBody: "Looks like you landed here directly.",
     notFoundCta: "Book an appointment",
+    dateFormat: "EEEE d MMMM 'at' HH:mm",
+    reference: "Your booking code",
+    referenceHint: "Keep this — you'll need it (with your phone number) to change or cancel.",
+    manageBooking: "Manage booking",
   },
   auth: {
     accountEyebrow: "Account",
@@ -143,6 +155,30 @@ const en = {
     guestHint: "You can also",
     guestLink: "book as a guest",
     guestHintEnd: "without an account.",
+    confirmTitle: "Check your email",
+    confirmBody:
+      "We've sent a confirmation link to {email}. Click it, then come back and log in.",
+  },
+  lookup: {
+    eyebrow: "Your booking",
+    title: "Find your appointment",
+    body: "Enter the booking code from your confirmation, plus the phone number you booked with.",
+    reference: "Booking code",
+    phone: "Phone number",
+    find: "Find booking",
+    notFound: "We couldn't find a booking with that code and phone number.",
+    cancelled: "This booking has been cancelled.",
+    completed: "This appointment has already taken place.",
+    cancel: "Cancel this booking",
+    cancelConfirm: "Cancel this appointment?",
+    cancelConfirmTitle: "Cancel this appointment?",
+    cancelConfirmBody: "This frees the time for someone else. You'll need to book again if you change your mind.",
+    cancelConfirmAction: "Yes, cancel it",
+    keepAppointment: "Keep it",
+    cancelDone: "Your booking has been cancelled.",
+    cancelFailed: "We couldn't cancel it — please call the salon.",
+    searchAgain: "Look up another booking",
+    dateFormat: "EEEE d MMMM 'at' HH:mm",
   },
   myAppointments: {
     eyebrow: "Your visits",
@@ -151,10 +187,24 @@ const en = {
     empty: "No upcoming appointments.",
     cancel: "Cancel",
     cancelConfirm: "Cancel this appointment?",
+    cancelConfirmTitle: "Cancel this appointment?",
+    cancelConfirmBody: "This frees the time for someone else. You'll need to book again if you change your mind.",
+    cancelConfirmAction: "Yes, cancel it",
+    keepAppointment: "Keep it",
     cancelled: "Appointment cancelled.",
     cancelError: "Couldn't cancel. Try again.",
+    dateFormat: "EEE d MMM 'at' HH:mm",
   },
   days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  meta: {
+    servicesTitle: "Services & pricing",
+    servicesDescription:
+      "Every treatment and price at GlowNest Beauty Salon in Høje Taastrup — nails, threading, facials, hair and waxing.",
+    bookTitle: "Book an appointment",
+    bookDescription: "Pick your services and a time. Booking takes under a minute, no account needed.",
+    lookupTitle: "Find your booking",
+    lookupDescription: "Look up or cancel your appointment with your booking code.",
+  },
 };
 
 type Dictionary = typeof en;
@@ -211,6 +261,10 @@ const da: Dictionary = {
     title: "Seneste besøg",
     instagram: "Følg med på Instagram →",
   },
+  testimonials: {
+    eyebrow: "Pæne ord",
+    title: "Det siger kunderne",
+  },
   visit: {
     eyebrow: "Besøg os",
     title: "Find GlowNest",
@@ -233,6 +287,9 @@ const da: Dictionary = {
     bookLink: "Book en tid",
     myAppointmentsLink: "Mine aftaler",
     visit: "Besøg",
+    findBooking: "Find din booking",
+    privacy: "Privatlivspolitik",
+    terms: "Bookingbetingelser",
     rights: "Alle rettigheder forbeholdes.",
   },
   servicesPage: {
@@ -272,6 +329,7 @@ const da: Dictionary = {
     services: "behandlinger",
     loadError: "Kunne ikke hente ledige tider. Prøv igen.",
     submitError: "Noget gik galt. Prøv igen.",
+    dateFormat: "EEEE d. MMMM 'kl.' HH:mm",
   },
   confirmation: {
     thanks: "Tak",
@@ -284,6 +342,10 @@ const da: Dictionary = {
     notFoundTitle: "Ingen booking fundet",
     notFoundBody: "Det ser ud til, at du er landet her direkte.",
     notFoundCta: "Book en tid",
+    dateFormat: "EEEE d. MMMM 'kl.' HH:mm",
+    reference: "Din bookingkode",
+    referenceHint: "Gem den — du skal bruge den sammen med dit telefonnummer for at ændre eller aflyse.",
+    manageBooking: "Se din booking",
   },
   auth: {
     accountEyebrow: "Konto",
@@ -302,6 +364,30 @@ const da: Dictionary = {
     guestHint: "Du kan også",
     guestLink: "booke som gæst",
     guestHintEnd: "uden en konto.",
+    confirmTitle: "Tjek din e-mail",
+    confirmBody:
+      "Vi har sendt et bekræftelseslink til {email}. Klik på det, og log derefter ind.",
+  },
+  lookup: {
+    eyebrow: "Din booking",
+    title: "Find din aftale",
+    body: "Indtast bookingkoden fra din bekræftelse samt det telefonnummer, du bookede med.",
+    reference: "Bookingkode",
+    phone: "Telefonnummer",
+    find: "Find booking",
+    notFound: "Vi kunne ikke finde en booking med den kode og det telefonnummer.",
+    cancelled: "Denne booking er aflyst.",
+    completed: "Denne aftale har allerede fundet sted.",
+    cancel: "Aflys denne booking",
+    cancelConfirm: "Vil du aflyse denne aftale?",
+    cancelConfirmTitle: "Aflys denne aftale?",
+    cancelConfirmBody: "Tiden bliver frigivet til en anden. Du skal booke igen, hvis du fortryder.",
+    cancelConfirmAction: "Ja, aflys",
+    keepAppointment: "Behold tiden",
+    cancelDone: "Din booking er aflyst.",
+    cancelFailed: "Vi kunne ikke aflyse den — ring venligst til salonen.",
+    searchAgain: "Slå en anden booking op",
+    dateFormat: "EEEE d. MMMM 'kl.' HH:mm",
   },
   myAppointments: {
     eyebrow: "Dine besøg",
@@ -310,10 +396,24 @@ const da: Dictionary = {
     empty: "Ingen kommende aftaler.",
     cancel: "Aflys",
     cancelConfirm: "Vil du aflyse denne aftale?",
+    cancelConfirmTitle: "Aflys denne aftale?",
+    cancelConfirmBody: "Tiden bliver frigivet til en anden. Du skal booke igen, hvis du fortryder.",
+    cancelConfirmAction: "Ja, aflys",
+    keepAppointment: "Behold tiden",
     cancelled: "Aftalen er aflyst.",
     cancelError: "Kunne ikke aflyse. Prøv igen.",
+    dateFormat: "EEE d. MMM 'kl.' HH:mm",
   },
   days: ["Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"],
+  meta: {
+    servicesTitle: "Behandlinger & priser",
+    servicesDescription:
+      "Alle behandlinger og priser hos GlowNest Beauty Salon i Høje Taastrup — negle, trådning, ansigtsbehandlinger, hår og voksning.",
+    bookTitle: "Book en tid",
+    bookDescription: "Vælg dine behandlinger og et tidspunkt. Det tager under et minut, og du behøver ingen konto.",
+    lookupTitle: "Find din booking",
+    lookupDescription: "Slå din aftale op eller aflys den med din bookingkode.",
+  },
 };
 
 const dictionaries: Record<Locale, Dictionary> = { en, da };

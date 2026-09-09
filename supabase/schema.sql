@@ -75,6 +75,53 @@ alter table public.appointments add column if not exists total_price numeric(10,
 drop trigger if exists appointments_set_end_at on public.appointments;
 alter table public.appointments drop column if exists service_id;
 
+-- Turnaround time after a service (tidying, drying, sanitising). It blocks the calendar but is
+-- never charged or shown to the customer as part of the treatment length.
+alter table public.services add column if not exists buffer_minutes int not null default 0;
+alter table public.appointments add column if not exists buffer_minutes int not null default 0;
+
+-- Short human-friendly code so a guest can find their booking again without an account.
+alter table public.appointments add column if not exists reference text;
+create unique index if not exists appointments_reference_unique on public.appointments (reference);
+
+-- Danish copy for the customer-facing service list. The English columns stay the canonical
+-- keys (categories group and pick images by them); these are display-only overrides.
+alter table public.services add column if not exists name_da text;
+alter table public.services add column if not exists description_da text;
+alter table public.services add column if not exists category_da text;
+
+-- Real reviews from real clients, added by the owner. Intentionally seeded empty — nothing
+-- here should ever be invented.
+create table if not exists public.testimonials (
+  id uuid primary key default gen_random_uuid(),
+  author_name text not null,
+  quote text not null,
+  rating int check (rating between 1 and 5),
+  is_published boolean not null default true,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+
+-- Time the owner is unavailable every week (school run, another job, a standing commitment).
+create table if not exists public.recurring_time_off (
+  id uuid primary key default gen_random_uuid(),
+  day_of_week int not null check (day_of_week between 0 and 6), -- 0 = Sunday
+  start_time time not null,
+  end_time time not null check (end_time > start_time),
+  reason text,
+  created_at timestamptz not null default now()
+);
+
+-- Browser push subscriptions for the owner's phone, so new bookings reach her with the app closed.
+create table if not exists public.push_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid not null references public.profiles (id) on delete cascade,
+  endpoint text not null unique,
+  p256dh text not null,
+  auth text not null,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists public.notifications (
   id uuid primary key default gen_random_uuid(),
   audience text not null check (audience in ('owner', 'customer')),
@@ -96,6 +143,17 @@ create index if not exists notifications_audience_idx on public.notifications (a
 -- =========================================================
 -- Helper functions
 -- =========================================================
+
+-- The salon's wall-clock timezone. Opening hours and recurring time off are stored as plain
+-- times ("10:00"), so they must be anchored to this rather than to whatever timezone the
+-- server happens to run in — hosting runs in UTC and would otherwise shift every slot.
+create or replace function public.salon_timezone()
+returns text
+language sql
+immutable
+as $$
+  select 'Europe/Copenhagen';
+$$;
 
 create or replace function public.is_owner()
 returns boolean
@@ -138,7 +196,10 @@ security definer
 set search_path = public
 as $$
 begin
-  if new.role <> old.role and not public.is_owner() then
+  -- Only guard against a signed-in customer promoting themselves. When there is no user in
+  -- context (the SQL editor, or a trusted server-side key) the caller is already an admin —
+  -- without this check, granting the first owner from the SQL editor silently does nothing.
+  if new.role <> old.role and auth.uid() is not null and not public.is_owner() then
     new.role := old.role;
   end if;
   return new;
@@ -157,14 +218,15 @@ language plpgsql
 set search_path = public
 as $$
 begin
-  new.end_at := new.start_at + make_interval(mins => new.duration_minutes);
+  -- The blocked slot covers the treatment plus its turnaround time.
+  new.end_at := new.start_at + make_interval(mins => new.duration_minutes + coalesce(new.buffer_minutes, 0));
   return new;
 end;
 $$;
 
 drop trigger if exists appointments_set_end_at on public.appointments;
 create trigger appointments_set_end_at
-  before insert or update of start_at, duration_minutes on public.appointments
+  before insert or update of start_at, duration_minutes, buffer_minutes on public.appointments
   for each row execute function public.set_appointment_end_at();
 
 -- Comma-separated service names for an appointment, used in notification copy.
@@ -256,7 +318,19 @@ as $$
   select b.start_at, b.end_at
   from public.availability_blocks b
   where b.start_at < p_to
-    and b.end_at > p_from;
+    and b.end_at > p_from
+  union all
+  -- Weekly commitments, expanded onto each real date in the window and anchored to the
+  -- salon's timezone so they land at the right wall-clock time year round.
+  select
+    (day::date + r.start_time) at time zone public.salon_timezone(),
+    (day::date + r.end_time) at time zone public.salon_timezone()
+  from generate_series(
+    date_trunc('day', p_from at time zone public.salon_timezone()),
+    date_trunc('day', p_to at time zone public.salon_timezone()),
+    interval '1 day'
+  ) as day
+  join public.recurring_time_off r on r.day_of_week = extract(dow from day)::int;
 $$;
 
 grant execute on function public.busy_intervals(timestamptz, timestamptz, uuid) to anon, authenticated;
@@ -267,7 +341,31 @@ grant execute on function public.busy_intervals(timestamptz, timestamptz, uuid) 
 -- The only way an appointment gets created. Runs as definer so a guest (who can't read
 -- appointments afterwards) can still book, while price and duration are always recomputed
 -- from the services table rather than trusted from the browser.
-create or replace function public.create_booking(
+-- Short, unambiguous booking code (no O/0/I/1/S/5 mix-ups when read over the phone).
+create or replace function public.generate_booking_reference()
+returns text
+language plpgsql
+set search_path = public
+as $$
+declare
+  alphabet text := 'ACDEFGHJKLMNPQRTUVWXY34679';
+  candidate text;
+  i int;
+begin
+  loop
+    candidate := '';
+    for i in 1..6 loop
+      candidate := candidate || substr(alphabet, floor(random() * length(alphabet) + 1)::int, 1);
+    end loop;
+    exit when not exists (select 1 from public.appointments where reference = candidate);
+  end loop;
+  return candidate;
+end;
+$$;
+
+drop function if exists public.create_booking(uuid[], timestamptz, text, text, text, text, text);
+
+create function public.create_booking(
   p_service_ids uuid[],
   p_start_at timestamptz,
   p_guest_name text,
@@ -276,14 +374,16 @@ create or replace function public.create_booking(
   p_notes text default null,
   p_booked_by text default 'customer'
 )
-returns uuid
+returns table (appointment_id uuid, reference text)
 language plpgsql
 security definer
 set search_path = public
 as $$
 declare
-  v_appointment_id uuid;
+  v_id uuid;
+  v_reference text;
   v_duration int;
+  v_buffer int;
   v_total numeric(10, 2);
   v_count int;
   v_names text;
@@ -300,8 +400,11 @@ begin
     raise exception 'Pick at least one service';
   end if;
 
-  select count(*), sum(duration_minutes), sum(price), string_agg(name, ', ' order by sort_order)
-    into v_count, v_duration, v_total, v_names
+  -- Duration and price always come from the services table, never from the browser. One
+  -- turnaround period covers the whole visit, so take the longest of the chosen services.
+  select count(*), sum(duration_minutes), max(buffer_minutes), sum(price),
+         string_agg(name, ', ' order by sort_order)
+    into v_count, v_duration, v_buffer, v_total, v_names
   from public.services
   where id = any (p_service_ids) and active = true;
 
@@ -309,35 +412,102 @@ begin
     raise exception 'One or more selected services are unavailable';
   end if;
 
+  v_reference := public.generate_booking_reference();
+
   insert into public.appointments (
-    customer_id, guest_name, guest_phone, guest_email,
-    start_at, duration_minutes, total_price, status, booked_by, notes
+    customer_id, guest_name, guest_phone, guest_email, start_at,
+    duration_minutes, buffer_minutes, total_price, status, booked_by, notes, reference
   )
   values (
-    auth.uid(), p_guest_name, p_guest_phone, nullif(p_guest_email, ''),
-    p_start_at, v_duration, v_total, 'confirmed', p_booked_by, nullif(p_notes, '')
+    auth.uid(), p_guest_name, p_guest_phone, nullif(p_guest_email, ''), p_start_at,
+    v_duration, coalesce(v_buffer, 0), v_total, 'confirmed', p_booked_by, nullif(p_notes, ''), v_reference
   )
-  returning id into v_appointment_id;
+  returning id into v_id;
 
   insert into public.appointment_services (appointment_id, service_id)
-  select v_appointment_id, unnest(p_service_ids);
+  select v_id, unnest(p_service_ids);
 
   if p_booked_by = 'customer' then
     insert into public.notifications (audience, type, message, appointment_id)
     values (
       'owner',
       'new_booking',
-      p_guest_name || ' booked ' || v_names || ' on ' || to_char(p_start_at, 'Mon DD, HH12:MI AM'),
-      v_appointment_id
+      p_guest_name || ' booked ' || v_names || ' on ' || to_char(p_start_at at time zone public.salon_timezone(), 'Mon DD, HH24:MI'),
+      v_id
     );
   end if;
 
-  return v_appointment_id;
+  return query select v_id, v_reference;
 end;
 $$;
 
 grant execute on function public.create_booking(uuid[], timestamptz, text, text, text, text, text)
   to anon, authenticated;
+
+-- =========================================================
+-- Guest booking lookup
+-- =========================================================
+-- A guest has no account, so their booking is invisible to them under the normal rules. These
+-- two functions let them find and cancel it with the reference code plus the phone number they
+-- booked with — the phone acts as the shared secret, so a code alone reveals nothing.
+create or replace function public.find_booking(p_reference text, p_phone text)
+returns table (
+  reference text,
+  guest_name text,
+  start_at timestamptz,
+  duration_minutes int,
+  total_price numeric,
+  status text,
+  services text
+)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select a.reference, a.guest_name, a.start_at, a.duration_minutes, a.total_price, a.status,
+         public.appointment_service_names(a.id)
+  from public.appointments a
+  where upper(a.reference) = upper(trim(p_reference))
+    and regexp_replace(a.guest_phone, '[^0-9]', '', 'g') = regexp_replace(p_phone, '[^0-9]', '', 'g');
+$$;
+
+grant execute on function public.find_booking(text, text) to anon, authenticated;
+
+create or replace function public.cancel_booking(p_reference text, p_phone text)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_id uuid;
+begin
+  select a.id into v_id
+  from public.appointments a
+  where upper(a.reference) = upper(trim(p_reference))
+    and regexp_replace(a.guest_phone, '[^0-9]', '', 'g') = regexp_replace(p_phone, '[^0-9]', '', 'g')
+    and a.status = 'confirmed'
+    and a.start_at > now();
+
+  if v_id is null then
+    return false;
+  end if;
+
+  update public.appointments set status = 'cancelled' where id = v_id;
+
+  insert into public.notifications (audience, type, message, appointment_id)
+  select 'owner', 'appointment_cancelled',
+         a.guest_name || ' cancelled ' || public.appointment_service_names(a.id) || ' on ' ||
+           to_char(a.start_at at time zone public.salon_timezone(), 'Mon DD, HH24:MI'),
+         a.id
+  from public.appointments a where a.id = v_id;
+
+  return true;
+end;
+$$;
+
+grant execute on function public.cancel_booking(text, text) to anon, authenticated;
 
 -- =========================================================
 -- Row Level Security
@@ -349,6 +519,9 @@ alter table public.business_hours enable row level security;
 alter table public.availability_blocks enable row level security;
 alter table public.appointments enable row level security;
 alter table public.appointment_services enable row level security;
+alter table public.recurring_time_off enable row level security;
+alter table public.testimonials enable row level security;
+alter table public.push_subscriptions enable row level security;
 alter table public.notifications enable row level security;
 
 -- profiles
@@ -388,6 +561,25 @@ drop policy if exists "availability_blocks_write" on public.availability_blocks;
 create policy "availability_blocks_write" on public.availability_blocks
   for all using (public.is_owner()) with check (public.is_owner());
 
+-- testimonials: anyone may read the published ones; only the owner writes.
+drop policy if exists "testimonials_select" on public.testimonials;
+create policy "testimonials_select" on public.testimonials
+  for select using (is_published = true or public.is_owner());
+
+drop policy if exists "testimonials_write" on public.testimonials;
+create policy "testimonials_write" on public.testimonials
+  for all using (public.is_owner()) with check (public.is_owner());
+
+-- recurring_time_off: owner only, same reasoning as one-off blocks.
+drop policy if exists "recurring_time_off_all" on public.recurring_time_off;
+create policy "recurring_time_off_all" on public.recurring_time_off
+  for all using (public.is_owner()) with check (public.is_owner());
+
+-- push_subscriptions: a device row belongs to whoever registered it.
+drop policy if exists "push_subscriptions_own" on public.push_subscriptions;
+create policy "push_subscriptions_own" on public.push_subscriptions
+  for all using (profile_id = auth.uid()) with check (profile_id = auth.uid());
+
 -- appointments
 drop policy if exists "appointments_select" on public.appointments;
 create policy "appointments_select" on public.appointments
@@ -426,16 +618,27 @@ create policy "notifications_update" on public.notifications
     or (audience = 'customer' and customer_id = auth.uid())
   );
 
--- Make new notification rows push to subscribed clients in real time.
+-- Push changes to subscribed clients in real time, so the owner's screens update the moment a
+-- booking arrives or is cancelled instead of waiting for a refresh. Realtime still applies the
+-- policies above, so a client only ever receives rows it is allowed to read.
 do $$
+declare
+  t text;
 begin
-  if not exists (
-    select 1 from pg_publication_tables
-    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'notifications'
-  ) then
-    alter publication supabase_realtime add table public.notifications;
-  end if;
+  foreach t in array array['notifications', 'appointments', 'availability_blocks'] loop
+    if not exists (
+      select 1 from pg_publication_tables
+      where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = t
+    ) then
+      execute format('alter publication supabase_realtime add table public.%I', t);
+    end if;
+  end loop;
 end $$;
+
+-- Give any pre-existing booking a reference so every appointment can be looked up.
+update public.appointments
+set reference = public.generate_booking_reference()
+where reference is null;
 
 -- =========================================================
 -- Seed data
@@ -507,6 +710,46 @@ from (
 where not exists (
   select 1 from public.services s where lower(s.name) = lower(v.name)
 );
+
+-- Draft reviews so you can see how the section looks and edit rather than start from a blank
+-- page. They are deliberately UNPUBLISHED and clearly marked as examples: publishing invented
+-- reviews would misrepresent real clients. Replace the text with genuine feedback (with the
+-- client's permission), then switch "Show on the website" on.
+insert into public.testimonials (author_name, quote, rating, is_published, sort_order)
+select v.author_name, v.quote, v.rating, false, v.sort_order
+from (
+  values
+    ('EXAMPLE — replace with a real client',
+     'Replace this text with something a client actually told you. Two or three sentences about what they came in for and how it went works best.',
+     5, 1),
+    ('EXAMPLE — replace with a real client',
+     'A second example. Reviews that mention a specific service ("my gel nails lasted three weeks") persuade far more than general praise.',
+     5, 2),
+    ('EXAMPLE — replace with a real client',
+     'A third example. Mentioning the unhurried, one-client-at-a-time experience is what sets a home salon apart.',
+     5, 3)
+) as v(author_name, quote, rating, sort_order)
+where not exists (select 1 from public.testimonials);
+
+-- Danish names for the starter services. Only fills blanks, so it never overwrites your edits.
+update public.services s
+set name_da = coalesce(s.name_da, v.name_da),
+    description_da = coalesce(s.description_da, v.description_da),
+    category_da = coalesce(s.category_da, v.category_da)
+from (
+  values
+    ('Threading', 'Trådning', 'Præcis trådning af bryn og ansigtshår.', 'Ansigt'),
+    ('Facial', 'Ansigtsbehandling', 'Rensende og forfriskende ansigtsbehandling.', 'Ansigt'),
+    ('Cleansing', 'Dybderens', 'Dybderensende ansigtsbehandling.', 'Ansigt'),
+    ('Hair Cut', 'Klipning', 'Stilrådgivning og præcis klipning.', 'Hår'),
+    ('Manicure', 'Manicure', 'Klassisk manicure med lak.', 'Negle'),
+    ('Pedicure', 'Pedicure', 'Afslappende pedicure med lak.', 'Negle'),
+    ('Gel Nail', 'Gelenegle', 'Langtidsholdbar gelelak.', 'Negle'),
+    ('Acrylic Nail', 'Akrylnegle', 'Fuldt sæt akrylnegle.', 'Negle'),
+    ('Nail Extension', 'Negleforlængelse', 'Negleforlængelse med valgfri form og længde.', 'Negle'),
+    ('Waxing', 'Voksbehandling', 'Glat, langtidsholdbar hårfjerning.', 'Krop')
+) as v(name, name_da, description_da, category_da)
+where lower(s.name) = lower(v.name);
 
 -- =========================================================
 -- After running this file: make yourself the owner

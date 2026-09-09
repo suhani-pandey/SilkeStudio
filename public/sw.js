@@ -48,3 +48,35 @@ self.addEventListener("fetch", (event) => {
     );
   }
 });
+
+// New-booking alerts for the owner, delivered even when the app is closed.
+self.addEventListener("push", (event) => {
+  if (!event.data) return;
+  let payload = {};
+  try {
+    payload = event.data.json();
+  } catch {
+    payload = { title: "GlowNest", body: event.data.text() };
+  }
+  event.waitUntil(
+    self.registration.showNotification(payload.title || "GlowNest", {
+      body: payload.body || "",
+      icon: "/images/icon-192.png",
+      badge: "/images/icon-192.png",
+      data: { url: payload.url || "/admin" },
+      tag: "glownest-booking",
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = event.notification.data?.url || "/admin";
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      const open = clients.find((client) => client.url.includes(target));
+      if (open) return open.focus();
+      return self.clients.openWindow(target);
+    }),
+  );
+});

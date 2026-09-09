@@ -71,7 +71,12 @@ export function LoginForm({ t }: { t: Dictionary["auth"] }) {
         </CardContent>
       </Card>
 
-      <p className="text-muted-foreground mt-6 text-center text-sm">
+      <p className="text-muted-foreground mt-4 text-center text-sm">
+        <Link href="/forgot-password" className="hover:text-foreground">
+          Forgot your password?
+        </Link>
+      </p>
+      <p className="text-muted-foreground mt-4 text-center text-sm">
         {t.noAccount}{" "}
         <Link href="/signup" className="text-primary font-medium">
           {t.signUp}

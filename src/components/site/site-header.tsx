@@ -36,7 +36,7 @@ export async function SiteHeader() {
           <Logo className="h-9 sm:h-11" />
         </Link>
 
-        <nav className="hidden items-center gap-10 md:flex">
+        <nav className="hidden items-center gap-6 md:flex lg:gap-10">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -57,12 +57,12 @@ export async function SiteHeader() {
                 filter={`customer_id=eq.${user.id}`}
                 onMarkRead={markNotificationRead}
               />
-              <Button asChild variant="ghost" className="hidden lg:inline-flex">
+              <Button asChild variant="ghost" className="hidden md:inline-flex">
                 <Link href="/my-appointments">{t.nav.myAppointments}</Link>
               </Button>
             </>
           ) : (
-            <Button asChild variant="ghost" className="hidden lg:inline-flex">
+            <Button asChild variant="ghost" className="hidden md:inline-flex">
               <Link href="/login">{t.nav.login}</Link>
             </Button>
           )}

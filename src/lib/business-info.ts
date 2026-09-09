@@ -1,5 +1,9 @@
 // Central place for salon contact details and social links — edit here to update them everywhere.
 
+// Opening hours and time off are stored as wall-clock times, so they need an explicit
+// timezone. Hosting runs in UTC; without this every slot would shift by an hour or two.
+export const SALON_TIMEZONE = "Europe/Copenhagen";
+
 export const businessInfo = {
   name: "GlowNest Beauty Salon",
   address: {
@@ -16,6 +20,11 @@ export const socialLinks = {
   facebook: "https://facebook.com/glownestbeautysalon",
   tiktok: "https://tiktok.com/@glownestbeautysalon",
 };
+
+/** Public address of the site, used for sitemaps, share cards and SMS links. */
+export function siteUrl(): string {
+  return (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+}
 
 export const mapEmbedSrc = `https://www.google.com/maps?q=${encodeURIComponent(
   `${businessInfo.address.line1}, ${businessInfo.address.line2}`,

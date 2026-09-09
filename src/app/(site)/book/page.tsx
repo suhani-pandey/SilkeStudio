@@ -2,22 +2,31 @@ import type { Metadata } from "next";
 import { BookingWizard } from "@/components/booking/booking-wizard";
 import { getActiveServices } from "@/lib/actions/booking";
 import { createClient } from "@/lib/supabase/server";
-import { getT } from "@/lib/i18n/server";
+import { getLocale, getT } from "@/lib/i18n/server";
 
-export const metadata: Metadata = { title: "Book an Appointment" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.meta.bookTitle, description: t.meta.bookDescription };
+}
 
-export default async function BookPage() {
+export default async function BookPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
+  const { category } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [services, profile, t] = await Promise.all([
+  const [services, profile, t, locale] = await Promise.all([
     getActiveServices(),
     user
       ? supabase.from("profiles").select("full_name, phone, email").eq("id", user.id).single()
       : Promise.resolve({ data: null }),
     getT(),
+    getLocale(),
   ]);
 
   const defaultContact = profile?.data
@@ -39,7 +48,13 @@ export default async function BookPage() {
         </p>
       </section>
       <div className="py-10 sm:py-14">
-        <BookingWizard services={services} defaultContact={defaultContact} t={t.booking} />
+        <BookingWizard
+          services={services}
+          defaultContact={defaultContact}
+          t={t.booking}
+          locale={locale}
+          initialCategory={category}
+        />
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { Loader2, MailCheck } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,7 @@ export function SignupForm({ t }: { t: Dictionary["auth"] }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   function handleSubmit(e: React.FormEvent) {
@@ -24,7 +25,20 @@ export function SignupForm({ t }: { t: Dictionary["auth"] }) {
     startTransition(async () => {
       const result = await signUpCustomer({ fullName, email, password, phone });
       if (result?.error) setError(result.error);
+      else if (result?.needsConfirmation) setNeedsConfirmation(true);
     });
+  }
+
+  if (needsConfirmation) {
+    return (
+      <div className="mx-auto max-w-sm px-6 py-20 text-center">
+        <div className="bg-accent mx-auto flex size-14 items-center justify-center rounded-full">
+          <MailCheck className="text-plum size-6" />
+        </div>
+        <h1 className="font-heading mt-6 text-3xl font-medium">{t.confirmTitle}</h1>
+        <p className="text-muted-foreground mt-3 text-sm">{t.confirmBody.replace("{email}", email)}</p>
+      </div>
+    );
   }
 
   return (

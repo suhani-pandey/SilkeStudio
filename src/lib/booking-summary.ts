@@ -4,4 +4,5 @@ export interface BookingSummary {
   durationMinutes: number;
   startAtISO: string;
   guestName: string;
+  reference: string;
 }

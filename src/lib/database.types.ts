@@ -33,7 +33,11 @@ export interface Database {
           category: string;
           price: number;
           duration_minutes: number;
+          buffer_minutes: number;
           description: string | null;
+          name_da: string | null;
+          description_da: string | null;
+          category_da: string | null;
           active: boolean;
           sort_order: number;
           created_at: string;
@@ -44,7 +48,11 @@ export interface Database {
           category: string;
           price: number;
           duration_minutes: number;
+          buffer_minutes?: number;
           description?: string | null;
+          name_da?: string | null;
+          description_da?: string | null;
+          category_da?: string | null;
           active?: boolean;
           sort_order?: number;
           created_at?: string;
@@ -98,7 +106,9 @@ export interface Database {
           start_at: string;
           end_at: string;
           duration_minutes: number;
+          buffer_minutes: number;
           total_price: number;
+          reference: string | null;
           status: AppointmentStatus;
           booked_by: BookedBy;
           notes: string | null;
@@ -113,7 +123,9 @@ export interface Database {
           start_at: string;
           end_at?: string;
           duration_minutes?: number;
+          buffer_minutes?: number;
           total_price?: number;
+          reference?: string | null;
           status?: AppointmentStatus;
           booked_by?: BookedBy;
           notes?: string | null;
@@ -148,6 +160,68 @@ export interface Database {
             referencedColumns: ["id"];
           },
         ];
+      };
+      testimonials: {
+        Row: {
+          id: string;
+          author_name: string;
+          quote: string;
+          rating: number | null;
+          is_published: boolean;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          author_name: string;
+          quote: string;
+          rating?: number | null;
+          is_published?: boolean;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["testimonials"]["Insert"]>;
+        Relationships: [];
+      };
+      recurring_time_off: {
+        Row: {
+          id: string;
+          day_of_week: number;
+          start_time: string;
+          end_time: string;
+          reason: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          day_of_week: number;
+          start_time: string;
+          end_time: string;
+          reason?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["recurring_time_off"]["Insert"]>;
+        Relationships: [];
+      };
+      push_subscriptions: {
+        Row: {
+          id: string;
+          profile_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          profile_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["push_subscriptions"]["Insert"]>;
+        Relationships: [];
       };
       notifications: {
         Row: {
@@ -194,7 +268,23 @@ export interface Database {
           p_notes?: string | null;
           p_booked_by?: BookedBy;
         };
-        Returns: string;
+        Returns: { appointment_id: string; reference: string }[];
+      };
+      find_booking: {
+        Args: { p_reference: string; p_phone: string };
+        Returns: {
+          reference: string;
+          guest_name: string;
+          start_at: string;
+          duration_minutes: number;
+          total_price: number;
+          status: AppointmentStatus;
+          services: string | null;
+        }[];
+      };
+      cancel_booking: {
+        Args: { p_reference: string; p_phone: string };
+        Returns: boolean;
       };
     };
     Enums: Record<string, never>;
@@ -208,6 +298,7 @@ export type BusinessHour = Database["public"]["Tables"]["business_hours"]["Row"]
 export type AvailabilityBlock = Database["public"]["Tables"]["availability_blocks"]["Row"];
 export type Appointment = Database["public"]["Tables"]["appointments"]["Row"];
 export type AppointmentNotification = Database["public"]["Tables"]["notifications"]["Row"];
+export type Testimonial = Database["public"]["Tables"]["testimonials"]["Row"];
 
 /** Shape returned by `select("*, appointment_services(service:services(*))")`. */
 export type AppointmentWithServices = Appointment & {

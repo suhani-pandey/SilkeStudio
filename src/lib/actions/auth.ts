@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 
 export interface AuthResult {
   error?: string;
+  /** Supabase is set to require email confirmation, so no session was created yet. */
+  needsConfirmation?: boolean;
 }
 
 export async function signUpCustomer(input: {
@@ -14,12 +16,16 @@ export async function signUpCustomer(input: {
   phone?: string;
 }): Promise<AuthResult> {
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: input.email,
     password: input.password,
     options: { data: { full_name: input.fullName } },
   });
   if (error) return { error: error.message };
+
+  // With email confirmation switched on in Supabase, signUp returns no session. Sending the
+  // customer to their appointments here would just bounce them back to the login screen.
+  if (!data.session) return { needsConfirmation: true };
 
   if (input.phone) {
     const {
@@ -58,6 +64,23 @@ export async function signInOwner(input: { email: string; password: string }): P
   }
 
   redirect("/admin");
+}
+
+export async function requestPasswordReset(email: string): Promise<AuthResult> {
+  const supabase = await createClient();
+  const site = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "";
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${site}/reset-password`,
+  });
+  if (error) return { error: error.message };
+  return {};
+}
+
+export async function updatePassword(password: string): Promise<AuthResult> {
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { error: error.message };
+  return {};
 }
 
 export async function signOut() {

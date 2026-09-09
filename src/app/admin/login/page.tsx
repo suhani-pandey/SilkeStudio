@@ -69,6 +69,11 @@ export default function AdminLoginPage() {
           </CardContent>
         </Card>
         <p className="text-muted-foreground mt-6 text-center text-sm">
+          <Link href="/forgot-password" className="hover:text-foreground">
+            Forgot your password?
+          </Link>
+        </p>
+        <p className="text-muted-foreground mt-3 text-center text-sm">
           <Link href="/" className="hover:text-foreground">
             ← Back to site
           </Link>

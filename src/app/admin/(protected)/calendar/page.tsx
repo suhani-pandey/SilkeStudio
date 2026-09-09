@@ -1,81 +1,73 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { addDays, format, isToday, startOfWeek } from "date-fns";
+import { addMonths, endOfMonth, format, startOfMonth, subMonths } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { listAppointments } from "@/lib/actions/admin";
-import { formatPrice } from "@/lib/format";
-import { appointmentServiceNames } from "@/lib/database.types";
-import { cn } from "@/lib/utils";
+import { MonthCalendar } from "@/components/admin/month-calendar";
+import {
+  listAppointments,
+  listAvailabilityBlocksInRange,
+  listRecurringTimeOff,
+} from "@/lib/actions/admin";
 
 export const metadata: Metadata = { title: "Calendar" };
 
 export default async function AdminCalendarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ start?: string }>;
+  searchParams: Promise<{ month?: string }>;
 }) {
-  const params = await searchParams;
-  const startParam = typeof params.start === "string" ? params.start : undefined;
-  const weekStart = startOfWeek(startParam ? new Date(startParam) : new Date(), { weekStartsOn: 1 });
-  const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  const { month } = await searchParams;
+  const anchor = month ? new Date(`${month}-01T12:00:00`) : new Date();
+  const monthStart = startOfMonth(anchor);
+  const monthEnd = endOfMonth(anchor);
 
-  const appointments = await listAppointments({
-    fromISO: weekStart.toISOString(),
-    toISO: addDays(weekStart, 7).toISOString(),
-  });
-  const active = appointments.filter((a) => a.status !== "cancelled");
+  // Pad the range so appointments in the leading/trailing week of the grid are included.
+  const from = new Date(monthStart);
+  from.setDate(from.getDate() - 7);
+  const to = new Date(monthEnd);
+  to.setDate(to.getDate() + 7);
 
-  const prevWeek = addDays(weekStart, -7).toISOString();
-  const nextWeek = addDays(weekStart, 7).toISOString();
+  const [appointments, blocks, recurring] = await Promise.all([
+    listAppointments({ fromISO: from.toISOString(), toISO: to.toISOString() }),
+    listAvailabilityBlocksInRange(from.toISOString(), to.toISOString()),
+    listRecurringTimeOff(),
+  ]);
+
+  const prev = format(subMonths(monthStart, 1), "yyyy-MM");
+  const next = format(addMonths(monthStart, 1), "yyyy-MM");
 
   return (
-    <div>
+    <div className="mx-auto max-w-5xl">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-heading text-2xl font-semibold sm:text-3xl">Calendar</h1>
+        <div>
+          <h1 className="font-heading text-3xl font-medium">{format(monthStart, "MMMM yyyy")}</h1>
+          <p className="text-muted-foreground mt-1 text-sm">Tap a day to see what&apos;s on.</p>
+        </div>
         <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="icon">
-            <Link href={`/admin/calendar?start=${encodeURIComponent(prevWeek)}`} aria-label="Previous week">
+          <Button asChild variant="outline" size="icon" className="size-11">
+            <Link href={`/admin/calendar?month=${prev}`} aria-label="Previous month">
               <ChevronLeft className="size-4" />
             </Link>
           </Button>
-          <span className="text-sm font-medium">
-            {format(weekStart, "MMM d")} – {format(addDays(weekStart, 6), "MMM d, yyyy")}
-          </span>
-          <Button asChild variant="outline" size="icon">
-            <Link href={`/admin/calendar?start=${encodeURIComponent(nextWeek)}`} aria-label="Next week">
+          <Button asChild variant="outline" className="h-11">
+            <Link href="/admin/calendar">Today</Link>
+          </Button>
+          <Button asChild variant="outline" size="icon" className="size-11">
+            <Link href={`/admin/calendar?month=${next}`} aria-label="Next month">
               <ChevronRight className="size-4" />
             </Link>
           </Button>
         </div>
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-7">
-        {days.map((day) => {
-          const dayAppointments = active
-            .filter((a) => format(new Date(a.start_at), "yyyy-MM-dd") === format(day, "yyyy-MM-dd"))
-            .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
-
-          return (
-            <div
-              key={day.toISOString()}
-              className={cn("rounded-xl border p-3", isToday(day) ? "border-primary bg-primary/5" : "border-border/60")}
-            >
-              <p className={cn("text-sm font-semibold", isToday(day) && "text-primary")}>{format(day, "EEE d")}</p>
-              <div className="mt-2 space-y-2">
-                {dayAppointments.length === 0 && <p className="text-muted-foreground text-xs">No bookings</p>}
-                {dayAppointments.map((appt) => (
-                  <div key={appt.id} className="bg-secondary/50 rounded-lg p-2 text-xs">
-                    <p className="font-medium">{format(new Date(appt.start_at), "h:mm a")}</p>
-                    <p className="truncate">{appt.guest_name}</p>
-                    <p className="text-muted-foreground truncate">{appointmentServiceNames(appt)}</p>
-                    <p className="text-muted-foreground">{formatPrice(appt.total_price)}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
+      <div className="mt-6">
+        <MonthCalendar
+          month={format(monthStart, "yyyy-MM-01")}
+          appointments={appointments}
+          blocks={blocks}
+          recurring={recurring}
+        />
       </div>
     </div>
   );

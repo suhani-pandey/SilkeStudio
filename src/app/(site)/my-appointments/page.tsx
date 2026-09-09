@@ -7,7 +7,8 @@ import { CancelAppointmentButton } from "@/components/booking/cancel-appointment
 import { getUpcomingAppointmentsForCustomer } from "@/lib/actions/booking";
 import { formatPrice } from "@/lib/format";
 import { appointmentServiceNames } from "@/lib/database.types";
-import { getT } from "@/lib/i18n/server";
+import { getLocale, getT } from "@/lib/i18n/server";
+import { dateLocale } from "@/lib/date-locale";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,11 @@ export default async function MyAppointmentsPage() {
 
   if (!user) redirect("/login");
 
-  const [appointments, t] = await Promise.all([getUpcomingAppointmentsForCustomer(), getT()]);
+  const [appointments, t, locale] = await Promise.all([
+    getUpcomingAppointmentsForCustomer(),
+    getT(),
+    getLocale(),
+  ]);
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-16">
@@ -50,12 +55,18 @@ export default async function MyAppointmentsPage() {
                 <div>
                   <p className="font-medium">{appointmentServiceNames(appt)}</p>
                   <p className="text-muted-foreground text-sm">
-                    {format(new Date(appt.start_at), "EEE, MMM d 'at' h:mm a")}
+                    {format(new Date(appt.start_at), t.myAppointments.dateFormat, { locale: dateLocale(locale) })}
                   </p>
                   <p className="text-muted-foreground text-sm">{formatPrice(appt.total_price)}</p>
                 </div>
               </div>
-              <CancelAppointmentButton appointmentId={appt.id} t={t.myAppointments} />
+              <CancelAppointmentButton
+                appointmentId={appt.id}
+                serviceNames={appointmentServiceNames(appt)}
+                startAtISO={appt.start_at}
+                t={t.myAppointments}
+                locale={locale}
+              />
             </CardContent>
           </Card>
         ))}

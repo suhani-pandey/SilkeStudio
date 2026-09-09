@@ -62,6 +62,9 @@ export async function SiteFooter() {
               <Link href="/my-appointments" className="text-muted-foreground hover:text-plum py-2.5">
                 {t.footer.myAppointmentsLink}
               </Link>
+              <Link href="/booking" className="text-muted-foreground hover:text-plum py-2.5">
+                {t.footer.findBooking}
+              </Link>
             </nav>
           </div>
 
@@ -84,9 +87,19 @@ export async function SiteFooter() {
           </div>
         </div>
 
-        <p className="text-muted-foreground mt-14 border-t pt-8 text-center text-xs">
-          © {new Date().getFullYear()} {businessInfo.name}. {t.footer.rights}
-        </p>
+        <div className="mt-14 border-t pt-8">
+          <nav className="flex flex-wrap items-center justify-center gap-x-6 text-xs">
+            <Link href="/privacy" className="text-muted-foreground hover:text-plum py-2">
+              {t.footer.privacy}
+            </Link>
+            <Link href="/terms" className="text-muted-foreground hover:text-plum py-2">
+              {t.footer.terms}
+            </Link>
+          </nav>
+          <p className="text-muted-foreground mt-3 text-center text-xs">
+            © {new Date().getFullYear()} {businessInfo.name}. {t.footer.rights}
+          </p>
+        </div>
       </div>
     </footer>
   );

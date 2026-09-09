@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarClock, CalendarDays, LayoutDashboard, ListChecks, Scissors } from "lucide-react";
+import { CalendarClock, CalendarDays, LayoutDashboard, ListChecks, MessageSquareQuote, Scissors } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -11,6 +11,7 @@ const links = [
   { href: "/admin/appointments", label: "Appointments", icon: ListChecks },
   { href: "/admin/availability", label: "Availability", icon: CalendarClock },
   { href: "/admin/services", label: "Services", icon: Scissors },
+  { href: "/admin/testimonials", label: "Reviews", icon: MessageSquareQuote },
 ];
 
 export function AdminNavLinks({ onNavigate }: { onNavigate?: () => void }) {

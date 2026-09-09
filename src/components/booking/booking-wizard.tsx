@@ -16,16 +16,23 @@ import { nextBookableDays } from "@/lib/dates";
 import type { BookingSummary } from "@/lib/booking-summary";
 import type { Service } from "@/lib/database.types";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
+import type { Locale } from "@/lib/i18n/config";
+import { dateLocale } from "@/lib/date-locale";
+import { categoryLabelFor, serviceName } from "@/lib/service-locale";
 
 interface BookingWizardProps {
   services: Service[];
   defaultContact?: { fullName: string; phone: string; email: string };
   t: Dictionary["booking"];
+  locale: Locale;
+  /** Category to show first, when the visitor arrived from a category card. */
+  initialCategory?: string;
 }
 
 type Step = 1 | 2 | 3;
 
-export function BookingWizard({ services, defaultContact, t }: BookingWizardProps) {
+export function BookingWizard({ services, defaultContact, t, locale, initialCategory }: BookingWizardProps) {
+  const df = { locale: dateLocale(locale) };
   const steps: { id: Step; label: string }[] = [
     { id: 1, label: t.stepServices },
     { id: 2, label: t.stepDateTime },
@@ -47,14 +54,16 @@ export function BookingWizard({ services, defaultContact, t }: BookingWizardProp
 
   const days = useMemo(() => nextBookableDays(21), []);
 
-  const grouped = useMemo(
-    () =>
-      services.reduce<Record<string, Service[]>>((acc, service) => {
-        (acc[service.category] ??= []).push(service);
-        return acc;
-      }, {}),
-    [services],
-  );
+  const grouped = useMemo(() => {
+    const byCategory = services.reduce<Record<string, Service[]>>((acc, service) => {
+      (acc[service.category] ??= []).push(service);
+      return acc;
+    }, {});
+    if (!initialCategory || !byCategory[initialCategory]) return byCategory;
+    // Lead with the category they tapped, without hiding the others.
+    const { [initialCategory]: first, ...rest } = byCategory;
+    return { [initialCategory]: first, ...rest };
+  }, [services, initialCategory]);
 
   const selectedServices = useMemo(
     () => services.filter((s) => selectedIds.includes(s.id)),
@@ -96,7 +105,7 @@ export function BookingWizard({ services, defaultContact, t }: BookingWizardProp
 
     startSubmit(async () => {
       try {
-        await createBooking({
+        const { reference } = await createBooking({
           serviceIds: selectedIds,
           startAtISO: selectedSlotISO,
           guestName: name.trim(),
@@ -105,11 +114,12 @@ export function BookingWizard({ services, defaultContact, t }: BookingWizardProp
           notes: notes.trim() || undefined,
         });
         const summary: BookingSummary = {
-          serviceNames: selectedServices.map((s) => s.name),
+          serviceNames: selectedServices.map((s) => serviceName(s, locale)),
           totalPrice,
           durationMinutes: totalDuration,
           startAtISO: selectedSlotISO,
           guestName: name.trim(),
+          reference,
         };
         sessionStorage.setItem("lastBooking", JSON.stringify(summary));
         router.push("/book/confirmation");
@@ -156,7 +166,9 @@ export function BookingWizard({ services, defaultContact, t }: BookingWizardProp
         <div className="space-y-10">
           {Object.entries(grouped).map(([category, items]) => (
             <div key={category}>
-              <h2 className="font-heading border-gold/40 border-b pb-3 text-2xl font-medium">{category}</h2>
+              <h2 className="font-heading border-gold/40 border-b pb-3 text-2xl font-medium">
+                {categoryLabelFor(services, category, locale)}
+              </h2>
               <div className="mt-4 space-y-2">
                 {items.map((service) => {
                   const checked = selectedIds.includes(service.id);
@@ -180,7 +192,7 @@ export function BookingWizard({ services, defaultContact, t }: BookingWizardProp
                         {checked && <Check className="size-3.5" />}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block font-medium">{service.name}</span>
+                        <span className="block font-medium">{serviceName(service, locale)}</span>
                         <span className="text-muted-foreground text-sm">
                           {formatDuration(service.duration_minutes)}
                         </span>
@@ -222,9 +234,9 @@ export function BookingWizard({ services, defaultContact, t }: BookingWizardProp
                     : "border-border hover:border-primary/50",
                 )}
               >
-                <span className="text-xs opacity-80">{format(day, "EEE")}</span>
+                <span className="text-xs opacity-80">{format(day, "EEE", df)}</span>
                 <span className="mt-0.5 text-lg font-semibold">{format(day, "d")}</span>
-                <span className="text-xs opacity-80">{format(day, "MMM")}</span>
+                <span className="text-xs opacity-80">{format(day, "MMM", df)}</span>
               </button>
             ))}
           </div>
@@ -274,12 +286,12 @@ export function BookingWizard({ services, defaultContact, t }: BookingWizardProp
           <div className="bg-secondary/60 rounded-md p-5">
             <p className="eyebrow">{t.yourBooking}</p>
             <p className="font-heading mt-2 text-2xl font-medium">
-              {format(new Date(selectedSlotISO), "EEEE d MMMM 'at' HH:mm")}
+              {format(new Date(selectedSlotISO), t.dateFormat, df)}
             </p>
             <ul className="text-muted-foreground mt-4 space-y-1 text-sm">
               {selectedServices.map((s) => (
                 <li key={s.id} className="flex justify-between gap-4">
-                  <span>{s.name}</span>
+                  <span>{serviceName(s, locale)}</span>
                   <span>{formatPrice(s.price)}</span>
                 </li>
               ))}

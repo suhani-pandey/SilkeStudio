@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { Bell } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { subscribeWithAuth } from "@/lib/supabase/realtime";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -28,24 +30,22 @@ export function NotificationBell({ initialNotifications, filter, onMarkRead }: N
   // initialNotifications so this never needs to sync state from props in an effect.
   const [liveNotifications, setLiveNotifications] = useState<AppointmentNotification[]>([]);
   const [readIds, setReadIds] = useState<Set<string>>(new Set());
+  const router = useRouter();
 
   useEffect(() => {
-    const supabase = createClient();
-    const channel = supabase
-      .channel(`notifications-${filter}`)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "notifications", filter },
-        (payload) => {
-          setLiveNotifications((prev) => [payload.new as AppointmentNotification, ...prev].slice(0, 30));
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [filter]);
+    return subscribeWithAuth(
+      `notifications-${filter}`,
+      [{ table: "notifications", event: "INSERT", filter }],
+      (payload) => {
+        setLiveNotifications((prev) =>
+          [payload.new as AppointmentNotification, ...prev].slice(0, 30),
+        );
+        // The bell updates from its own state; this pulls the pages underneath it — today's
+        // list, the calendar — up to date at the same moment, without a manual refresh.
+        router.refresh();
+      },
+    );
+  }, [filter, router]);
 
   const notifications = useMemo(() => {
     const existingIds = new Set(initialNotifications.map((n) => n.id));
@@ -73,28 +73,34 @@ export function NotificationBell({ initialNotifications, filter, onMarkRead }: N
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80">
-        <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {notifications.length === 0 && (
-          <p className="text-muted-foreground px-2 py-4 text-center text-sm">No notifications yet.</p>
-        )}
-        <div className="max-h-80 overflow-y-auto">
-          {notifications.map((n) => (
-            <DropdownMenuItem
-              key={n.id}
-              className={cn("flex flex-col items-start gap-0.5 whitespace-normal py-2", !n.is_read && "bg-accent/60")}
-              onSelect={(e) => {
-                e.preventDefault();
-                if (!n.is_read) handleMarkRead(n.id);
-              }}
-            >
-              <span className="text-sm leading-snug">{n.message}</span>
-              <span className="text-muted-foreground text-xs">
-                {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
-              </span>
-            </DropdownMenuItem>
-          ))}
-        </div>
+        {/* Base UI requires a label to live inside its group. */}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {notifications.length === 0 && (
+            <p className="text-muted-foreground px-2 py-4 text-center text-sm">No notifications yet.</p>
+          )}
+          <div className="max-h-80 overflow-y-auto">
+            {notifications.map((n) => (
+              <DropdownMenuItem
+                key={n.id}
+                className={cn(
+                  "flex flex-col items-start gap-0.5 py-2 whitespace-normal",
+                  !n.is_read && "bg-accent/60",
+                )}
+                onSelect={(e) => {
+                  e.preventDefault();
+                  if (!n.is_read) handleMarkRead(n.id);
+                }}
+              >
+                <span className="text-sm leading-snug">{n.message}</span>
+                <span className="text-muted-foreground text-xs">
+                  {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
+                </span>
+              </DropdownMenuItem>
+            ))}
+          </div>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

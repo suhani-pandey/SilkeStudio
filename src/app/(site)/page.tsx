@@ -2,15 +2,24 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Clock, MapPin, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getActiveServices, getBusinessHours } from "@/lib/actions/booking";
+import { getActiveServices, getBusinessHours, getPublishedTestimonials } from "@/lib/actions/booking";
 import { formatPrice } from "@/lib/format";
 import { categoryImage } from "@/lib/category-images";
 import { businessInfo, mapEmbedSrc, socialLinks } from "@/lib/business-info";
-import { getT } from "@/lib/i18n/server";
+import { LocalBusinessSchema } from "@/components/site/local-business-schema";
+import { getLocale, getT } from "@/lib/i18n/server";
+import { categoryLabelFor } from "@/lib/service-locale";
+import { Quote, Star } from "lucide-react";
 import type { Service } from "@/lib/database.types";
 
 export default async function HomePage() {
-  const [services, hours, t] = await Promise.all([getActiveServices(), getBusinessHours(), getT()]);
+  const [services, hours, testimonials, t, locale] = await Promise.all([
+    getActiveServices(),
+    getBusinessHours(),
+    getPublishedTestimonials(),
+    getT(),
+    getLocale(),
+  ]);
 
   const byCategory = services.reduce<Record<string, Service[]>>((acc, service) => {
     (acc[service.category] ??= []).push(service);
@@ -19,6 +28,7 @@ export default async function HomePage() {
 
   const categories = Object.entries(byCategory).map(([name, items]) => ({
     name,
+    label: categoryLabelFor(services, name, locale),
     image: categoryImage(name),
     from: Math.min(...items.map((s) => s.price)),
     count: items.length,
@@ -26,6 +36,8 @@ export default async function HomePage() {
 
   return (
     <div>
+      <LocalBusinessSchema hours={hours} services={services} />
+
       {/* ---------------- Hero ---------------- */}
       <section className="grid items-stretch lg:min-h-[86vh] lg:grid-cols-[1.05fr_1fr]">
         <div className="order-2 flex items-center px-5 py-12 sm:px-10 sm:py-16 lg:order-1 lg:py-24 lg:pl-16 xl:pl-24">
@@ -94,18 +106,22 @@ export default async function HomePage() {
 
         <div className="mt-10 grid grid-cols-2 gap-3 sm:mt-12 sm:gap-6 lg:grid-cols-4">
           {categories.map((category) => (
-            <Link key={category.name} href="/services" className="group block">
+            <Link
+              key={category.name}
+              href={`/book?category=${encodeURIComponent(category.name)}`}
+              className="group block"
+            >
               <div className="relative aspect-[3/4] overflow-hidden sm:aspect-[4/5]">
                 <Image
                   src={category.image}
-                  alt={category.name}
+                  alt={category.label}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
                 <div className="absolute right-3 bottom-3 left-3 text-white sm:right-5 sm:bottom-5 sm:left-5">
-                  <h3 className="font-heading text-xl font-medium sm:text-2xl">{category.name}</h3>
+                  <h3 className="font-heading text-xl font-medium sm:text-2xl">{category.label}</h3>
                   <p className="mt-0.5 text-xs text-white/85 sm:mt-1 sm:text-sm">
                     {category.count}{" "}
                     {category.count === 1 ? t.categories.service : t.categories.services} ·{" "}
@@ -171,7 +187,7 @@ export default async function HomePage() {
           {Object.entries(byCategory).map(([category, items]) => (
             <div key={category}>
               <h3 className="font-heading border-gold/40 border-b pb-3 text-2xl font-medium">
-                {category}
+                {categoryLabelFor(services, category, locale)}
               </h3>
               <ul className="mt-5 space-y-4">
                 {items.map((service) => (
@@ -266,6 +282,35 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {testimonials.length > 0 && (
+        <section className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
+          <div className="text-center">
+            <p className="eyebrow">{t.testimonials.eyebrow}</p>
+            <h2 className="font-heading mt-3 text-3xl font-medium sm:text-4xl">{t.testimonials.title}</h2>
+            <div className="rule-gold mx-auto mt-6" />
+          </div>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {testimonials.map((testimonial) => (
+              <figure key={testimonial.id} className="bg-card flex h-full flex-col border p-6">
+                <Quote className="text-gold size-6" aria-hidden />
+                {testimonial.rating && (
+                  <div className="mt-3 flex gap-0.5" aria-label={`${testimonial.rating} out of 5`}>
+                    {Array.from({ length: testimonial.rating }).map((_, i) => (
+                      <Star key={i} className="fill-gold text-gold size-4" aria-hidden />
+                    ))}
+                  </div>
+                )}
+                <blockquote className="mt-4 flex-1 leading-relaxed">{testimonial.quote}</blockquote>
+                <figcaption className="text-muted-foreground mt-5 text-sm font-medium">
+                  {testimonial.author_name}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ---------------- Visit ---------------- */}
       <section className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">

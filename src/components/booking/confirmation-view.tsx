@@ -9,6 +9,8 @@ import { formatDuration, formatPrice } from "@/lib/format";
 import { businessInfo } from "@/lib/business-info";
 import type { BookingSummary } from "@/lib/booking-summary";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
+import type { Locale } from "@/lib/i18n/config";
+import { dateLocale } from "@/lib/date-locale";
 
 function subscribe() {
   return () => {};
@@ -22,7 +24,7 @@ function getServerSnapshot() {
   return null;
 }
 
-export function ConfirmationView({ t }: { t: Dictionary["confirmation"] }) {
+export function ConfirmationView({ t, locale }: { t: Dictionary["confirmation"]; locale: Locale }) {
   const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const booking = raw ? (JSON.parse(raw) as BookingSummary) : null;
 
@@ -49,10 +51,18 @@ export function ConfirmationView({ t }: { t: Dictionary["confirmation"] }) {
         {t.body} {booking.guestName.split(" ")[0]}.
       </p>
 
-      <div className="mt-10 border p-6 text-left">
+      {booking.reference && (
+        <div className="border-gold/50 bg-secondary/50 mt-8 rounded-lg border border-dashed p-4">
+          <p className="eyebrow">{t.reference}</p>
+          <p className="font-heading mt-1 text-3xl font-semibold tracking-[0.2em]">{booking.reference}</p>
+          <p className="text-muted-foreground mt-2 text-xs">{t.referenceHint}</p>
+        </div>
+      )}
+
+      <div className="mt-6 border p-6 text-left">
         <p className="eyebrow">{t.appointment}</p>
         <p className="font-heading mt-2 text-2xl font-medium">
-          {format(new Date(booking.startAtISO), "EEEE d MMMM 'at' HH:mm")}
+          {format(new Date(booking.startAtISO), t.dateFormat, { locale: dateLocale(locale) })}
         </p>
 
         <ul className="text-muted-foreground mt-5 space-y-1.5 text-sm">
@@ -85,7 +95,7 @@ export function ConfirmationView({ t }: { t: Dictionary["confirmation"] }) {
 
       <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:justify-center">
         <Button asChild variant="outline" className="h-12 px-8">
-          <Link href="/">{t.backHome}</Link>
+          <Link href="/booking">{t.manageBooking}</Link>
         </Button>
         <Button asChild className="h-12 px-8">
           <Link href="/book">{t.bookAnother}</Link>

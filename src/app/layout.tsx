@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Alex_Brush, Cormorant_Garamond, Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { RegisterServiceWorker } from "@/components/register-service-worker";
+import { siteUrl } from "@/lib/business-info";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,11 +28,32 @@ const alexBrush = Alex_Brush({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: {
-    default: "GlowNest Beauty Salon",
+    default: "GlowNest Beauty Salon — nails, threading & facials in Høje Taastrup",
     template: "%s · GlowNest Beauty Salon",
   },
-  description: "Book threading, nails, facials, hair and more at GlowNest Beauty Salon.",
+  description:
+    "Home-based beauty salon in Høje Taastrup. Nails, threading, facials, hair and waxing — book online in under a minute, no account needed.",
+  keywords: [
+    "beauty salon Høje Taastrup",
+    "negle Høje Taastrup",
+    "trådning",
+    "ansigtsbehandling",
+    "manicure",
+    "pedicure",
+  ],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "GlowNest Beauty Salon",
+    locale: "en_DK",
+    alternateLocale: "da_DK",
+    url: siteUrl(),
+    title: "GlowNest Beauty Salon — Høje Taastrup",
+    description:
+      "Nails, threading, facials, hair and waxing in a home-based salon. Book online in under a minute.",
+  },
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, statusBarStyle: "default", title: "GlowNest" },
   icons: {

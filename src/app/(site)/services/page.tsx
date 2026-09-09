@@ -5,13 +5,17 @@ import { Button } from "@/components/ui/button";
 import { getActiveServices } from "@/lib/actions/booking";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { categoryImage } from "@/lib/category-images";
-import { getT } from "@/lib/i18n/server";
+import { getLocale, getT } from "@/lib/i18n/server";
+import { categoryLabelFor, serviceDescription, serviceName } from "@/lib/service-locale";
 import type { Service } from "@/lib/database.types";
 
-export const metadata: Metadata = { title: "Services & Pricing" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t.meta.servicesTitle, description: t.meta.servicesDescription };
+}
 
 export default async function ServicesPage() {
-  const [services, t] = await Promise.all([getActiveServices(), getT()]);
+  const [services, t, locale] = await Promise.all([getActiveServices(), getT(), getLocale()]);
 
   const grouped = services.reduce<Record<string, Service[]>>((acc, service) => {
     (acc[service.category] ??= []).push(service);
@@ -48,16 +52,20 @@ export default async function ServicesPage() {
 
               <div className={index % 2 === 1 ? "lg:order-1" : undefined}>
                 <p className="eyebrow">{String(index + 1).padStart(2, "0")}</p>
-                <h2 className="font-heading mt-3 text-3xl font-medium sm:text-4xl">{category}</h2>
+                <h2 className="font-heading mt-3 text-3xl font-medium sm:text-4xl">
+                  {categoryLabelFor(services, category, locale)}
+                </h2>
                 <div className="rule-gold mt-5" />
 
                 <ul className="mt-8 divide-y">
                   {items.map((service) => (
                     <li key={service.id} className="flex items-start justify-between gap-6 py-5">
                       <div>
-                        <p className="font-medium">{service.name}</p>
-                        {service.description && (
-                          <p className="text-muted-foreground mt-1 text-sm">{service.description}</p>
+                        <p className="font-medium">{serviceName(service, locale)}</p>
+                        {serviceDescription(service, locale) && (
+                          <p className="text-muted-foreground mt-1 text-sm">
+                            {serviceDescription(service, locale)}
+                          </p>
                         )}
                         <p className="text-muted-foreground mt-1.5 text-xs tracking-wide uppercase">
                           {formatDuration(service.duration_minutes)}

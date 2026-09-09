@@ -2,7 +2,9 @@
 
 import { endOfDay, startOfDay } from "date-fns";
 import { revalidatePath } from "next/cache";
+import { fromZonedTime } from "date-fns-tz";
 import { createClient } from "@/lib/supabase/server";
+import { SALON_TIMEZONE } from "@/lib/business-info";
 import type { AppointmentStatus, BusinessHour, Service } from "@/lib/database.types";
 
 function revalidateAdmin() {
@@ -102,7 +104,12 @@ export interface ServiceInput {
   category: string;
   price: number;
   durationMinutes: number;
+  bufferMinutes: number;
   description?: string;
+  /** Danish display copy. Blank falls back to the English above. */
+  nameDa?: string;
+  descriptionDa?: string;
+  categoryDa?: string;
   active: boolean;
   sortOrder: number;
 }
@@ -116,7 +123,11 @@ export async function createService(input: ServiceInput): Promise<Service> {
       category: input.category,
       price: input.price,
       duration_minutes: input.durationMinutes,
+      buffer_minutes: input.bufferMinutes,
       description: input.description || null,
+      name_da: input.nameDa || null,
+      description_da: input.descriptionDa || null,
+      category_da: input.categoryDa || null,
       active: input.active,
       sort_order: input.sortOrder,
     })
@@ -138,7 +149,11 @@ export async function updateService(id: string, input: ServiceInput) {
       category: input.category,
       price: input.price,
       duration_minutes: input.durationMinutes,
+      buffer_minutes: input.bufferMinutes,
       description: input.description || null,
+      name_da: input.nameDa || null,
+      description_da: input.descriptionDa || null,
+      category_da: input.categoryDa || null,
       active: input.active,
       sort_order: input.sortOrder,
     })
@@ -194,6 +209,46 @@ export async function listAvailabilityBlocks() {
   return data ?? [];
 }
 
+/** Blocked time within a window — the calendar needs past dates too, unlike the settings list. */
+export async function listAvailabilityBlocksInRange(fromISO: string, toISO: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("availability_blocks")
+    .select("*")
+    .lt("start_at", toISO)
+    .gt("end_at", fromISO)
+    .order("start_at", { ascending: true });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+/**
+ * Blocks a slice of one day, e.g. 14:00–15:00 on the 12th. Times are entered as salon
+ * wall-clock and converted here, so they stay correct whatever timezone the browser is in.
+ */
+export async function blockTimeOnDate(input: {
+  date: string; // yyyy-MM-dd
+  startTime: string; // HH:mm
+  endTime: string; // HH:mm
+  reason?: string;
+}) {
+  const startAt = fromZonedTime(`${input.date}T${input.startTime}:00`, SALON_TIMEZONE);
+  const endAt = fromZonedTime(`${input.date}T${input.endTime}:00`, SALON_TIMEZONE);
+
+  if (endAt <= startAt) throw new Error("End time must be after start time.");
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("availability_blocks").insert({
+    start_at: startAt.toISOString(),
+    end_at: endAt.toISOString(),
+    reason: input.reason || null,
+  });
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/availability");
+  revalidatePath("/admin/calendar");
+  revalidatePath("/book");
+}
+
 export async function createAvailabilityBlock(input: { startAtISO: string; endAtISO: string; reason?: string }) {
   const supabase = await createClient();
   const { error } = await supabase.from("availability_blocks").insert({
@@ -211,5 +266,109 @@ export async function deleteAvailabilityBlock(id: string) {
   const { error } = await supabase.from("availability_blocks").delete().eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/admin/availability");
+  revalidatePath("/admin/calendar");
   revalidatePath("/book");
+}
+
+// ---------- Recurring weekly time off ----------
+
+export async function listRecurringTimeOff() {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("recurring_time_off")
+    .select("*")
+    .order("day_of_week")
+    .order("start_time");
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function createRecurringTimeOff(input: {
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  reason?: string;
+}) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("recurring_time_off").insert({
+    day_of_week: input.dayOfWeek,
+    start_time: input.startTime,
+    end_time: input.endTime,
+    reason: input.reason || null,
+  });
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/availability");
+  revalidatePath("/book");
+}
+
+export async function deleteRecurringTimeOff(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("recurring_time_off").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/availability");
+  revalidatePath("/book");
+}
+
+// ---------- Testimonials ----------
+
+export async function listTestimonials() {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("testimonials")
+    .select("*")
+    .order("sort_order", { ascending: true });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export interface TestimonialInput {
+  authorName: string;
+  quote: string;
+  rating: number | null;
+  isPublished: boolean;
+  sortOrder: number;
+}
+
+export async function createTestimonial(input: TestimonialInput) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("testimonials")
+    .insert({
+      author_name: input.authorName,
+      quote: input.quote,
+      rating: input.rating,
+      is_published: input.isPublished,
+      sort_order: input.sortOrder,
+    })
+    .select()
+    .single();
+  if (error) throw new Error(error.message);
+  revalidatePath("/");
+  revalidatePath("/admin/testimonials");
+  return data;
+}
+
+export async function updateTestimonial(id: string, input: TestimonialInput) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("testimonials")
+    .update({
+      author_name: input.authorName,
+      quote: input.quote,
+      rating: input.rating,
+      is_published: input.isPublished,
+      sort_order: input.sortOrder,
+    })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/");
+  revalidatePath("/admin/testimonials");
+}
+
+export async function deleteTestimonial(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("testimonials").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/");
+  revalidatePath("/admin/testimonials");
 }
