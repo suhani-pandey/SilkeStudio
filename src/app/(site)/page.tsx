@@ -4,8 +4,10 @@ import { ArrowRight, Clock, MapPin, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getActiveServices, getBusinessHours, getPublishedTestimonials } from "@/lib/actions/booking";
 import { formatPrice } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { categoryImage } from "@/lib/category-images";
 import { businessInfo, mapEmbedSrc, socialLinks } from "@/lib/business-info";
+import { galleryImages } from "@/lib/gallery";
 import { LocalBusinessSchema } from "@/components/site/local-business-schema";
 import { getLocale, getT } from "@/lib/i18n/server";
 import { categoryLabelFor } from "@/lib/service-locale";
@@ -221,64 +223,34 @@ export default async function HomePage() {
               <h2 className="font-heading mt-3 text-4xl font-medium sm:text-5xl">{t.gallery.title}</h2>
             </div>
             <a
-              href={socialLinks.instagram}
+              href={socialLinks.tiktok}
               target="_blank"
               rel="noopener noreferrer"
               className="text-plum inline-flex min-h-11 items-center text-sm font-medium underline-offset-4 hover:underline"
             >
-              {t.gallery.instagram}
+              {t.gallery.tiktok}
             </a>
           </div>
 
+          <p className="text-muted-foreground mt-4 max-w-xl text-sm leading-relaxed">
+            {t.gallery.tiktokNote}
+          </p>
+
           <div className="mt-10 grid grid-cols-2 gap-3 sm:mt-12 sm:gap-4 lg:grid-cols-4">
-            <Image
-              src="/images/gallery-1.jpg"
-              alt="Manicure detail"
-              width={1000}
-              height={1000}
-              sizes="(max-width: 1024px) 50vw, 25vw"
-              className="aspect-square w-full object-cover lg:row-span-2 lg:aspect-auto lg:h-full"
-            />
-            <Image
-              src="/images/gallery-3.jpg"
-              alt="Nail shaping"
-              width={1000}
-              height={1000}
-              sizes="(max-width: 1024px) 50vw, 25vw"
-              className="aspect-square w-full object-cover"
-            />
-            <Image
-              src="/images/gallery-2.jpg"
-              alt="Nail artistry"
-              width={1000}
-              height={1000}
-              sizes="(max-width: 1024px) 50vw, 25vw"
-              className="aspect-square w-full object-cover"
-            />
-            <Image
-              src="/images/svc-brows.jpg"
-              alt="Brow and lash tools"
-              width={1000}
-              height={1000}
-              sizes="(max-width: 1024px) 50vw, 25vw"
-              className="aspect-square w-full object-cover"
-            />
-            <Image
-              src="/images/gallery-4.jpg"
-              alt="Fresh towels"
-              width={1000}
-              height={1000}
-              sizes="(max-width: 1024px) 50vw, 25vw"
-              className="aspect-square w-full object-cover"
-            />
-            <Image
-              src="/images/svc-body.jpg"
-              alt="Smooth skin after waxing"
-              width={1000}
-              height={1000}
-              sizes="(max-width: 1024px) 50vw, 25vw"
-              className="aspect-square w-full object-cover"
-            />
+            {galleryImages.map((image) => (
+              <Image
+                key={image.src}
+                src={image.src}
+                alt={image.alt}
+                width={1000}
+                height={1000}
+                sizes="(max-width: 1024px) 50vw, 25vw"
+                className={cn(
+                  "aspect-square w-full object-cover",
+                  image.feature && "lg:row-span-2 lg:aspect-auto lg:h-full",
+                )}
+              />
+            ))}
           </div>
         </div>
       </section>

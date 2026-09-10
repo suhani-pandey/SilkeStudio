@@ -50,7 +50,8 @@ const en = {
   gallery: {
     eyebrow: "The work",
     title: "Recent visits",
-    instagram: "Follow on Instagram →",
+    tiktok: "See it all on TikTok →",
+    tiktokNote: "A few of our recent sets, brows and facials. There is plenty more on TikTok.",
   },
   testimonials: {
     eyebrow: "Kind words",
@@ -259,7 +260,8 @@ const da: Dictionary = {
   gallery: {
     eyebrow: "Arbejdet",
     title: "Seneste besøg",
-    instagram: "Følg med på Instagram →",
+    tiktok: "Se det hele på TikTok →",
+    tiktokNote: "Et udpluk af de seneste negle, bryn og ansigtsbehandlinger. Der er meget mere på TikTok.",
   },
   testimonials: {
     eyebrow: "Pæne ord",

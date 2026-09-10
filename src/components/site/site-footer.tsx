@@ -21,24 +21,6 @@ export async function SiteFooter() {
             </p>
             <div className="mt-6 flex items-center gap-4">
               <a
-                href={socialLinks.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="GlowNest on Instagram"
-                className="text-muted-foreground hover:text-plum -m-2.5 p-2.5 transition-colors"
-              >
-                <InstagramIcon className="size-5" />
-              </a>
-              <a
-                href={socialLinks.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="GlowNest on Facebook"
-                className="text-muted-foreground hover:text-plum -m-2.5 p-2.5 transition-colors"
-              >
-                <FacebookIcon className="size-5" />
-              </a>
-              <a
                 href={socialLinks.tiktok}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -47,6 +29,26 @@ export async function SiteFooter() {
               >
                 <TikTokIcon className="size-5" />
               </a>
+              <a
+                href={socialLinks.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GlowNest on Instagram"
+                className="text-muted-foreground hover:text-plum -m-2.5 p-2.5 transition-colors"
+              >
+                <InstagramIcon className="size-5" />
+              </a>
+              {socialLinks.facebook && (
+                <a
+                  href={socialLinks.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="GlowNest on Facebook"
+                  className="text-muted-foreground hover:text-plum -m-2.5 p-2.5 transition-colors"
+                >
+                  <FacebookIcon className="size-5" />
+                </a>
+              )}
             </div>
           </div>
 

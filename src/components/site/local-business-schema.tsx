@@ -38,7 +38,7 @@ export function LocalBusinessSchema({
       addressLocality: "Høje Taastrup",
       addressCountry: "DK",
     },
-    sameAs: [socialLinks.instagram, socialLinks.facebook, socialLinks.tiktok],
+    sameAs: [socialLinks.tiktok, socialLinks.instagram, socialLinks.facebook].filter(Boolean),
     openingHoursSpecification: hours
       .filter((hour) => !hour.is_closed && hour.open_time && hour.close_time)
       .map((hour) => ({

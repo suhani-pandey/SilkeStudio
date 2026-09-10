@@ -14,12 +14,18 @@ export const businessInfo = {
   phoneHref: "tel:+4591719063",
 };
 
-// Placeholder handles — swap for the real profiles whenever they're ready.
 export const socialLinks = {
-  instagram: "https://instagram.com/glownestbeautysalon",
-  facebook: "https://facebook.com/glownestbeautysalon",
-  tiktok: "https://tiktok.com/@glownestbeautysalon",
+  instagram: "https://www.instagram.com/glownest_hoje_taastrup/",
+  tiktok: "https://www.tiktok.com/@glownest357",
+  // No Facebook page yet — add the URL here and it appears in the footer automatically.
+  facebook: null as string | null,
 };
+
+/**
+ * The salon's photos and videos of finished work all live on TikTok, so that is where anyone
+ * looking for a portfolio should be sent.
+ */
+export const mediaLink = socialLinks.tiktok;
 
 /** Public address of the site, used for sitemaps, share cards and SMS links. */
 export function siteUrl(): string {
