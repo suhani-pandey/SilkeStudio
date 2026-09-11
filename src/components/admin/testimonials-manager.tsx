@@ -131,13 +131,20 @@ export function TestimonialsManager({ initial }: { initial: Testimonial[] }) {
                 <p className="text-muted-foreground mt-1.5 text-sm">{item.quote}</p>
               </div>
               <div className="flex shrink-0">
-                <Button variant="ghost" size="icon" className="size-11" onClick={() => openEdit(item)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-11"
+                  aria-label={`Edit review from ${item.author_name}`}
+                  onClick={() => openEdit(item)}
+                >
                   <Pencil className="size-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
                   className="size-11"
+                  aria-label={`Delete review from ${item.author_name}`}
                   onClick={() => setDeleteTarget(item)}
                   disabled={isPending}
                 >

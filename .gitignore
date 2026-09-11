@@ -32,6 +32,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but the template belongs in the repo, so anyone cloning knows what to fill in.
+!.env.local.example
+
+# Original photos supplied by the salon — working copies, not served by the site.
+/photos-from-salon
 
 # vercel
 .vercel

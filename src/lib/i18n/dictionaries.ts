@@ -198,6 +198,10 @@ const en = {
   },
   days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
   meta: {
+    homeTitle: "GlowNest Beauty Salon — nails, threading & facials in Høje Taastrup",
+    homeShortTitle: "GlowNest Beauty Salon — Høje Taastrup",
+    homeDescription:
+      "Home-based beauty salon in Høje Taastrup. Nails, threading, facials, hair and waxing — book online in under a minute, no account needed.",
     servicesTitle: "Services & pricing",
     servicesDescription:
       "Every treatment and price at GlowNest Beauty Salon in Høje Taastrup — nails, threading, facials, hair and waxing.",
@@ -408,6 +412,10 @@ const da: Dictionary = {
   },
   days: ["Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"],
   meta: {
+    homeTitle: "GlowNest Beauty Salon — negle, trådning og ansigtsbehandlinger i Høje Taastrup",
+    homeShortTitle: "GlowNest Beauty Salon — Høje Taastrup",
+    homeDescription:
+      "Hjemmebaseret skønhedssalon i Høje Taastrup. Negle, trådning, ansigtsbehandlinger, hår og voksning — book online på under et minut, helt uden konto.",
     servicesTitle: "Behandlinger & priser",
     servicesDescription:
       "Alle behandlinger og priser hos GlowNest Beauty Salon i Høje Taastrup — negle, trådning, ansigtsbehandlinger, hår og voksning.",

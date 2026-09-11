@@ -138,10 +138,23 @@ export function ServicesManager({ initialServices }: { initialServices: Service[
               </div>
               <div className="flex items-center gap-3">
                 <p className="font-heading font-semibold whitespace-nowrap">{formatPrice(service.price)}</p>
-                <Button variant="ghost" size="icon" onClick={() => openEdit(service)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-11"
+                  aria-label={`Edit ${service.name}`}
+                  onClick={() => openEdit(service)}
+                >
                   <Pencil className="size-4" />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={() => setDeleteTarget(service)} disabled={isPending}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-11"
+                  aria-label={`Delete ${service.name}`}
+                  onClick={() => setDeleteTarget(service)}
+                  disabled={isPending}
+                >
                   <Trash2 className="size-4" />
                 </Button>
               </div>

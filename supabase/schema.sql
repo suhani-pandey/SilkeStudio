@@ -696,7 +696,7 @@ insert into public.services (name, category, price, duration_minutes, descriptio
 select v.name, v.category, v.price, v.duration_minutes, v.description, v.sort_order
 from (
   values
-    ('Threading', 'Face', 60, 15, 'Precise eyebrow and facial hair threading.', 1),
+    ('Threading', 'Face', 50, 15, 'Precise eyebrow and facial hair threading.', 1),
     ('Facial', 'Face', 450, 45, 'Cleansing and rejuvenating facial treatment.', 2),
     ('Cleansing', 'Face', 300, 30, 'Deep pore cleansing facial.', 3),
     ('Hair Cut', 'Hair', 350, 45, 'Style consultation and precision haircut.', 4),

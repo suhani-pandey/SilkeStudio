@@ -3,6 +3,7 @@ import { Alex_Brush, Cormorant_Garamond, Geist, Geist_Mono } from "next/font/goo
 import { Toaster } from "@/components/ui/sonner";
 import { RegisterServiceWorker } from "@/components/register-service-worker";
 import { siteUrl } from "@/lib/business-info";
+import { getLocale, getT } from "@/lib/i18n/server";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,41 +28,48 @@ const alexBrush = Alex_Brush({
   weight: "400",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl()),
-  title: {
-    default: "GlowNest Beauty Salon — nails, threading & facials in Høje Taastrup",
-    template: "%s · GlowNest Beauty Salon",
-  },
-  description:
-    "Home-based beauty salon in Høje Taastrup. Nails, threading, facials, hair and waxing — book online in under a minute, no account needed.",
-  keywords: [
-    "beauty salon Høje Taastrup",
-    "negle Høje Taastrup",
-    "trådning",
-    "ansigtsbehandling",
-    "manicure",
-    "pedicure",
-  ],
-  alternates: { canonical: "/" },
-  openGraph: {
-    type: "website",
-    siteName: "GlowNest Beauty Salon",
-    locale: "en_DK",
-    alternateLocale: "da_DK",
-    url: siteUrl(),
-    title: "GlowNest Beauty Salon — Høje Taastrup",
-    description:
-      "Nails, threading, facials, hair and waxing in a home-based salon. Book online in under a minute.",
-  },
-  manifest: "/manifest.webmanifest",
-  appleWebApp: { capable: true, statusBarStyle: "default", title: "GlowNest" },
-  icons: {
-    icon: "/images/icon-192.png",
-    apple: "/images/apple-touch-icon.png",
-  },
-  formatDetection: { telephone: false },
-};
+/**
+ * Built per request rather than declared statically, so the title, description and share card
+ * follow the visitor's language toggle instead of always announcing the site in English.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = await getT();
+
+  return {
+    metadataBase: new URL(siteUrl()),
+    title: {
+      default: t.meta.homeTitle,
+      template: "%s · GlowNest Beauty Salon",
+    },
+    description: t.meta.homeDescription,
+    keywords: [
+      "beauty salon Høje Taastrup",
+      "negle Høje Taastrup",
+      "trådning",
+      "ansigtsbehandling",
+      "manicure",
+      "pedicure",
+    ],
+    alternates: { canonical: "/" },
+    openGraph: {
+      type: "website",
+      siteName: "GlowNest Beauty Salon",
+      locale: locale === "da" ? "da_DK" : "en_DK",
+      alternateLocale: locale === "da" ? "en_DK" : "da_DK",
+      url: siteUrl(),
+      title: t.meta.homeShortTitle,
+      description: t.meta.homeDescription,
+    },
+    manifest: "/manifest.webmanifest",
+    appleWebApp: { capable: true, statusBarStyle: "default", title: "GlowNest" },
+    icons: {
+      icon: "/images/icon-192.png",
+      apple: "/images/apple-touch-icon.png",
+    },
+    formatDetection: { telephone: false },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#fbf8f3",
@@ -70,10 +78,14 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  // Screen readers pick pronunciation from this, and search engines use it to serve the right
+  // language — so it has to follow the visitor's toggle rather than stay pinned to English.
+  const locale = await getLocale();
+
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} ${alexBrush.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">

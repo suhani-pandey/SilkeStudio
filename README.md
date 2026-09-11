@@ -119,11 +119,17 @@ and the layout stays exactly the same — no code changes needed. Shoot roughly 
 | `svc-face.jpg` | Face category, closing banner | Tall portrait (4:5) |
 | `svc-hair.jpg` | Hair category | Tall portrait (4:5) |
 | `svc-body.jpg` | Body category | Tall portrait (4:5) |
-| `svc-brows.jpg` | Gallery | Square |
+| `svc-brows.jpg` | Services page | Square |
 | `gallery-1..4.jpg` | Home page gallery | Square |
+| `gallery/*.jpg` | Home page gallery — the salon's own work | Square |
 
-The current photos are free stock (Pexels licence) standing in until yours are ready. Your own
-work is the single biggest visual upgrade left.
+Two real photographs of the salon's work lead the gallery; the rest are free stock (Pexels
+licence) standing in until more are ready. The gallery is one ordered list in
+`src/lib/gallery.ts` — add a file to `public/images/gallery/` and an entry to that list. Drop the
+stock entries as real photos replace them.
+
+Originals supplied by the salon live in `photos-from-salon/` (not published, not committed) so
+they can be re-edited later without asking for the files again.
 
 ## How it's organized
 
@@ -138,9 +144,44 @@ work is the single biggest visual upgrade left.
 - Customers can book as a guest (name + phone) or optionally create an account to see booking history.
 - The owner gets a real-time notification the moment someone books; customers with an account get notified if the owner cancels or reschedules them.
 - The site is installable to a phone's home screen (Add to Home Screen) — there's no separate native app.
-- Prices in the database are starting placeholders — set your real ones under **Admin → Services**.
+- Prices are set to current Copenhagen-area market rates for a home-based salon. Confirm them
+  before launch — they're what customers are quoted. Change any of them under **Admin → Services**,
+  or run `supabase/update-prices.sql` to reset the whole list at once.
 - Reviews on the home page come from **Admin → Reviews**. Only add real ones you actually
   received, with the client's permission; the page presents them as genuine.
 - Service names have separate Danish columns, editable in the admin. The English name stays the
   canonical key used for grouping and photos.
-# Glownest
+
+## Going live
+
+Deploy to Vercel (import the repo, it detects Next.js), and keep Supabase as the managed backend.
+
+### Before the first real customer
+
+- [ ] **Delete the test owner account.** `supabase/dev-owner.sql` creates `owner@glownest.test`
+      with a password written down in this repository. Run
+      `delete from auth.users where email = 'owner@glownest.test';`, then create the real owner
+      through **Sign up** and promote them to `owner` in the `profiles` table.
+- [ ] **Rotate the Supabase keys** if they've ever been pasted into a chat, an issue, or a
+      screenshot. Project Settings → API → rotate, then update the environment variables.
+- [ ] **Set `NEXT_PUBLIC_SITE_URL`** to the live domain. Password-reset emails and SMS links point
+      at whatever this says.
+- [ ] **Confirm the price list** under Admin → Services.
+- [ ] **Replace the stock photos** with the salon's own work.
+- [ ] **Publish real reviews only.** The seeded examples are unpublished and labelled as examples.
+- [ ] Optional: add `GATEWAYAPI_TOKEN` + `SALON_OWNER_PHONE` for SMS, and the VAPID keys for push.
+      Both stay dormant and cost nothing while unset.
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` is server-side only — never prefix it with `NEXT_PUBLIC_`.
+
+### What's already handled
+
+- Security headers (`X-Frame-Options`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS)
+  and no `X-Powered-By`, set in `next.config.ts`.
+- Row-level security on every table; customers can never read another customer's booking, and
+  free/busy times are exposed through a `busy_intervals()` function that returns times only —
+  no names, phone numbers or reasons.
+- `error.tsx`, `global-error.tsx` and `not-found.tsx`, all in the salon's styling with a phone
+  number as the fallback.
+- `<html lang>`, page titles, descriptions and Open Graph locale all follow the language toggle.
+- Sitemap, robots, JSON-LD `BeautySalon` structured data, and a generated Open Graph share card.
+- Installable as a PWA with an offline page.
