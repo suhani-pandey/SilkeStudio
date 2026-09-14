@@ -1,7 +1,7 @@
-// GlowNest service worker.
+// Silke Studio service worker.
 // Booking data must always be fresh, so pages and API calls go to the network first and only
 // fall back to a cached shell when the phone is offline. Static assets are cached on first use.
-const CACHE = "glownest-v1";
+const CACHE = "silke-v1"; // Bump this whenever a cached asset is replaced in place.
 const OFFLINE_URL = "/offline";
 
 self.addEventListener("install", (event) => {
@@ -56,15 +56,15 @@ self.addEventListener("push", (event) => {
   try {
     payload = event.data.json();
   } catch {
-    payload = { title: "GlowNest", body: event.data.text() };
+    payload = { title: "Silke Studio", body: event.data.text() };
   }
   event.waitUntil(
-    self.registration.showNotification(payload.title || "GlowNest", {
+    self.registration.showNotification(payload.title || "Silke Studio", {
       body: payload.body || "",
       icon: "/images/icon-192.png",
       badge: "/images/icon-192.png",
       data: { url: payload.url || "/admin" },
-      tag: "glownest-booking",
+      tag: "silke-booking",
     }),
   );
 });
