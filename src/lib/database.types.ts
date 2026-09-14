@@ -1,6 +1,13 @@
 export type ProfileRole = "owner" | "customer";
 export type AppointmentStatus = "confirmed" | "cancelled" | "completed";
 export type BookedBy = "customer" | "owner";
+/** The two halves of the business. */
+export type ServiceLine = "beauty" | "tailoring";
+/**
+ * How an alteration is handled: worked on during the appointment while the customer waits, or
+ * handed over in a short slot and collected once it's finished. Beauty work is always the former.
+ */
+export type Fulfilment = "appointment" | "dropoff";
 export type NotificationAudience = "owner" | "customer";
 
 export interface Database {
@@ -34,6 +41,8 @@ export interface Database {
           price: number;
           duration_minutes: number;
           buffer_minutes: number;
+          service_line: ServiceLine;
+          dropoff_minutes: number | null;
           description: string | null;
           name_da: string | null;
           description_da: string | null;
@@ -49,6 +58,8 @@ export interface Database {
           price: number;
           duration_minutes: number;
           buffer_minutes?: number;
+          service_line?: ServiceLine;
+          dropoff_minutes?: number | null;
           description?: string | null;
           name_da?: string | null;
           description_da?: string | null;
@@ -111,6 +122,8 @@ export interface Database {
           reference: string | null;
           status: AppointmentStatus;
           booked_by: BookedBy;
+          fulfilment: Fulfilment;
+          ready_by: string | null;
           notes: string | null;
           created_at: string;
         };
@@ -122,6 +135,8 @@ export interface Database {
           guest_email?: string | null;
           start_at: string;
           end_at?: string;
+          fulfilment?: Fulfilment;
+          ready_by?: string | null;
           duration_minutes?: number;
           buffer_minutes?: number;
           total_price?: number;

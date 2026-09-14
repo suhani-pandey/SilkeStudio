@@ -7,8 +7,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: da ? "Privatlivspolitik" : "Privacy policy",
     description: da
-      ? "Sådan behandler GlowNest Beauty Salon dine personoplysninger."
-      : "How GlowNest Beauty Salon handles your personal data.",
+      ? "Sådan behandler Silke Studio dine personoplysninger."
+      : "How Silke Studio handles your personal data.",
   };
 }
 
@@ -23,7 +23,7 @@ export default async function PrivacyPage() {
       <h1 className="font-heading mt-3 text-4xl font-medium">
         {da ? "Privatlivspolitik" : "Privacy policy"}
       </h1>
-      <div className="rule-gold mt-6" />
+      <div className="rule-copper mt-6" />
 
       <div className="prose-sm text-muted-foreground mt-10 space-y-8 leading-relaxed">
         <section>

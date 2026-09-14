@@ -39,9 +39,9 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --color-gold: var(--gold);
-  --color-gold-deep: var(--gold-deep);
-  --color-plum: var(--plum);
+  --color-copper: var(--copper);
+  --color-copper-deep: var(--copper-deep);
+  --color-clay: var(--clay);
   --font-script: var(--font-script);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
@@ -53,43 +53,44 @@
 }
 
 :root {
-  /* GlowNest — warm ivory, antique gold and plum, taken from the salon's own logo. */
-  --background: #fbf8f3;
-  --foreground: #241e1a;
+  /* Silke Studio — warm sand, terracotta and soft copper. Neutral enough to sit behind both
+     sides of the business: skin and fabric both read true against a warm ground. */
+  --background: #faf6f1;
+  --foreground: #2e2622;
   --card: #ffffff;
-  --card-foreground: #241e1a;
+  --card-foreground: #2e2622;
   --popover: #ffffff;
-  --popover-foreground: #241e1a;
-  --primary: #6b2c8f;
+  --popover-foreground: #2e2622;
+  --primary: #b95a41;
   --primary-foreground: #ffffff;
-  --secondary: #f4eee5;
-  --secondary-foreground: #241e1a;
-  --muted: #f2ece3;
-  --muted-foreground: #6a6058;
-  --accent: #f3e9f7;
-  --accent-foreground: #5a2478;
+  --secondary: #f3ebe2;
+  --secondary-foreground: #2e2622;
+  --muted: #f1e9df;
+  --muted-foreground: #6b5f56;
+  --accent: #f9e9e1;
+  --accent-foreground: #8f3f2b;
   --destructive: #b3261e;
-  --border: #e4dccf;
-  --input: #d9cfbe;
-  --ring: #6b2c8f;
-  --chart-1: #6b2c8f;
-  --chart-2: #b58648;
-  --chart-3: #a67f9c;
-  --chart-4: #6a6058;
-  --chart-5: #241e1a;
+  --border: #e6dbcf;
+  --input: #d8c9b8;
+  --ring: #b95a41;
+  --chart-1: #c4674f;
+  --chart-2: #d9a273;
+  --chart-3: #8f7a68;
+  --chart-4: #6b5f56;
+  --chart-5: #2e2622;
   --radius: 0.5rem;
   --sidebar: #ffffff;
-  --sidebar-foreground: #241e1a;
-  --sidebar-primary: #6b2c8f;
+  --sidebar-foreground: #2e2622;
+  --sidebar-primary: #b95a41;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f4eee5;
-  --sidebar-accent-foreground: #241e1a;
-  --sidebar-border: #e4dccf;
-  --sidebar-ring: #6b2c8f;
-  /* Decorative gold for rules and icons; gold-deep is the readable-on-ivory text tone. */
-  --gold: #b58648;
-  --gold-deep: #8a6329;
-  --plum: #6b2c8f;
+  --sidebar-accent: #f3ebe2;
+  --sidebar-accent-foreground: #2e2622;
+  --sidebar-border: #e6dbcf;
+  --sidebar-ring: #b95a41;
+  /* Decorative copper for rules and icons; copper-deep is the tone that stays readable as text. */
+  --copper: #d9a273;
+  --copper-deep: #9a6237;
+  --clay: #b95a41;
 }
 
 @layer base {
@@ -124,13 +125,13 @@
 }
 
 @layer components {
-  /* Small gold label that sits above a section heading. */
+  /* Small copper label that sits above a section heading. */
   .eyebrow {
-    @apply text-gold-deep text-xs font-semibold tracking-[0.2em] uppercase;
+    @apply text-copper-deep text-xs font-semibold tracking-[0.2em] uppercase;
   }
-  /* Thin gold rule used as a divider under headings. */
-  .rule-gold {
-    @apply bg-gold/60 h-px w-16;
+  /* Thin copper rule used as a divider under headings. */
+  .rule-copper {
+    @apply bg-copper/60 h-px w-16;
   }
   /* Horizontal day/time pickers: snap like a native control, no visible scrollbar. */
   .snap-row {
@@ -143,5 +144,47 @@
   }
   .snap-row > * {
     scroll-snap-align: start;
+  }
+}
+/* ---------------------------------------------------------------
+   Home page: the header floats over the hero photograph, then turns
+   into the ordinary solid bar once you scroll past it. It stays
+   sticky the whole way, so navigation is never lost.
+   --------------------------------------------------------------- */
+:root[data-home] body > header {
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease,
+    color 300ms ease;
+}
+
+:root[data-home][data-home-top] body > header {
+  background: transparent;
+  border-bottom-color: transparent;
+  backdrop-filter: none;
+  color: #fff;
+}
+
+:root[data-home][data-home-top] body > header a,
+:root[data-home][data-home-top] body > header button {
+  color: #fff;
+}
+
+/* The logo is dark ink on transparent, so invert it while it sits on the photograph. */
+:root[data-home][data-home-top] body > header img {
+  filter: brightness(0) invert(1);
+  transition: filter 300ms ease;
+}
+
+/* The sticky header takes up space at the top of the flow; cancel it so the photograph starts at
+   the very top of the page, then pad the content back down clear of the bar. */
+:root[data-home] .home-hero {
+  margin-top: calc(var(--home-header-h, 4rem) * -1);
+  padding-top: var(--home-header-h, 4rem);
+}
+
+@media (min-width: 640px) {
+  :root[data-home] .home-hero {
+    --home-header-h: 5rem;
   }
 }

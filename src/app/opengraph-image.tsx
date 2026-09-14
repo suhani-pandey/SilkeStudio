@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { businessInfo } from "@/lib/business-info";
 
-export const alt = "GlowNest Beauty Salon — nails, threading, facials, hair and waxing";
+export const alt = "Silke Studio — beauty and clothing alterations in Høje Taastrup";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -17,21 +17,21 @@ export default async function OpengraphImage() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#fbf8f3",
-          color: "#241e1a",
+          backgroundColor: "#faf6f1",
+          color: "#2e2622",
           fontFamily: "Georgia, serif",
         }}
       >
-        <div style={{ display: "flex", border: "3px solid #b58648", padding: "18px 44px" }}>
-          <div style={{ fontSize: 66, letterSpacing: 10, color: "#b58648", fontWeight: 700 }}>
-            GLOWNEST
+        <div style={{ display: "flex", border: "3px solid #9a6237", padding: "18px 44px" }}>
+          <div style={{ fontSize: 66, letterSpacing: 10, color: "#9a6237", fontWeight: 700 }}>
+            SILKE
           </div>
         </div>
-        <div style={{ fontSize: 40, color: "#6b2c8f", marginTop: 18 }}>Salon</div>
-        <div style={{ fontSize: 30, marginTop: 42, color: "#6a6058" }}>
-          Nails · Threading · Facials · Hair · Waxing
+        <div style={{ fontSize: 40, color: "#b95a41", marginTop: 18 }}>Studio</div>
+        <div style={{ fontSize: 30, marginTop: 42, color: "#6b5f56" }}>
+          Beauty · Nails · Threading · Alterations · Sari
         </div>
-        <div style={{ fontSize: 25, marginTop: 14, color: "#6a6058" }}>
+        <div style={{ fontSize: 25, marginTop: 14, color: "#6b5f56" }}>
           {businessInfo.address.line2}
         </div>
       </div>

@@ -4,7 +4,6 @@ import { ArrowRight, Clock, MapPin, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getActiveServices, getBusinessHours, getPublishedTestimonials } from "@/lib/actions/booking";
 import { formatPrice } from "@/lib/format";
-import { cn } from "@/lib/utils";
 import { categoryImage } from "@/lib/category-images";
 import { businessInfo, mapEmbedSrc, socialLinks } from "@/lib/business-info";
 import { galleryImages } from "@/lib/gallery";
@@ -40,53 +39,71 @@ export default async function HomePage() {
     <div>
       <LocalBusinessSchema hours={hours} services={services} />
 
-      {/* ---------------- Hero ---------------- */}
-      <section className="grid items-stretch lg:min-h-[86vh] lg:grid-cols-[1.05fr_1fr]">
-        <div className="order-2 flex items-center px-5 py-12 sm:px-10 sm:py-16 lg:order-1 lg:py-24 lg:pl-16 xl:pl-24">
-          <div className="max-w-xl">
-            <p className="font-script text-plum text-3xl leading-none sm:text-4xl">{t.hero.welcome}</p>
-            <h1 className="font-heading mt-3 text-[2.6rem] leading-[1.06] font-medium tracking-tight text-balance sm:text-6xl xl:text-7xl">
-              {t.hero.title}
-            </h1>
-            <div className="rule-gold mt-6 sm:mt-8" />
-            <p className="text-muted-foreground mt-6 leading-relaxed sm:mt-8 sm:text-lg">
-{t.hero.body}
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row">
-              <Button asChild size="lg" className="h-13 w-full px-8 text-base sm:w-auto">
-                <Link href="/book">
-                  {t.hero.bookCta}
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="h-13 w-full px-8 text-base sm:w-auto">
-                <Link href="/services">{t.hero.priceCta}</Link>
-              </Button>
-            </div>
-            <a
-              href={businessInfo.phoneHref}
-              className="text-muted-foreground hover:text-plum mt-6 inline-flex min-h-11 items-center gap-2 text-sm sm:mt-8"
-            >
-              <Phone className="size-4" />
-              {t.hero.call} {businessInfo.phone}
-            </a>
-          </div>
-        </div>
+      {/* ---------------- Hero ----------------
+          One frame that holds both trades at once: a painted manicure and a knitted cuff resting
+          on folds of silk. Fabric fills most of the picture, so it still crops gracefully to any
+          aspect ratio — a narrow phone or an ultrawide monitor — without losing the subject.
+          The site header floats over this section (see .home-hero in globals.css). */}
+      <section className="home-hero relative flex min-h-[100svh] items-center justify-center overflow-hidden">
+        <Image
+          src="/images/hero-studio.jpg"
+          alt={t.hero.imageAlt}
+          fill
+          priority
+          sizes="100vw"
+          // Soft folds hide compression well, and this is the largest thing on the page.
+          quality={68}
+          className="object-cover"
+        />
+        {/* The photograph is pale, so the type needs a real scrim behind it rather than a hint of
+            one: an overall wash, plus a soft dark centre where the headline actually sits. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/65" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.42)_0%,rgba(0,0,0,0.12)_55%,transparent_80%)]" />
 
-        <div className="relative order-1 min-h-[42vh] sm:min-h-[52vh] lg:order-2 lg:min-h-full">
-          <Image
-            src="/images/hero.jpg"
-            alt={t.hero.imageAlt}
-            fill
-            priority
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover"
-          />
+        <div className="relative mx-auto w-full max-w-3xl px-6 py-24 text-center sm:py-28">
+          <p className="font-script text-3xl leading-none text-white/90 sm:text-4xl">
+            {t.hero.welcome}
+          </p>
+          <h1 className="font-heading mt-5 text-[2.8rem] leading-[1.03] font-medium tracking-tight text-balance text-white sm:text-6xl lg:text-7xl">
+            {t.hero.title}
+          </h1>
+          <p className="mx-auto mt-7 max-w-lg leading-relaxed text-white/85 sm:text-lg">
+            {t.hero.body}
+          </p>
+
+          <div className="mt-11 flex flex-col items-center justify-center gap-x-12 gap-y-5 sm:flex-row">
+            <Link
+              href="/book?line=beauty"
+              className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold tracking-[0.2em] text-white uppercase"
+            >
+              <span className="border-b border-white/50 pb-1.5 transition-colors group-hover:border-white">
+                {t.hero.bookBeautyCta}
+              </span>
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+            <Link
+              href="/book?line=tailoring"
+              className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold tracking-[0.2em] text-white uppercase"
+            >
+              <span className="border-b border-white/50 pb-1.5 transition-colors group-hover:border-white">
+                {t.hero.bookTailoringCta}
+              </span>
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
+
+          <a
+            href={businessInfo.phoneHref}
+            className="mt-10 inline-flex min-h-11 items-center gap-2 text-sm text-white/70 transition-colors hover:text-white"
+          >
+            <Phone className="size-4" />
+            {t.hero.call} {businessInfo.phone}
+          </a>
         </div>
       </section>
 
       {/* ---------------- Trust strip ---------------- */}
-      <section className="bg-plum text-primary-foreground">
+      <section className="bg-clay text-primary-foreground">
         <div className="mx-auto grid max-w-6xl gap-3 px-6 py-5 text-center text-sm sm:grid-cols-3 sm:gap-6">
           <p>{t.trust.one}</p>
           <p className="border-primary-foreground/20 sm:border-x">{t.trust.two}</p>
@@ -94,15 +111,17 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ---------------- Service categories ---------------- */}
+      {/* ---------------- What we do ----------------
+          One section rather than two: it explains that the studio does clothes as well as faces,
+          and shows every category with a price, which is what the visitor actually needs. */}
       <section className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
         <div className="max-w-2xl">
-          <p className="eyebrow">{t.categories.eyebrow}</p>
+          <p className="eyebrow">{t.twoTrades.eyebrow}</p>
           <h2 className="font-heading mt-3 text-4xl font-medium sm:text-5xl">
-            {t.categories.title}
+            {t.twoTrades.title}
           </h2>
           <p className="text-muted-foreground mt-4">
-            {t.categories.body}
+            {t.twoTrades.body}
           </p>
         </div>
 
@@ -113,7 +132,7 @@ export default async function HomePage() {
               href={`/book?category=${encodeURIComponent(category.name)}`}
               className="group block"
             >
-              <div className="relative aspect-[3/4] overflow-hidden sm:aspect-[4/5]">
+              <div className="relative aspect-[3/4] overflow-hidden rounded-2xl sm:aspect-[4/5]">
                 <Image
                   src={category.image}
                   alt={category.label}
@@ -134,20 +153,26 @@ export default async function HomePage() {
             </Link>
           ))}
         </div>
+
+        <div className="mt-10 text-center sm:mt-12">
+          <Button asChild size="lg" variant="outline" className="h-13 px-8 text-base">
+            <Link href="/services">{t.categories.seeAll}</Link>
+          </Button>
+        </div>
       </section>
 
       {/* ---------------- Story ---------------- */}
       <section className="bg-secondary/60">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 sm:gap-14 sm:px-6 sm:py-24 lg:grid-cols-2 lg:gap-20">
           <div className="relative">
-            <div className="border-gold/50 absolute -top-5 -left-5 hidden h-full w-full border sm:block" />
+            <div className="border-copper/50 absolute -top-5 -left-5 hidden h-full w-full border sm:block" />
             <Image
               src="/images/about.jpg"
               alt={t.story.imageAlt}
               width={1400}
               height={933}
               sizes="(max-width: 1024px) 100vw, 50vw"
-              className="relative aspect-[4/3] w-full object-cover"
+              className="relative aspect-[4/3] w-full rounded-2xl object-cover"
             />
           </div>
           <div>
@@ -155,66 +180,32 @@ export default async function HomePage() {
             <h2 className="font-heading mt-3 text-4xl font-medium sm:text-5xl">
               {t.story.title}
             </h2>
-            <div className="rule-gold mt-6" />
+            <div className="rule-copper mt-6" />
             <p className="text-muted-foreground mt-6 leading-relaxed">
               {t.story.body}
             </p>
+            {/* The heading serif only ships old-style figures in this subset, which turn "10" into
+                something that reads as "IO". These use the sans face, which has lining numerals. */}
             <dl className="mt-10 grid grid-cols-3 gap-6 border-t pt-8">
-              <div>
-                <dt className="font-heading text-plum text-3xl font-medium">10</dt>
-                <dd className="text-muted-foreground mt-1 text-sm">{t.story.stat1}</dd>
-              </div>
-              <div>
-                <dt className="font-heading text-plum text-3xl font-medium">1:1</dt>
-                <dd className="text-muted-foreground mt-1 text-sm">{t.story.stat2}</dd>
-              </div>
-              <div>
-                <dt className="font-heading text-plum text-3xl font-medium">60s</dt>
-                <dd className="text-muted-foreground mt-1 text-sm">{t.story.stat3}</dd>
-              </div>
+              {[
+                { value: String(services.length), label: t.story.stat1 },
+                { value: "1:1", label: t.story.stat2 },
+                { value: "60s", label: t.story.stat3 },
+              ].map((stat) => (
+                <div key={stat.label}>
+                  <dt className="text-clay font-sans text-3xl font-semibold tracking-tight">
+                    {stat.value}
+                  </dt>
+                  <dd className="text-muted-foreground mt-1 text-sm">{stat.label}</dd>
+                </div>
+              ))}
             </dl>
           </div>
         </div>
       </section>
 
-      {/* ---------------- Price menu ---------------- */}
-      <section className="mx-auto max-w-4xl px-5 py-16 sm:px-6 sm:py-24">
-        <div className="text-center">
-          <p className="eyebrow">{t.priceMenu.eyebrow}</p>
-          <h2 className="font-heading mt-3 text-4xl font-medium sm:text-5xl">{t.priceMenu.title}</h2>
-          <div className="rule-gold mx-auto mt-6" />
-        </div>
-
-        <div className="mt-14 space-y-12">
-          {Object.entries(byCategory).map(([category, items]) => (
-            <div key={category}>
-              <h3 className="font-heading border-gold/40 border-b pb-3 text-2xl font-medium">
-                {categoryLabelFor(services, category, locale)}
-              </h3>
-              <ul className="mt-5 space-y-4">
-                {items.map((service) => (
-                  <li key={service.id} className="flex items-baseline gap-4">
-                    <span className="font-medium">{service.name}</span>
-                    <span className="border-border/70 min-w-6 flex-1 border-b border-dotted" />
-                    <span className="text-muted-foreground hidden text-sm sm:inline">{service.duration_minutes} min</span>
-                    <span className="font-heading text-lg font-semibold whitespace-nowrap">
-                      {formatPrice(service.price)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-14 text-center">
-          <Button asChild size="lg" className="h-13 px-10 text-base">
-            <Link href="/book">{t.priceMenu.cta}</Link>
-          </Button>
-        </div>
-      </section>
-
       {/* ---------------- Gallery ---------------- */}
+      {galleryImages.length > 0 && (
       <section className="bg-secondary/60 py-16 sm:py-24">
         <div className="mx-auto max-w-6xl px-5 sm:px-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -226,7 +217,7 @@ export default async function HomePage() {
               href={socialLinks.tiktok}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-plum inline-flex min-h-11 items-center text-sm font-medium underline-offset-4 hover:underline"
+              className="text-clay inline-flex min-h-11 items-center text-sm font-medium underline-offset-4 hover:underline"
             >
               {t.gallery.tiktok}
             </a>
@@ -236,7 +227,7 @@ export default async function HomePage() {
             {t.gallery.tiktokNote}
           </p>
 
-          <div className="mt-10 grid grid-cols-2 gap-3 sm:mt-12 sm:gap-4 lg:grid-cols-4">
+          <div className="mt-10 grid grid-cols-2 gap-3 sm:mt-12 sm:gap-4 lg:gap-6">
             {galleryImages.map((image) => (
               <Image
                 key={image.src}
@@ -245,32 +236,30 @@ export default async function HomePage() {
                 width={1000}
                 height={1000}
                 sizes="(max-width: 1024px) 50vw, 25vw"
-                className={cn(
-                  "aspect-square w-full object-cover",
-                  image.feature && "lg:row-span-2 lg:aspect-auto lg:h-full",
-                )}
+                className="aspect-square w-full rounded-2xl object-cover"
               />
             ))}
           </div>
         </div>
       </section>
+      )}
 
       {testimonials.length > 0 && (
         <section className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
           <div className="text-center">
             <p className="eyebrow">{t.testimonials.eyebrow}</p>
             <h2 className="font-heading mt-3 text-3xl font-medium sm:text-4xl">{t.testimonials.title}</h2>
-            <div className="rule-gold mx-auto mt-6" />
+            <div className="rule-copper mx-auto mt-6" />
           </div>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {testimonials.map((testimonial) => (
               <figure key={testimonial.id} className="bg-card flex h-full flex-col border p-6">
-                <Quote className="text-gold size-6" aria-hidden />
+                <Quote className="text-copper size-6" aria-hidden />
                 {testimonial.rating && (
                   <div className="mt-3 flex gap-0.5" aria-label={`${testimonial.rating} out of 5`}>
                     {Array.from({ length: testimonial.rating }).map((_, i) => (
-                      <Star key={i} className="fill-gold text-gold size-4" aria-hidden />
+                      <Star key={i} className="fill-gold text-copper size-4" aria-hidden />
                     ))}
                   </div>
                 )}
@@ -290,11 +279,11 @@ export default async function HomePage() {
           <div>
             <p className="eyebrow">{t.visit.eyebrow}</p>
             <h2 className="font-heading mt-3 text-4xl font-medium sm:text-5xl">{t.visit.title}</h2>
-            <div className="rule-gold mt-6" />
+            <div className="rule-copper mt-6" />
 
             <div className="mt-10 space-y-8">
               <div className="flex gap-4">
-                <MapPin className="text-gold mt-1 size-5 shrink-0" />
+                <MapPin className="text-copper mt-1 size-5 shrink-0" />
                 <div>
                   <p className="font-medium">{t.visit.address}</p>
                   <p className="text-muted-foreground mt-1">
@@ -306,17 +295,17 @@ export default async function HomePage() {
               </div>
 
               <div className="flex gap-4">
-                <Phone className="text-gold mt-1 size-5 shrink-0" />
+                <Phone className="text-copper mt-1 size-5 shrink-0" />
                 <div>
                   <p className="font-medium">{t.visit.phone}</p>
-                  <a href={businessInfo.phoneHref} className="text-muted-foreground hover:text-plum mt-1 inline-flex min-h-11 items-center">
+                  <a href={businessInfo.phoneHref} className="text-muted-foreground hover:text-clay mt-1 inline-flex min-h-11 items-center">
                     {businessInfo.phone}
                   </a>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <Clock className="text-gold mt-1 size-5 shrink-0" />
+                <Clock className="text-copper mt-1 size-5 shrink-0" />
                 <div className="min-w-0 flex-1">
                   <p className="font-medium">{t.visit.hours}</p>
                   <dl className="text-muted-foreground mt-2 space-y-1 text-sm">
@@ -358,7 +347,7 @@ export default async function HomePage() {
           sizes="100vw"
           className="h-80 w-full object-cover"
         />
-        <div className="bg-plum/85 absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+        <div className="bg-clay/85 absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
           <p className="font-script text-3xl text-white/90">{t.closing.script}</p>
           <h2 className="font-heading mt-2 max-w-2xl text-4xl font-medium text-white sm:text-5xl">
             {t.closing.title}

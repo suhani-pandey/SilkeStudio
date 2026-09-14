@@ -2,10 +2,10 @@
 
 import { endOfDay, startOfDay } from "date-fns";
 import { formatInTimeZone, toZonedTime } from "date-fns-tz";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { computeAvailableSlots, type Interval } from "@/lib/availability";
-import type { Service } from "@/lib/database.types";
+import type { Fulfilment, Service } from "@/lib/database.types";
 import { SALON_TIMEZONE } from "@/lib/business-info";
 import {
   customerConfirmationMessage,
@@ -14,53 +14,80 @@ import {
   sendSms,
 } from "@/lib/sms";
 import { sendPushToOwners } from "@/lib/push";
+import { CACHE_TAGS } from "@/lib/cache-tags";
+import { createPublicClient } from "@/lib/supabase/public";
 
 const APPOINTMENT_SELECT = "*, appointment_services(service:services(*))";
 
-export async function getActiveServices(): Promise<Service[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("services")
-    .select("*")
-    .eq("active", true)
-    .order("sort_order", { ascending: true });
+const loadActiveServices = unstable_cache(
+  async (): Promise<Service[]> => {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from("services")
+      .select("*")
+      .eq("active", true)
+      .order("sort_order", { ascending: true });
 
-  if (error) throw new Error(error.message);
-  return data ?? [];
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  },
+  ["active-services"],
+  { tags: [CACHE_TAGS.services], revalidate: 3600 },
+);
+
+export async function getActiveServices(): Promise<Service[]> {
+  return loadActiveServices();
 }
+
+const loadPublishedTestimonials = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from("testimonials")
+      .select("*")
+      .eq("is_published", true)
+      .order("sort_order", { ascending: true });
+
+    // Reviews are decorative: if the table is missing or unreadable, the home page should still
+    // render rather than 500 on a section that may well be empty anyway.
+    if (error) {
+      console.error("Could not load testimonials", error.message);
+      return [];
+    }
+    return data ?? [];
+  },
+  ["published-testimonials"],
+  { tags: [CACHE_TAGS.testimonials], revalidate: 3600 },
+);
 
 export async function getPublishedTestimonials() {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("testimonials")
-    .select("*")
-    .eq("is_published", true)
-    .order("sort_order", { ascending: true });
-
-  // Reviews are decorative: if the table is missing or unreadable, the home page should still
-  // render rather than 500 on a section that may well be empty anyway.
-  if (error) {
-    console.error("Could not load testimonials", error.message);
-    return [];
-  }
-  return data ?? [];
+  return loadPublishedTestimonials();
 }
 
-export async function getBusinessHours() {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("business_hours")
-    .select("*")
-    .order("day_of_week", { ascending: true });
+const loadBusinessHours = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from("business_hours")
+      .select("*")
+      .order("day_of_week", { ascending: true });
 
-  if (error) throw new Error(error.message);
-  return data ?? [];
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  },
+  ["business-hours"],
+  { tags: [CACHE_TAGS.businessHours], revalidate: 3600 },
+);
+
+export async function getBusinessHours() {
+  return loadBusinessHours();
 }
 
 export async function getAvailableSlots(
   serviceIds: string[],
   dateISO: string,
   excludeAppointmentId?: string,
+  fulfilment: Fulfilment = "appointment",
 ): Promise<string[]> {
   if (serviceIds.length === 0) return [];
 
@@ -76,7 +103,10 @@ export async function getAvailableSlots(
 
   const [{ data: services, error: servicesError }, { data: hours }, { data: busyRows, error: busyError }] =
     await Promise.all([
-      supabase.from("services").select("duration_minutes, buffer_minutes").in("id", serviceIds).eq("active", true),
+      // Selecting * rather than naming dropoff_minutes: on a database that hasn't had the
+      // tailoring migration applied yet the column simply isn't there, and naming it would fail
+      // the whole query and leave customers staring at a booking page with no times on it.
+      supabase.from("services").select("*").in("id", serviceIds).eq("active", true),
       supabase.from("business_hours").select("*").eq("day_of_week", dayOfWeek).single(),
       // Taken slots come from a database function so guests (who can't read appointments) still
       // see accurate availability instead of every slot looking free.
@@ -91,7 +121,12 @@ export async function getAvailableSlots(
   if (busyError) throw new Error(busyError.message);
   if (!services || services.length === 0) return [];
 
-  const durationMinutes = services.reduce((sum, s) => sum + s.duration_minutes, 0);
+  // A drop-off only needs the hand-over slot — the sewing happens afterwards, not while the
+  // customer stands there — so it books a fraction of the time the same job would take to wait for.
+  const durationMinutes = services.reduce(
+    (sum, s) => sum + (fulfilment === "dropoff" ? (s.dropoff_minutes ?? 15) : s.duration_minutes),
+    0,
+  );
   // One turnaround covers the whole visit, so take the longest of the chosen services.
   const bufferMinutes = Math.max(0, ...services.map((s) => s.buffer_minutes ?? 0));
 
@@ -120,6 +155,8 @@ export interface CreateBookingInput {
   guestPhone: string;
   guestEmail?: string;
   notes?: string;
+  /** Alterations only: whether the customer waits for the work or leaves the garment. */
+  fulfilment?: Fulfilment;
 }
 
 export async function createBooking(input: CreateBookingInput): Promise<{ reference: string }> {
@@ -133,6 +170,7 @@ export async function createBooking(input: CreateBookingInput): Promise<{ refere
     p_guest_email: input.guestEmail ?? null,
     p_notes: input.notes ?? null,
     p_booked_by: "customer",
+    p_fulfilment: input.fulfilment ?? "appointment",
   });
 
   if (error) {

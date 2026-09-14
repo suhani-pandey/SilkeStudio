@@ -1,11 +1,14 @@
 "use server";
 
 import { endOfDay, startOfDay } from "date-fns";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { fromZonedTime } from "date-fns-tz";
 import { createClient } from "@/lib/supabase/server";
 import { SALON_TIMEZONE } from "@/lib/business-info";
-import type { AppointmentStatus, BusinessHour, Service } from "@/lib/database.types";
+import { CACHE_TAGS } from "@/lib/cache-tags";
+import type { AppointmentStatus, BusinessHour, Service,
+  ServiceLine,
+} from "@/lib/database.types";
 
 function revalidateAdmin() {
   revalidatePath("/admin");
@@ -105,6 +108,10 @@ export interface ServiceInput {
   price: number;
   durationMinutes: number;
   bufferMinutes: number;
+  /** Which half of the business this belongs to. */
+  serviceLine: ServiceLine;
+  /** Alterations only: the short hand-over slot when the garment is left behind. */
+  dropoffMinutes?: number | null;
   description?: string;
   /** Danish display copy. Blank falls back to the English above. */
   nameDa?: string;
@@ -124,6 +131,8 @@ export async function createService(input: ServiceInput): Promise<Service> {
       price: input.price,
       duration_minutes: input.durationMinutes,
       buffer_minutes: input.bufferMinutes,
+      service_line: input.serviceLine,
+      dropoff_minutes: input.serviceLine === "tailoring" ? (input.dropoffMinutes ?? 15) : null,
       description: input.description || null,
       name_da: input.nameDa || null,
       description_da: input.descriptionDa || null,
@@ -134,6 +143,7 @@ export async function createService(input: ServiceInput): Promise<Service> {
     .select()
     .single();
   if (error) throw new Error(error.message);
+  updateTag(CACHE_TAGS.services);
   revalidatePath("/admin/services");
   revalidatePath("/services");
   revalidatePath("/book");
@@ -150,6 +160,8 @@ export async function updateService(id: string, input: ServiceInput) {
       price: input.price,
       duration_minutes: input.durationMinutes,
       buffer_minutes: input.bufferMinutes,
+      service_line: input.serviceLine,
+      dropoff_minutes: input.serviceLine === "tailoring" ? (input.dropoffMinutes ?? 15) : null,
       description: input.description || null,
       name_da: input.nameDa || null,
       description_da: input.descriptionDa || null,
@@ -159,6 +171,7 @@ export async function updateService(id: string, input: ServiceInput) {
     })
     .eq("id", id);
   if (error) throw new Error(error.message);
+  updateTag(CACHE_TAGS.services);
   revalidatePath("/admin/services");
   revalidatePath("/services");
   revalidatePath("/book");
@@ -168,6 +181,7 @@ export async function deleteService(id: string) {
   const supabase = await createClient();
   const { error } = await supabase.from("services").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  updateTag(CACHE_TAGS.services);
   revalidatePath("/admin/services");
   revalidatePath("/services");
   revalidatePath("/book");
@@ -192,6 +206,7 @@ export async function updateBusinessHours(
     .update({ open_time: input.openTime, close_time: input.closeTime, is_closed: input.isClosed })
     .eq("day_of_week", dayOfWeek);
   if (error) throw new Error(error.message);
+  updateTag(CACHE_TAGS.businessHours);
   revalidatePath("/admin/availability");
   revalidatePath("/book");
 }
@@ -343,6 +358,7 @@ export async function createTestimonial(input: TestimonialInput) {
     .select()
     .single();
   if (error) throw new Error(error.message);
+  updateTag(CACHE_TAGS.testimonials);
   revalidatePath("/");
   revalidatePath("/admin/testimonials");
   return data;
@@ -361,6 +377,7 @@ export async function updateTestimonial(id: string, input: TestimonialInput) {
     })
     .eq("id", id);
   if (error) throw new Error(error.message);
+  updateTag(CACHE_TAGS.testimonials);
   revalidatePath("/");
   revalidatePath("/admin/testimonials");
 }
@@ -369,6 +386,7 @@ export async function deleteTestimonial(id: string) {
   const supabase = await createClient();
   const { error } = await supabase.from("testimonials").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  updateTag(CACHE_TAGS.testimonials);
   revalidatePath("/");
   revalidatePath("/admin/testimonials");
 }

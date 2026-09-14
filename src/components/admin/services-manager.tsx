@@ -10,11 +10,12 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { createService, deleteService, updateService, type ServiceInput } from "@/lib/actions/admin";
 import { formatDuration, formatPrice } from "@/lib/format";
-import type { Service } from "@/lib/database.types";
+import type { Service, ServiceLine } from "@/lib/database.types";
 
 const emptyForm: ServiceInput = {
   name: "",
@@ -22,6 +23,8 @@ const emptyForm: ServiceInput = {
   price: 0,
   durationMinutes: 30,
   bufferMinutes: 0,
+  serviceLine: "beauty",
+  dropoffMinutes: 15,
   description: "",
   nameDa: "",
   descriptionDa: "",
@@ -50,6 +53,8 @@ export function ServicesManager({ initialServices }: { initialServices: Service[
       price: service.price,
       durationMinutes: service.duration_minutes,
       bufferMinutes: service.buffer_minutes ?? 0,
+      serviceLine: service.service_line ?? "beauty",
+      dropoffMinutes: service.dropoff_minutes ?? 15,
       description: service.description ?? "",
       nameDa: service.name_da ?? "",
       descriptionDa: service.description_da ?? "",
@@ -75,6 +80,8 @@ export function ServicesManager({ initialServices }: { initialServices: Service[
                     price: form.price,
                     duration_minutes: form.durationMinutes,
                     buffer_minutes: form.bufferMinutes,
+                    service_line: form.serviceLine,
+                    dropoff_minutes: form.serviceLine === "tailoring" ? form.dropoffMinutes ?? 15 : null,
                     description: form.description || null,
                     name_da: form.nameDa || null,
                     description_da: form.descriptionDa || null,
@@ -189,6 +196,47 @@ export function ServicesManager({ initialServices }: { initialServices: Service[
             <DialogTitle>{editing ? "Edit service" : "Add service"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            <div>
+              <Label className="mb-1.5 block">Part of the business</Label>
+              <div className="bg-muted flex rounded-lg p-1" role="group" aria-label="Part of the business">
+                {(["beauty", "tailoring"] as ServiceLine[]).map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={form.serviceLine === value}
+                    onClick={() => setForm((f) => ({ ...f, serviceLine: value }))}
+                    className={cn(
+                      "flex-1 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
+                      form.serviceLine === value
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {value === "beauty" ? "Beauty" : "Alterations"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {form.serviceLine === "tailoring" && (
+              <div>
+                <Label className="mb-1.5 block">Drop-off slot (min)</Label>
+                <Input
+                  type="number"
+                  min={5}
+                  value={form.dropoffMinutes ?? 15}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, dropoffMinutes: Number(e.target.value) || 15 }))
+                  }
+                  className="h-11"
+                />
+                <p className="text-muted-foreground mt-1.5 text-sm">
+                  How long you need to take the garment in and measure, when the customer leaves it
+                  with you. The duration above is used instead when they wait for it.
+                </p>
+              </div>
+            )}
+
             <div>
               <Label className="mb-1.5 block">Name</Label>
               <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className="h-11" />

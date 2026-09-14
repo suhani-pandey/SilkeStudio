@@ -13,7 +13,7 @@ export async function SiteFooter() {
       <div className="mx-auto max-w-6xl px-5 py-12 sm:px-6 sm:py-16">
         <div className="grid gap-10 sm:grid-cols-2 sm:gap-12 lg:grid-cols-4">
           <div className="lg:col-span-2">
-            <Link href="/" aria-label="GlowNest home">
+            <Link href="/" aria-label="Silke Studio home">
               <Logo className="h-12" />
             </Link>
             <p className="text-muted-foreground mt-5 max-w-sm text-sm leading-relaxed">
@@ -24,8 +24,8 @@ export async function SiteFooter() {
                 href={socialLinks.tiktok}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="GlowNest on TikTok"
-                className="text-muted-foreground hover:text-plum -m-2.5 p-2.5 transition-colors"
+                aria-label="Silke Studio on TikTok"
+                className="text-muted-foreground hover:text-clay -m-2.5 p-2.5 transition-colors"
               >
                 <TikTokIcon className="size-5" />
               </a>
@@ -33,8 +33,8 @@ export async function SiteFooter() {
                 href={socialLinks.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="GlowNest on Instagram"
-                className="text-muted-foreground hover:text-plum -m-2.5 p-2.5 transition-colors"
+                aria-label="Silke Studio on Instagram"
+                className="text-muted-foreground hover:text-clay -m-2.5 p-2.5 transition-colors"
               >
                 <InstagramIcon className="size-5" />
               </a>
@@ -43,8 +43,8 @@ export async function SiteFooter() {
                   href={socialLinks.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="GlowNest on Facebook"
-                  className="text-muted-foreground hover:text-plum -m-2.5 p-2.5 transition-colors"
+                  aria-label="Silke Studio on Facebook"
+                  className="text-muted-foreground hover:text-clay -m-2.5 p-2.5 transition-colors"
                 >
                   <FacebookIcon className="size-5" />
                 </a>
@@ -55,16 +55,16 @@ export async function SiteFooter() {
           <div>
             <p className="eyebrow">{t.footer.explore}</p>
             <nav className="mt-4 flex flex-col gap-1 text-sm">
-              <Link href="/services" className="text-muted-foreground hover:text-plum py-2.5">
+              <Link href="/services" className="text-muted-foreground hover:text-clay py-2.5">
                 {t.footer.servicesLink}
               </Link>
-              <Link href="/book" className="text-muted-foreground hover:text-plum py-2.5">
+              <Link href="/book" className="text-muted-foreground hover:text-clay py-2.5">
                 {t.footer.bookLink}
               </Link>
-              <Link href="/my-appointments" className="text-muted-foreground hover:text-plum py-2.5">
+              <Link href="/my-appointments" className="text-muted-foreground hover:text-clay py-2.5">
                 {t.footer.myAppointmentsLink}
               </Link>
-              <Link href="/booking" className="text-muted-foreground hover:text-plum py-2.5">
+              <Link href="/booking" className="text-muted-foreground hover:text-clay py-2.5">
                 {t.footer.findBooking}
               </Link>
             </nav>
@@ -74,15 +74,15 @@ export async function SiteFooter() {
             <p className="eyebrow">{t.footer.visit}</p>
             <div className="text-muted-foreground mt-5 space-y-3 text-sm">
               <p className="flex items-start gap-2">
-                <MapPin className="text-gold mt-0.5 size-4 shrink-0" />
+                <MapPin className="text-copper mt-0.5 size-4 shrink-0" />
                 <span>
                   {businessInfo.address.line1}
                   <br />
                   {businessInfo.address.line2}
                 </span>
               </p>
-              <a href={businessInfo.phoneHref} className="hover:text-plum flex items-center gap-2 py-2.5">
-                <Phone className="text-gold size-4 shrink-0" />
+              <a href={businessInfo.phoneHref} className="hover:text-clay flex items-center gap-2 py-2.5">
+                <Phone className="text-copper size-4 shrink-0" />
                 {businessInfo.phone}
               </a>
             </div>
@@ -91,10 +91,10 @@ export async function SiteFooter() {
 
         <div className="mt-14 border-t pt-8">
           <nav className="flex flex-wrap items-center justify-center gap-x-6 text-xs">
-            <Link href="/privacy" className="text-muted-foreground hover:text-plum py-2">
+            <Link href="/privacy" className="text-muted-foreground hover:text-clay py-2">
               {t.footer.privacy}
             </Link>
-            <Link href="/terms" className="text-muted-foreground hover:text-plum py-2">
+            <Link href="/terms" className="text-muted-foreground hover:text-clay py-2">
               {t.footer.terms}
             </Link>
           </nav>

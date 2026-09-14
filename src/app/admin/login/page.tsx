@@ -28,7 +28,7 @@ export default function AdminLoginPage() {
   return (
     <div className="bg-secondary/50 flex min-h-screen items-center justify-center px-6">
       <div className="w-full max-w-sm">
-        <Link href="/" className="mb-8 flex items-center justify-center" aria-label="GlowNest home">
+        <Link href="/" className="mb-8 flex items-center justify-center" aria-label="Silke Studio home">
           <Logo className="h-14" />
         </Link>
         <Card className="border-border/60">

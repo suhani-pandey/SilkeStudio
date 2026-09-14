@@ -29,7 +29,7 @@ export function LoginForm({ t }: { t: Dictionary["auth"] }) {
     <div className="mx-auto max-w-sm px-6 py-20">
       <p className="eyebrow text-center">{t.accountEyebrow}</p>
       <h1 className="font-heading mt-3 text-center text-4xl font-medium">{t.loginTitle}</h1>
-      <div className="rule-gold mx-auto mt-5" />
+      <div className="rule-copper mx-auto mt-5" />
       <p className="text-muted-foreground mt-5 text-center text-sm">
         {t.loginBody}
       </p>

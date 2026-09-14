@@ -31,7 +31,7 @@ export default function GlobalError({
       >
         <h1 style={{ fontSize: "1.5rem", fontWeight: 500, margin: 0 }}>Something went wrong</h1>
         <p style={{ margin: 0, maxWidth: "24rem", lineHeight: 1.6 }}>
-          GlowNest couldn&apos;t load. Please try again, or call 91 71 90 63 to book.
+          Silke Studio couldn&apos;t load. Please try again, or call 91 71 90 63 to book.
         </p>
         <button
           onClick={reset}

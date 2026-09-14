@@ -29,7 +29,7 @@ export default function ForgotPasswordPage() {
     return (
       <div className="mx-auto max-w-sm px-6 py-20 text-center">
         <div className="bg-accent mx-auto flex size-14 items-center justify-center rounded-full">
-          <MailCheck className="text-plum size-6" />
+          <MailCheck className="text-clay size-6" />
         </div>
         <h1 className="font-heading mt-6 text-3xl font-medium">Check your email</h1>
         <p className="text-muted-foreground mt-3 text-sm">
@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
     <div className="mx-auto max-w-sm px-6 py-20">
       <p className="eyebrow text-center">Account</p>
       <h1 className="font-heading mt-3 text-center text-4xl font-medium">Reset password</h1>
-      <div className="rule-gold mx-auto mt-5" />
+      <div className="rule-copper mx-auto mt-5" />
       <p className="text-muted-foreground mt-5 text-center text-sm">
         We&apos;ll email you a link to choose a new one.
       </p>

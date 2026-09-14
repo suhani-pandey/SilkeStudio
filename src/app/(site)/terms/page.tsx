@@ -7,8 +7,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: da ? "Bookingbetingelser" : "Booking terms",
     description: da
-      ? "Betingelser for booking, aflysning og betaling hos GlowNest Beauty Salon."
-      : "Booking, cancellation and payment terms at GlowNest Beauty Salon.",
+      ? "Betingelser for booking, aflysning og betaling hos Silke Studio."
+      : "Booking, cancellation and payment terms at Silke Studio.",
   };
 }
 
@@ -60,7 +60,7 @@ export default async function TermsPage() {
       <h1 className="font-heading mt-3 text-4xl font-medium">
         {da ? "Booking­betingelser" : "Booking terms"}
       </h1>
-      <div className="rule-gold mt-6" />
+      <div className="rule-copper mt-6" />
 
       <div className="text-muted-foreground mt-10 space-y-8 leading-relaxed">
         {sections.map((section) => (

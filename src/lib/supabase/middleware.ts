@@ -1,8 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/lib/database.types";
+import { getCachedJwks } from "@/lib/supabase/jwks";
 
 export async function updateSession(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const isAdminRoute = pathname.startsWith("/admin");
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient<Database>(
@@ -24,45 +28,21 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  // Refresh the auth token if needed. Required so server components see a valid session.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Verifies the token's signature against the project's public key, held locally after the first
+  // fetch — unlike getUser(), which called the Supabase Auth API on every navigation and put
+  // 150–300 ms of dead time in front of every page, static ones included. It still refreshes an
+  // expired session, so server components downstream see a valid one.
+  const jwks = await getCachedJwks();
+  const { data } = await supabase.auth.getClaims(undefined, jwks ? { jwks } : undefined);
+  const signedIn = Boolean(data?.claims?.sub);
 
-  const { pathname } = request.nextUrl;
-
-  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
-    if (!user) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/admin/login";
-      return NextResponse.redirect(url);
-    }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (profile?.role !== "owner") {
-      const url = request.nextUrl.clone();
-      url.pathname = "/admin/login";
-      return NextResponse.redirect(url);
-    }
-  }
-
-  if (pathname === "/admin/login" && user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (profile?.role === "owner") {
-      const url = request.nextUrl.clone();
-      url.pathname = "/admin";
-      return NextResponse.redirect(url);
-    }
+  // Middleware only decides "is anyone signed in". Whether that person is the owner is settled in
+  // the admin layout, which has to load their profile anyway — and row-level security is the real
+  // boundary regardless, so nothing rests on this check alone.
+  if (isAdminRoute && pathname !== "/admin/login" && !signedIn) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin/login";
+    return NextResponse.redirect(url);
   }
 
   return supabaseResponse;

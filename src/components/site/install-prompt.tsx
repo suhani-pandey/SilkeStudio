@@ -12,7 +12,7 @@ interface BeforeInstallPromptEvent extends Event {
 const DISMISSED_KEY = "glownest_install_dismissed";
 
 /**
- * Invites phone visitors to install GlowNest to their home screen. Android fires
+ * Invites phone visitors to install Silke Studio to their home screen. Android fires
  * `beforeinstallprompt` and gets a real install button; iOS has no such API, so it gets the
  * Share-sheet instructions instead.
  */
@@ -72,7 +72,7 @@ export function InstallPrompt() {
         {/* eslint-disable-next-line @next/next/no-img-element -- fixed-size app icon */}
         <img src="/images/icon-192.png" alt="" className="size-11 shrink-0 rounded-lg" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium">Add GlowNest to your home screen</p>
+          <p className="text-sm font-medium">Add Silke Studio to your home screen</p>
           {showIosHint ? (
             <p className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
               Tap <Share className="size-3.5" /> then &ldquo;Add to Home Screen&rdquo;

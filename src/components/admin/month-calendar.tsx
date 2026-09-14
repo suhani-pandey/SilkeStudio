@@ -239,7 +239,7 @@ export function MonthCalendar({
                 {entry.phone && (
                   <a
                     href={`tel:${entry.phone.replace(/\s/g, "")}`}
-                    className="text-muted-foreground hover:text-plum mt-1 inline-flex min-h-9 items-center gap-1.5 text-sm"
+                    className="text-muted-foreground hover:text-clay mt-1 inline-flex min-h-9 items-center gap-1.5 text-sm"
                   >
                     <Phone className="size-3.5" />
                     {entry.phone}

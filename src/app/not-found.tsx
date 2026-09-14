@@ -10,13 +10,13 @@ export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
       <div className="bg-accent flex size-16 items-center justify-center rounded-full">
-        <MapPinOff className="text-plum size-7" />
+        <MapPinOff className="text-clay size-7" />
       </div>
       <p className="eyebrow mt-8">404</p>
       <h1 className="font-heading mt-3 text-3xl font-medium sm:text-4xl">
         We can&apos;t find that page
       </h1>
-      <div className="rule-gold mx-auto mt-5" />
+      <div className="rule-copper mx-auto mt-5" />
       <p className="text-muted-foreground mt-5 max-w-sm leading-relaxed">
         The link may be out of date. Everything is still one tap away from the home page — or call
         and we&apos;ll book you in ourselves.
@@ -31,7 +31,7 @@ export default function NotFound() {
       </div>
       <a
         href={businessInfo.phoneHref}
-        className="text-muted-foreground hover:text-plum mt-8 inline-flex min-h-11 items-center text-sm"
+        className="text-muted-foreground hover:text-clay mt-8 inline-flex min-h-11 items-center text-sm"
       >
         {businessInfo.phone}
       </a>

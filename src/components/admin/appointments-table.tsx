@@ -118,12 +118,19 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
                 <p className="font-heading text-lg font-medium">
                   {format(new Date(appt.start_at), "EEE d MMM 'at' HH:mm")}
                 </p>
-                <p className="mt-0.5 font-medium">{appt.guest_name}</p>
+                <p className="mt-0.5 font-medium">
+                  {appt.guest_name}
+                  {appt.fulfilment === "dropoff" && (
+                    <Badge variant="secondary" className="ml-2 align-middle">
+                      Drop-off
+                    </Badge>
+                  )}
+                </p>
                 <p className="text-muted-foreground mt-1 text-sm">{appointmentServiceNames(appt)}</p>
                 <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                   <a
                     href={`tel:${appt.guest_phone.replace(/\s/g, "")}`}
-                    className="hover:text-plum inline-flex min-h-9 items-center gap-1.5"
+                    className="hover:text-clay inline-flex min-h-9 items-center gap-1.5"
                   >
                     <Phone className="size-3.5" />
                     {appt.guest_phone}

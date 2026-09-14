@@ -759,3 +759,17 @@ where lower(s.name) = lower(v.name);
 -- 2. In the SQL Editor, run:
 --    update public.profiles set role = 'owner' where email = 'YOUR_OWNER_EMAIL_HERE';
 -- 3. Log in at /admin/login with that account from then on.
+
+-- =========================================================
+--  Tailoring
+-- =========================================================
+--  The alterations side of the business lives in its own file so it stays readable and can be
+--  applied to a database that was set up before it existed. It is idempotent, so run it straight
+--  after this file on a fresh project:
+--
+--      supabase/add-tailoring.sql
+--
+--  It adds services.service_line and services.dropoff_minutes, appointments.fulfilment and
+--  appointments.ready_by, seeds the alterations menu, and replaces create_booking() with the
+--  version that understands drop-offs. The site works without it — everything simply reads as
+--  beauty work — so nothing breaks in the window before it is applied.

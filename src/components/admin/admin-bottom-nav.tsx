@@ -34,7 +34,7 @@ export function AdminBottomNav() {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex min-h-16 flex-col items-center justify-center gap-1 px-1",
-                  active ? "text-plum" : "text-muted-foreground",
+                  active ? "text-clay" : "text-muted-foreground",
                 )}
               >
                 <Icon className={cn("size-5", active && "stroke-[2.25]")} />

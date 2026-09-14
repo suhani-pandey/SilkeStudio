@@ -43,16 +43,16 @@ export function ConfirmationView({ t, locale }: { t: Dictionary["confirmation"];
   return (
     <div className="mx-auto max-w-lg px-6 py-20 text-center">
       <div className="bg-accent mx-auto flex size-16 items-center justify-center rounded-full">
-        <Check className="text-plum size-7" />
+        <Check className="text-clay size-7" />
       </div>
-      <p className="font-script text-plum mt-6 text-4xl leading-none">{t.thanks}</p>
+      <p className="font-script text-clay mt-6 text-4xl leading-none">{t.thanks}</p>
       <h1 className="font-heading mt-3 text-4xl font-medium">{t.title}</h1>
       <p className="text-muted-foreground mt-3">
         {t.body} {booking.guestName.split(" ")[0]}.
       </p>
 
       {booking.reference && (
-        <div className="border-gold/50 bg-secondary/50 mt-8 rounded-lg border border-dashed p-4">
+        <div className="border-copper/50 bg-secondary/50 mt-8 rounded-lg border border-dashed p-4">
           <p className="eyebrow">{t.reference}</p>
           <p className="font-heading mt-1 text-3xl font-semibold tracking-[0.2em]">{booking.reference}</p>
           <p className="text-muted-foreground mt-2 text-xs">{t.referenceHint}</p>
@@ -68,7 +68,7 @@ export function ConfirmationView({ t, locale }: { t: Dictionary["confirmation"];
         <ul className="text-muted-foreground mt-5 space-y-1.5 text-sm">
           {booking.serviceNames.map((name) => (
             <li key={name} className="flex items-center gap-2">
-              <span className="bg-gold size-1 rounded-full" />
+              <span className="bg-copper size-1 rounded-full" />
               {name}
             </li>
           ))}
@@ -84,11 +84,11 @@ export function ConfirmationView({ t, locale }: { t: Dictionary["confirmation"];
 
       <div className="text-muted-foreground mt-8 space-y-2 text-sm">
         <p className="flex items-center justify-center gap-2">
-          <MapPin className="text-gold size-4" />
+          <MapPin className="text-copper size-4" />
           {businessInfo.address.line1}, {businessInfo.address.line2}
         </p>
-        <a href={businessInfo.phoneHref} className="hover:text-plum flex items-center justify-center gap-2">
-          <Phone className="text-gold size-4" />
+        <a href={businessInfo.phoneHref} className="hover:text-clay flex items-center justify-center gap-2">
+          <Phone className="text-copper size-4" />
           {businessInfo.phone}
         </a>
       </div>

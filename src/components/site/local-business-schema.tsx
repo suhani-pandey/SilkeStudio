@@ -24,7 +24,8 @@ export function LocalBusinessSchema({
 }) {
   const schema = {
     "@context": "https://schema.org",
-    "@type": "BeautySalon",
+    // Two trades under one roof, so the generic type is the accurate one.
+    "@type": "LocalBusiness",
     name: businessInfo.name,
     url: siteUrl(),
     telephone: businessInfo.phoneHref.replace("tel:", ""),

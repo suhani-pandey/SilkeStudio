@@ -3,6 +3,7 @@ import { BookingWizard } from "@/components/booking/booking-wizard";
 import { getActiveServices } from "@/lib/actions/booking";
 import { createClient } from "@/lib/supabase/server";
 import { getLocale, getT } from "@/lib/i18n/server";
+import type { ServiceLine } from "@/lib/database.types";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
@@ -12,9 +13,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function BookPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; line?: string }>;
 }) {
-  const { category } = await searchParams;
+  const { category, line } = await searchParams;
+  // Arriving from "Book alterations" should open on that side of the menu, not on nails.
+  const initialLine: ServiceLine | undefined =
+    line === "tailoring" || line === "beauty" ? line : undefined;
   const supabase = await createClient();
   const {
     data: { user },
@@ -42,7 +46,7 @@ export default async function BookPage({
       <section className="bg-secondary/60 px-5 py-12 text-center sm:px-6 sm:py-16">
         <p className="eyebrow">{t.booking.eyebrow}</p>
         <h1 className="font-heading mt-3 text-3xl font-medium sm:text-5xl">{t.booking.title}</h1>
-        <div className="rule-gold mx-auto mt-6" />
+        <div className="rule-copper mx-auto mt-6" />
         <p className="text-muted-foreground mx-auto mt-6 max-w-md">
           {t.booking.body}
         </p>
@@ -54,6 +58,7 @@ export default async function BookPage({
           t={t.booking}
           locale={locale}
           initialCategory={category}
+          initialLine={initialLine}
         />
       </div>
     </div>

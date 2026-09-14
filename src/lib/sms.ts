@@ -13,7 +13,7 @@ import { businessInfo } from "@/lib/business-info";
 const API_URL = "https://gatewayapi.com/rest/mtsms";
 
 /** Max 11 characters, letters and digits — GatewayAPI rejects longer sender names. */
-const SENDER = "GlowNest";
+const SENDER = "Silke Studio";
 
 export function isSmsConfigured(): boolean {
   return Boolean(process.env.GATEWAYAPI_TOKEN);

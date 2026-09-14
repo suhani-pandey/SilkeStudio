@@ -121,9 +121,9 @@ export function TestimonialsManager({ initial }: { initial: Testimonial[] }) {
                   <p className="font-medium">{item.author_name}</p>
                   {!item.is_published && <Badge variant="secondary">Hidden</Badge>}
                   {item.rating && (
-                    <span className="text-gold flex gap-0.5">
+                    <span className="text-copper flex gap-0.5">
                       {Array.from({ length: item.rating }).map((_, i) => (
-                        <Star key={i} className="fill-gold size-3.5" />
+                        <Star key={i} className="fill-copper size-3.5" />
                       ))}
                     </span>
                   )}

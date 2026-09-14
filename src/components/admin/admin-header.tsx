@@ -26,7 +26,7 @@ export function AdminHeader({ initialNotifications }: { initialNotifications: Ap
           </SheetTrigger>
           <SheetContent side="left" className="w-72">
             <SheetHeader>
-              <SheetTitle className="sr-only">GlowNest Admin</SheetTitle>
+              <SheetTitle className="sr-only">Silke Studio Admin</SheetTitle>
               <Logo className="h-8" />
             </SheetHeader>
             <div className="px-4">
@@ -34,7 +34,7 @@ export function AdminHeader({ initialNotifications }: { initialNotifications: Ap
             </div>
           </SheetContent>
         </Sheet>
-        <Link href="/admin" className="flex lg:hidden" aria-label="GlowNest admin home">
+        <Link href="/admin" className="flex lg:hidden" aria-label="Silke Studio admin home">
           <Logo className="h-8" />
         </Link>
       </div>

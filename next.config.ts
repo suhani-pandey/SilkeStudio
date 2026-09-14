@@ -21,6 +21,11 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // Don't advertise the framework version to anyone scanning for known issues.
   poweredByHeader: false,
+  images: {
+    // 75 is the default; 68 is for the full-screen hero, where soft folds hide the extra
+    // compression and the saving is worth far more than the detail.
+    qualities: [68, 75],
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

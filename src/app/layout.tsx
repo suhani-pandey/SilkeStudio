@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(siteUrl()),
     title: {
       default: t.meta.homeTitle,
-      template: "%s · GlowNest Beauty Salon",
+      template: "%s · Silke Studio",
     },
     description: t.meta.homeDescription,
     keywords: [
@@ -54,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: "/" },
     openGraph: {
       type: "website",
-      siteName: "GlowNest Beauty Salon",
+      siteName: "Silke Studio",
       locale: locale === "da" ? "da_DK" : "en_DK",
       alternateLocale: locale === "da" ? "en_DK" : "da_DK",
       url: siteUrl(),
@@ -62,7 +62,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: t.meta.homeDescription,
     },
     manifest: "/manifest.webmanifest",
-    appleWebApp: { capable: true, statusBarStyle: "default", title: "GlowNest" },
+    appleWebApp: { capable: true, statusBarStyle: "default", title: "Silke Studio" },
     icons: {
       icon: "/images/icon-192.png",
       apple: "/images/apple-touch-icon.png",
@@ -72,7 +72,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#fbf8f3",
+  themeColor: "#faf6f1",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",

@@ -1,12 +1,11 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { Menu } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
-import { getNotificationsForCustomer, markNotificationRead } from "@/lib/actions/notifications";
-import { NotificationBell } from "@/components/notification-bell";
+import { getSessionUser } from "@/lib/supabase/server";
+import { CustomerBell, CustomerBellFallback } from "@/components/site/customer-bell";
 import { Logo } from "@/components/site/logo";
-import { LanguageToggle } from "@/components/site/language-toggle";
 import { Button } from "@/components/ui/button";
-import { getLocale, getT } from "@/lib/i18n/server";
+import { getT } from "@/lib/i18n/server";
 import {
   Sheet,
   SheetContent,
@@ -17,11 +16,7 @@ import {
 } from "@/components/ui/sheet";
 
 export async function SiteHeader() {
-  const supabase = await createClient();
-  const [{ data }, t, locale] = await Promise.all([supabase.auth.getUser(), getT(), getLocale()]);
-  const user = data.user;
-
-  const notifications = user ? await getNotificationsForCustomer() : [];
+  const [user, t] = await Promise.all([getSessionUser(), getT()]);
 
   const navLinks = [
     { href: "/", label: t.nav.home },
@@ -41,7 +36,7 @@ export async function SiteHeader() {
             <Link
               key={link.href}
               href={link.href}
-              className="hover:text-plum text-xs font-semibold tracking-[0.18em] uppercase transition-colors"
+              className="hover:text-clay text-xs font-semibold tracking-[0.18em] uppercase transition-colors"
             >
               {link.label}
             </Link>
@@ -49,14 +44,11 @@ export async function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <LanguageToggle current={locale} />
           {user ? (
             <>
-              <NotificationBell
-                initialNotifications={notifications}
-                filter={`customer_id=eq.${user.id}`}
-                onMarkRead={markNotificationRead}
-              />
+              <Suspense fallback={<CustomerBellFallback />}>
+                <CustomerBell userId={user.id} />
+              </Suspense>
               <Button asChild variant="ghost" className="hidden md:inline-flex">
                 <Link href="/my-appointments">{t.nav.myAppointments}</Link>
               </Button>

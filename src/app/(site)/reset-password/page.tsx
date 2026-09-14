@@ -39,7 +39,7 @@ export default function ResetPasswordPage() {
     <div className="mx-auto max-w-sm px-6 py-20">
       <p className="eyebrow text-center">Account</p>
       <h1 className="font-heading mt-3 text-center text-4xl font-medium">Choose a new password</h1>
-      <div className="rule-gold mx-auto mt-5" />
+      <div className="rule-copper mx-auto mt-5" />
 
       <Card className="border-border/60 mt-8">
         <CardContent>

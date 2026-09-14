@@ -1,6 +1,18 @@
-# GlowNest Beauty Salon
+# Silke Studio
 
-A booking website for a home-based beauty salon — customers book services online (or the owner books for them over the phone), and the owner manages everything from a dedicated admin dashboard with real-time notifications.
+A booking website for a home studio that does two things: beauty treatments (nails, threading,
+facials, hair, waxing) and clothing alterations (hemming, fittings, sari work, repairs).
+
+Customers book either side online — or the owner books for them over the phone — and she manages
+everything from one admin dashboard with real-time notifications.
+
+Alterations can be booked two ways, because both happen in real life:
+
+- **while you wait** — a normal appointment for the full working time
+- **drop off & collect** — a short hand-over-and-measure slot, picked up once it's finished
+
+The calendar only ever blocks the time she is actually working, so a drop-off doesn't tie up an
+hour she could spend on someone's nails.
 
 ## Tech stack
 
@@ -49,7 +61,7 @@ in the SQL Editor. It creates a confirmed owner account with a fake email, so th
 confirmation step and no real inbox needed:
 
     Email:     owner@glownest.test
-    Password:  GlowNest-Test-2026!
+    Password:  Silke Studio-Test-2026!
 
 **Delete this account before real customers use the site** — the password is in this repository.
 The removal statement is at the bottom of that file.
@@ -113,7 +125,7 @@ and the layout stays exactly the same — no code changes needed. Shoot roughly 
 
 | File | Where it appears | Shape |
 | --- | --- | --- |
-| `hero.jpg` | Home page, beside the headline | Tall portrait (4:5) |
+| `hero-studio.jpg` | Home page, full-screen background | Near-square (roughly 8:7) |
 | `about.jpg` | Home page, "Our story" | Landscape (4:3) |
 | `svc-nails.jpg` | Nails category card + services page | Tall portrait (4:5) |
 | `svc-face.jpg` | Face category, closing banner | Tall portrait (4:5) |
@@ -166,7 +178,12 @@ Deploy to Vercel (import the repo, it detects Next.js), and keep Supabase as the
       screenshot. Project Settings → API → rotate, then update the environment variables.
 - [ ] **Set `NEXT_PUBLIC_SITE_URL`** to the live domain. Password-reset emails and SMS links point
       at whatever this says.
-- [ ] **Confirm the price list** under Admin → Services.
+- [ ] **Run `supabase/add-tailoring.sql`** to switch the alterations side on. Until you do, the
+      site runs as beauty-only — nothing breaks, the tailoring menu just isn't there.
+- [ ] **Confirm the price list** under Admin → Services. The alteration prices are market-rate
+      estimates and need her sign-off before customers are quoted them.
+- [ ] **Rename the social accounts** — the Instagram and TikTok handles in
+      `src/lib/business-info.ts` still point at the old GlowNest profiles.
 - [ ] **Replace the stock photos** with the salon's own work.
 - [ ] **Publish real reviews only.** The seeded examples are unpublished and labelled as examples.
 - [ ] Optional: add `GATEWAYAPI_TOKEN` + `SALON_OWNER_PHONE` for SMS, and the VAPID keys for push.

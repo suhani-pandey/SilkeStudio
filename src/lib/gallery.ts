@@ -9,22 +9,22 @@ export interface GalleryImage {
   src: string;
   /** Describes the photo for screen readers and for search engines. */
   alt: string;
-  /** True for photographs taken at GlowNest, false for stock placeholders. */
+  /** True for photographs taken at Silke Studio, false for stock placeholders. */
   real?: boolean;
   /** Gives one image the tall slot on wide screens. */
   feature?: boolean;
 }
 
-export const galleryImages: GalleryImage[] = [
+const allImages: GalleryImage[] = [
   {
     src: "/images/gallery/nails-pink-bows.jpg",
-    alt: "Almond gel nails with pink French tips and hand-painted bows, done at GlowNest",
+    alt: "Almond gel nails with pink French tips and hand-painted bows, done at Silke Studio",
     real: true,
     feature: true,
   },
   {
     src: "/images/gallery/threading-brows.jpg",
-    alt: "Eyebrow threading in progress at GlowNest",
+    alt: "Eyebrow threading in progress at Silke Studio",
     real: true,
   },
   { src: "/images/gallery-3.jpg", alt: "Nail shaping" },
@@ -32,3 +32,10 @@ export const galleryImages: GalleryImage[] = [
   { src: "/images/gallery-2.jpg", alt: "Nail artistry" },
   { src: "/images/gallery-4.jpg", alt: "Fresh towels" },
 ];
+
+/**
+ * Only the studio's own work is shown. This section exists to prove the work is good, and a stock
+ * photograph sitting beside a real one quietly undermines the real one — so the filler is kept
+ * out until there are enough genuine photographs to fill the row.
+ */
+export const galleryImages: GalleryImage[] = allImages.filter((image) => image.real);

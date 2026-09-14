@@ -71,11 +71,11 @@ export function BookingLookup({ t, locale }: { t: Dictionary["lookup"]; locale: 
       <div className="mx-auto max-w-md px-5 py-14 sm:px-6">
         <p className="eyebrow text-center">{t.eyebrow}</p>
         <h1 className="font-heading mt-3 text-center text-3xl font-medium">{booking.guestName}</h1>
-        <div className="rule-gold mx-auto mt-5" />
+        <div className="rule-copper mx-auto mt-5" />
 
         <div className="mt-8 border p-6">
           <div className="flex items-center gap-2">
-            <CalendarCheck className="text-gold size-5 shrink-0" />
+            <CalendarCheck className="text-copper size-5 shrink-0" />
             <p className="font-heading text-xl font-medium">
               {format(new Date(booking.startAtISO), t.dateFormat, { locale: dateLocale(locale) })}
             </p>
@@ -131,7 +131,7 @@ export function BookingLookup({ t, locale }: { t: Dictionary["lookup"]; locale: 
     <div className="mx-auto max-w-sm px-5 py-14 sm:px-6">
       <p className="eyebrow text-center">{t.eyebrow}</p>
       <h1 className="font-heading mt-3 text-center text-3xl font-medium">{t.title}</h1>
-      <div className="rule-gold mx-auto mt-5" />
+      <div className="rule-copper mx-auto mt-5" />
       <p className="text-muted-foreground mt-5 text-center text-sm">{t.body}</p>
 
       <form className="mt-8 space-y-5" onSubmit={handleSearch}>

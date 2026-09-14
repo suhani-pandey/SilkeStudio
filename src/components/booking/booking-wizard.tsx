@@ -3,7 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { format, isSameDay } from "date-fns";
-import { Check, ChevronLeft, Loader2 } from "lucide-react";
+import { Check, ChevronLeft, Loader2, PackageOpen, Timer } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import { formatDuration, formatPrice } from "@/lib/format";
 import { createBooking, getAvailableSlots } from "@/lib/actions/booking";
 import { nextBookableDays } from "@/lib/dates";
 import type { BookingSummary } from "@/lib/booking-summary";
-import type { Service } from "@/lib/database.types";
+import type { Fulfilment, Service, ServiceLine } from "@/lib/database.types";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import { dateLocale } from "@/lib/date-locale";
@@ -27,11 +27,20 @@ interface BookingWizardProps {
   locale: Locale;
   /** Category to show first, when the visitor arrived from a category card. */
   initialCategory?: string;
+  /** Which side of the business to open on, when the visitor arrived from a specific card. */
+  initialLine?: ServiceLine;
 }
 
 type Step = 1 | 2 | 3;
 
-export function BookingWizard({ services, defaultContact, t, locale, initialCategory }: BookingWizardProps) {
+export function BookingWizard({
+  services,
+  defaultContact,
+  t,
+  locale,
+  initialCategory,
+  initialLine,
+}: BookingWizardProps) {
   const df = { locale: dateLocale(locale) };
   const steps: { id: Step; label: string }[] = [
     { id: 1, label: t.stepServices },
@@ -41,6 +50,8 @@ export function BookingWizard({ services, defaultContact, t, locale, initialCate
 
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
+  const [line, setLine] = useState<ServiceLine>(initialLine ?? "beauty");
+  const [fulfilment, setFulfilment] = useState<Fulfilment>("appointment");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(() => nextBookableDays(1)[0]);
   const [selectedSlotISO, setSelectedSlotISO] = useState<string | null>(null);
@@ -54,34 +65,62 @@ export function BookingWizard({ services, defaultContact, t, locale, initialCate
 
   const days = useMemo(() => nextBookableDays(21), []);
 
+  const hasTailoring = useMemo(
+    () => services.some((s) => s.service_line === "tailoring"),
+    [services],
+  );
+
   const grouped = useMemo(() => {
-    const byCategory = services.reduce<Record<string, Service[]>>((acc, service) => {
-      (acc[service.category] ??= []).push(service);
-      return acc;
-    }, {});
+    const byCategory = services
+      .filter((service) => (service.service_line ?? "beauty") === line)
+      .reduce<Record<string, Service[]>>((acc, service) => {
+        (acc[service.category] ??= []).push(service);
+        return acc;
+      }, {});
     if (!initialCategory || !byCategory[initialCategory]) return byCategory;
     // Lead with the category they tapped, without hiding the others.
     const { [initialCategory]: first, ...rest } = byCategory;
     return { [initialCategory]: first, ...rest };
-  }, [services, initialCategory]);
+  }, [services, initialCategory, line]);
 
   const selectedServices = useMemo(
     () => services.filter((s) => selectedIds.includes(s.id)),
     [services, selectedIds],
   );
   const totalPrice = selectedServices.reduce((sum, s) => sum + s.price, 0);
-  const totalDuration = selectedServices.reduce((sum, s) => sum + s.duration_minutes, 0);
+  const totalDuration = selectedServices.reduce(
+    (sum, s) => sum + (fulfilment === "dropoff" ? (s.dropoff_minutes ?? 15) : s.duration_minutes),
+    0,
+  );
+  const isTailoring = line === "tailoring";
+  const canDropOff =
+    isTailoring && selectedServices.length > 0 && selectedServices.every((s) => s.dropoff_minutes != null);
+
+  function switchLine(next: ServiceLine) {
+    if (next === line) return;
+    setLine(next);
+    setSelectedIds([]);
+    setSelectedSlotISO(null);
+    // Only garments can be left behind, so leaving the tailoring side resets the choice.
+    if (next === "beauty") setFulfilment("appointment");
+  }
+
+  function chooseFulfilment(next: Fulfilment) {
+    setFulfilment(next);
+    setSelectedSlotISO(null);
+    if (step === 2) loadSlots(selectedIds, selectedDate, next);
+  }
 
   function toggleService(id: string) {
     setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
     setSelectedSlotISO(null);
   }
 
-  async function loadSlots(ids: string[], date: Date) {
+  async function loadSlots(ids: string[], date: Date, mode: Fulfilment = fulfilment) {
     setSlotsLoading(true);
     setSelectedSlotISO(null);
     try {
-      setSlots(await getAvailableSlots(ids, date.toISOString()));
+      setSlots(await getAvailableSlots(ids, date.toISOString(), undefined, mode));
     } catch {
       toast.error(t.loadError);
       setSlots([]);
@@ -112,8 +151,10 @@ export function BookingWizard({ services, defaultContact, t, locale, initialCate
           guestPhone: phone.trim(),
           guestEmail: email.trim() || undefined,
           notes: notes.trim() || undefined,
+          fulfilment,
         });
         const summary: BookingSummary = {
+          fulfilment,
           serviceNames: selectedServices.map((s) => serviceName(s, locale)),
           totalPrice,
           durationMinutes: totalDuration,
@@ -141,7 +182,7 @@ export function BookingWizard({ services, defaultContact, t, locale, initialCate
                 className={cn(
                   "flex size-8 items-center justify-center rounded-full border text-xs font-semibold",
                   step === id && "border-primary bg-primary text-primary-foreground",
-                  step > id && "border-gold text-gold-deep",
+                  step > id && "border-copper text-copper-deep",
                   step < id && "text-muted-foreground border-border",
                 )}
               >
@@ -164,9 +205,67 @@ export function BookingWizard({ services, defaultContact, t, locale, initialCate
       {/* Step 1 — services */}
       {step === 1 && (
         <div className="space-y-10">
+          {/* Two halves of the business. A single visit belongs to one or the other, so switching
+              here starts the basket over rather than quietly mixing hair with hemming. */}
+          {hasTailoring && (
+            <div className="bg-muted flex rounded-lg p-1" role="group" aria-label={t.lineLabel}>
+              {(["beauty", "tailoring"] as const).map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={line === value}
+                  onClick={() => switchLine(value)}
+                  className={cn(
+                    "flex-1 rounded-md px-4 py-3 text-sm font-medium transition-colors",
+                    line === value
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {value === "beauty" ? t.lineBeauty : t.lineTailoring}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Alterations can be waited for or left behind; the choice changes how much of her
+              day the booking takes, so it has to be made before a time is picked. */}
+          {isTailoring && selectedIds.length > 0 && canDropOff && (
+            <div>
+              <h2 className="font-heading text-2xl font-medium">{t.fulfilmentTitle}</h2>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {(
+                  [
+                    { value: "appointment" as const, icon: Timer, title: t.waitTitle, body: t.waitBody },
+                    { value: "dropoff" as const, icon: PackageOpen, title: t.dropoffTitle, body: t.dropoffBody },
+                  ]
+                ).map(({ value, icon: Icon, title, body }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={fulfilment === value}
+                    onClick={() => chooseFulfilment(value)}
+                    className={cn(
+                      "flex gap-3 rounded-lg border p-4 text-left transition-colors",
+                      fulfilment === value
+                        ? "border-primary bg-accent/60"
+                        : "border-border hover:border-primary/50",
+                    )}
+                  >
+                    <Icon className="text-copper-deep mt-0.5 size-5 shrink-0" />
+                    <span>
+                      <span className="block font-medium">{title}</span>
+                      <span className="text-muted-foreground text-sm">{body}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {Object.entries(grouped).map(([category, items]) => (
             <div key={category}>
-              <h2 className="font-heading border-gold/40 border-b pb-3 text-2xl font-medium">
+              <h2 className="font-heading border-copper/40 border-b pb-3 text-2xl font-medium">
                 {categoryLabelFor(services, category, locale)}
               </h2>
               <div className="mt-4 space-y-2">
@@ -194,7 +293,11 @@ export function BookingWizard({ services, defaultContact, t, locale, initialCate
                       <span className="min-w-0 flex-1">
                         <span className="block font-medium">{serviceName(service, locale)}</span>
                         <span className="text-muted-foreground text-sm">
-                          {formatDuration(service.duration_minutes)}
+                          {formatDuration(
+                            fulfilment === "dropoff"
+                              ? (service.dropoff_minutes ?? 15)
+                              : service.duration_minutes,
+                          )}
                         </span>
                       </span>
                       <span className="font-heading text-lg font-semibold whitespace-nowrap">

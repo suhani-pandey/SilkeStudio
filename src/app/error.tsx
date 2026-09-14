@@ -21,10 +21,10 @@ export default function Error({
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
       <div className="bg-accent flex size-16 items-center justify-center rounded-full">
-        <AlertCircle className="text-plum size-7" />
+        <AlertCircle className="text-clay size-7" />
       </div>
       <h1 className="font-heading mt-6 text-3xl font-medium sm:text-4xl">Something went wrong</h1>
-      <div className="rule-gold mx-auto mt-5" />
+      <div className="rule-copper mx-auto mt-5" />
       <p className="text-muted-foreground mt-5 max-w-sm leading-relaxed">
         Sorry — that didn&apos;t load. Try again, and if it keeps happening give us a call and
         we&apos;ll sort your booking out over the phone.
@@ -39,7 +39,7 @@ export default function Error({
       </div>
       <a
         href={businessInfo.phoneHref}
-        className="text-muted-foreground hover:text-plum mt-8 inline-flex min-h-11 items-center text-sm"
+        className="text-muted-foreground hover:text-clay mt-8 inline-flex min-h-11 items-center text-sm"
       >
         {businessInfo.phone}
       </a>

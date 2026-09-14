@@ -5,7 +5,7 @@
 export const SALON_TIMEZONE = "Europe/Copenhagen";
 
 export const businessInfo = {
-  name: "GlowNest Beauty Salon",
+  name: "Silke Studio",
   address: {
     line1: "Leen B3, 2.3",
     line2: "2630 Høje Taastrup, Denmark",
