@@ -282,6 +282,7 @@ export interface Database {
           p_guest_email?: string | null;
           p_notes?: string | null;
           p_booked_by?: BookedBy;
+          p_fulfilment?: Fulfilment;
         };
         Returns: { appointment_id: string; reference: string }[];
       };
@@ -300,6 +301,10 @@ export interface Database {
       cancel_booking: {
         Args: { p_reference: string; p_phone: string };
         Returns: boolean;
+      };
+      mark_ready_for_collection: {
+        Args: { p_appointment_id: string; p_ready_by: string };
+        Returns: undefined;
       };
     };
     Enums: Record<string, never>;

@@ -2,10 +2,11 @@
 
 import { endOfDay, startOfDay } from "date-fns";
 import { revalidatePath, updateTag } from "next/cache";
-import { fromZonedTime } from "date-fns-tz";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { createClient } from "@/lib/supabase/server";
 import { SALON_TIMEZONE } from "@/lib/business-info";
 import { CACHE_TAGS } from "@/lib/cache-tags";
+import { readyForCollectionMessage, sendSms } from "@/lib/sms";
 import type { AppointmentStatus, BusinessHour, Service,
   ServiceLine,
 } from "@/lib/database.types";
@@ -77,6 +78,49 @@ export async function updateAppointmentStatus(id: string, status: AppointmentSta
   const { error } = await supabase.from("appointments").update({ status }).eq("id", id);
   if (error) throw new Error(error.message);
   revalidateAdmin();
+  revalidatePath("/my-appointments");
+}
+
+/**
+ * Tells a customer their garment is finished. Booking a second appointment for the hand-back would
+ * mean guessing a date at drop-off and cluttering the calendar with two-minute slots, so the
+ * collection itself stays informal — this just makes sure they know.
+ */
+export async function markReadyForCollection(appointmentId: string, readyByDate: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("mark_ready_for_collection", {
+    p_appointment_id: appointmentId,
+    p_ready_by: readyByDate,
+  });
+  if (error) throw new Error(error.message);
+
+  // Most customers book as guests and have no account to be notified in, so the text is the
+  // channel that actually reaches them. A failure here must not undo the state change above.
+  const { data: appointment } = await supabase
+    .from("appointments")
+    .select("guest_phone, appointment_services(service:services(name))")
+    .eq("id", appointmentId)
+    .single();
+
+  if (appointment?.guest_phone) {
+    const names =
+      appointment.appointment_services
+        ?.map((row) => row.service?.name)
+        .filter(Boolean)
+        .join(", ") || "alteration";
+
+    await sendSms(
+      appointment.guest_phone,
+      readyForCollectionMessage({
+        services: names,
+        readyFrom: formatInTimeZone(new Date(`${readyByDate}T12:00:00Z`), SALON_TIMEZONE, "EEEE d MMMM"),
+      }),
+    );
+  }
+
+  revalidateAdmin();
+  revalidatePath("/booking");
   revalidatePath("/my-appointments");
 }
 

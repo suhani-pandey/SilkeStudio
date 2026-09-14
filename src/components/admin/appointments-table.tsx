@@ -2,16 +2,21 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { format, isPast } from "date-fns";
-import { CalendarClock, Check, Loader2, Phone, Search, X } from "lucide-react";
+import { CalendarClock, Check, Loader2, PackageCheck, Phone, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { SlotPicker } from "@/components/admin/slot-picker";
-import { updateAppointmentStatus, rescheduleAppointment } from "@/lib/actions/admin";
+import {
+  markReadyForCollection,
+  rescheduleAppointment,
+  updateAppointmentStatus,
+} from "@/lib/actions/admin";
 import { formatPrice } from "@/lib/format";
 import {
   appointmentServiceNames,
@@ -29,6 +34,8 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
   const [rescheduleTarget, setRescheduleTarget] = useState<AppointmentWithServices | null>(null);
   const [newSlotISO, setNewSlotISO] = useState<string | null>(null);
   const [cancelTarget, setCancelTarget] = useState<AppointmentWithServices | null>(null);
+  const [readyTarget, setReadyTarget] = useState<AppointmentWithServices | null>(null);
+  const [readyDate, setReadyDate] = useState("");
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -54,6 +61,19 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
       try {
         await updateAppointmentStatus(id, status);
         toast.success(status === "cancelled" ? "Appointment cancelled." : "Marked as completed.");
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Something went wrong.");
+      }
+    });
+  }
+
+  function handleMarkReady() {
+    if (!readyTarget || !readyDate) return;
+    startTransition(async () => {
+      try {
+        await markReadyForCollection(readyTarget.id, readyDate);
+        toast.success("Marked ready — the customer has been texted.");
+        setReadyTarget(null);
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "Something went wrong.");
       }
@@ -139,6 +159,12 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
                     <span className="tracking-widest uppercase">{appt.reference}</span>
                   )}
                 </div>
+                {appt.ready_by && (
+                  <p className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700">
+                    <PackageCheck className="size-4" />
+                    Ready to collect from {format(new Date(`${appt.ready_by}T12:00:00Z`), "EEE d MMM")}
+                  </p>
+                )}
                 {appt.notes && <p className="text-muted-foreground mt-2 text-sm italic">{appt.notes}</p>}
               </div>
 
@@ -172,6 +198,20 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
                   <CalendarClock className="size-4" />
                   Reschedule
                 </Button>
+                {appt.fulfilment === "dropoff" && (
+                  <Button
+                    variant="outline"
+                    className="h-10 flex-1 sm:flex-none"
+                    disabled={isPending}
+                    onClick={() => {
+                      setReadyTarget(appt);
+                      setReadyDate(appt.ready_by ?? format(new Date(), "yyyy-MM-dd"));
+                    }}
+                  >
+                    <PackageCheck className="size-4" />
+                    {appt.ready_by ? "Change ready date" : "Mark ready"}
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   className="h-10 flex-1 sm:flex-none"
@@ -221,6 +261,48 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
           setCancelTarget(null);
         }}
       />
+
+      <Dialog open={!!readyTarget} onOpenChange={(open) => !open && setReadyTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ready for collection</DialogTitle>
+          </DialogHeader>
+          {readyTarget && (
+            <div className="space-y-4">
+              <div>
+                <p className="font-medium">{readyTarget.guest_name}</p>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  {appointmentServiceNames(readyTarget)}
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="ready-date" className="mb-1.5 block">
+                  Ready from
+                </Label>
+                <Input
+                  id="ready-date"
+                  type="date"
+                  value={readyDate}
+                  onChange={(e) => setReadyDate(e.target.value)}
+                  className="h-11"
+                />
+                <p className="text-muted-foreground mt-2 text-sm">
+                  {readyTarget.guest_name.split(" ")[0]} gets a text with this date and your address.
+                  No second appointment is booked — they call or come by.
+                </p>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReadyTarget(null)}>
+              Cancel
+            </Button>
+            <Button onClick={handleMarkReady} disabled={!readyDate || isPending}>
+              {isPending ? <Loader2 className="size-4 animate-spin" /> : "Tell the customer"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!rescheduleTarget} onOpenChange={(open) => !open && setRescheduleTarget(null)}>
         <DialogContent>

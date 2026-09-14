@@ -50,6 +50,11 @@ export async function generateMetadata(): Promise<Metadata> {
       "ansigtsbehandling",
       "manicure",
       "pedicure",
+      "skrædder Høje Taastrup",
+      "systue Høje Taastrup",
+      "oplægning af bukser",
+      "clothing alterations Høje Taastrup",
+      "sari blouse fitting",
     ],
     alternates: { canonical: "/" },
     openGraph: {

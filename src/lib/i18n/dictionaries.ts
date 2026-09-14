@@ -90,7 +90,7 @@ const en = {
   },
   footer: {
     tagline:
-      "A home-based beauty salon in Høje Taastrup. Nails, threading, facials, hair and waxing — booked online or over the phone.",
+      "A home studio in Høje Taastrup for beauty and clothing alterations — booked online or over the phone.",
     explore: "Explore",
     servicesLink: "Services & pricing",
     bookLink: "Book an appointment",
@@ -335,7 +335,7 @@ const da: Dictionary = {
   },
   footer: {
     tagline:
-      "En hjemmesalon i Høje Taastrup. Negle, trådning, ansigtsbehandlinger, hår og voksning — book online eller på telefon.",
+      "Et hjemmestudie i Høje Taastrup til skønhed og tøjændringer — book online eller på telefon.",
     explore: "Udforsk",
     servicesLink: "Behandlinger & priser",
     bookLink: "Book en tid",

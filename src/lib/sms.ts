@@ -13,7 +13,7 @@ import { businessInfo } from "@/lib/business-info";
 const API_URL = "https://gatewayapi.com/rest/mtsms";
 
 /** Max 11 characters, letters and digits — GatewayAPI rejects longer sender names. */
-const SENDER = "Silke Studio";
+const SENDER = "SilkeStudio";
 
 export function isSmsConfigured(): boolean {
   return Boolean(process.env.GATEWAYAPI_TOKEN);
@@ -92,6 +92,20 @@ export function ownerAlertMessage({ guestName, services, when, guestPhone }: Boo
 
 export function customerCancellationMessage({ services, when }: BookingMessageInput): string {
   return `Your ${businessInfo.name} appointment (${services}, ${when}) has been cancelled. Call ${businessInfo.phone} to rebook.`;
+}
+
+export function readyForCollectionMessage({
+  services,
+  readyFrom,
+}: {
+  services: string;
+  readyFrom: string;
+}): string {
+  return [
+    `Your ${services} is ready to collect from ${readyFrom}.`,
+    `${businessInfo.name}, ${businessInfo.address.line1}`,
+    `Call ${businessInfo.phone} if you'd like to arrange a time.`,
+  ].join("\n");
 }
 
 export function bookingLookupUrl(): string {
