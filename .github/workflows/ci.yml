@@ -26,6 +26,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Runs `next typegen` first: LayoutProps and PageProps are generated from the route
+      # structure, so a clean checkout has no route types to check against yet.
       - name: Typecheck
         run: npm run typecheck
 
