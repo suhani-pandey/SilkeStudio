@@ -211,6 +211,8 @@ Deploy to Vercel (import the repo, it detects Next.js), and keep Supabase as the
   no names, phone numbers or reasons.
 - `error.tsx`, `global-error.tsx` and `not-found.tsx`, all in the salon's styling with a phone
   number as the fallback.
-- `<html lang>`, page titles, descriptions and Open Graph locale all follow the language toggle.
+- `<html lang>`, page titles, descriptions and Open Graph locale all follow the active language.
+  English and Danish copy are both maintained in `src/lib/i18n/dictionaries.ts`; the site runs in
+  one language at a time, set by `defaultLocale` in `src/lib/i18n/config.ts`.
 - Sitemap, robots, JSON-LD `BeautySalon` structured data, and a generated Open Graph share card.
 - Installable as a PWA with an offline page.

@@ -1,5 +1,5 @@
 {
-  "name": "glownest-beauty-salon",
+  "name": "silke-studio",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -46,5 +46,9 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^5.0.1"
+  },
+  "description": "Booking platform for a home studio offering beauty treatments and clothing alterations.",
+  "engines": {
+    "node": ">=20"
   }
 }
