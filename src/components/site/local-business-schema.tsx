@@ -1,15 +1,7 @@
 import { businessInfo, siteUrl, socialLinks } from "@/lib/business-info";
 import type { BusinessHour, Service } from "@/lib/database.types";
 
-const DAY_SCHEMA = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
+const DAY_SCHEMA = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 /**
  * Tells Google this is a local salon — name, address, phone, opening hours and price list.

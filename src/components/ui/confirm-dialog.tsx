@@ -46,11 +46,15 @@ export function ConfirmDialog({
                 : "bg-accent flex size-14 items-center justify-center rounded-full"
             }
           >
-            <AlertTriangle className={destructive ? "text-destructive size-6" : "text-clay size-6"} />
+            <AlertTriangle
+              className={destructive ? "text-destructive size-6" : "text-clay size-6"}
+            />
           </div>
           <h2 className="font-heading mt-5 text-2xl font-medium">{title}</h2>
           {description && <p className="text-muted-foreground mt-2 text-sm">{description}</p>}
-          {detail && <div className="bg-secondary/60 mt-5 w-full rounded-lg p-4 text-left">{detail}</div>}
+          {detail && (
+            <div className="bg-secondary/60 mt-5 w-full rounded-lg p-4 text-left">{detail}</div>
+          )}
         </div>
 
         <DialogFooter className="mt-2 flex-col-reverse gap-2 sm:flex-row sm:justify-center">

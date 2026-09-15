@@ -36,7 +36,9 @@ export function SignupForm({ t }: { t: Dictionary["auth"] }) {
           <MailCheck className="text-clay size-6" />
         </div>
         <h1 className="font-heading mt-6 text-3xl font-medium">{t.confirmTitle}</h1>
-        <p className="text-muted-foreground mt-3 text-sm">{t.confirmBody.replace("{email}", email)}</p>
+        <p className="text-muted-foreground mt-3 text-sm">
+          {t.confirmBody.replace("{email}", email)}
+        </p>
       </div>
     );
   }
@@ -46,9 +48,7 @@ export function SignupForm({ t }: { t: Dictionary["auth"] }) {
       <p className="eyebrow text-center">{t.accountEyebrow}</p>
       <h1 className="font-heading mt-3 text-center text-4xl font-medium">{t.signupTitle}</h1>
       <div className="rule-copper mx-auto mt-5" />
-      <p className="text-muted-foreground mt-5 text-center text-sm">
-        {t.signupBody}
-      </p>
+      <p className="text-muted-foreground mt-5 text-center text-sm">{t.signupBody}</p>
 
       <Card className="border-border/60 mt-8">
         <CardContent>
@@ -57,13 +57,25 @@ export function SignupForm({ t }: { t: Dictionary["auth"] }) {
               <Label htmlFor="fullName" className="mb-1.5 block">
                 {t.fullName}
               </Label>
-              <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} required className="h-11" />
+              <Input
+                id="fullName"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+                className="h-11"
+              />
             </div>
             <div>
               <Label htmlFor="phone" className="mb-1.5 block">
                 {t.phone}
               </Label>
-              <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="h-11" />
+              <Input
+                id="phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="h-11"
+              />
             </div>
             <div>
               <Label htmlFor="email" className="mb-1.5 block">

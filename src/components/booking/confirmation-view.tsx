@@ -54,7 +54,9 @@ export function ConfirmationView({ t, locale }: { t: Dictionary["confirmation"];
       {booking.reference && (
         <div className="border-copper/50 bg-secondary/50 mt-8 rounded-lg border border-dashed p-4">
           <p className="eyebrow">{t.reference}</p>
-          <p className="font-heading mt-1 text-3xl font-semibold tracking-[0.2em]">{booking.reference}</p>
+          <p className="font-heading mt-1 text-3xl font-semibold tracking-[0.2em]">
+            {booking.reference}
+          </p>
           <p className="text-muted-foreground mt-2 text-xs">{t.referenceHint}</p>
         </div>
       )}
@@ -78,7 +80,9 @@ export function ConfirmationView({ t, locale }: { t: Dictionary["confirmation"];
           <span className="text-muted-foreground text-sm">
             {t.total} · {formatDuration(booking.durationMinutes)}
           </span>
-          <span className="font-heading text-xl font-semibold">{formatPrice(booking.totalPrice)}</span>
+          <span className="font-heading text-xl font-semibold">
+            {formatPrice(booking.totalPrice)}
+          </span>
         </div>
       </div>
 
@@ -87,7 +91,10 @@ export function ConfirmationView({ t, locale }: { t: Dictionary["confirmation"];
           <MapPin className="text-copper size-4" />
           {businessInfo.address.line1}, {businessInfo.address.line2}
         </p>
-        <a href={businessInfo.phoneHref} className="hover:text-clay flex items-center justify-center gap-2">
+        <a
+          href={businessInfo.phoneHref}
+          className="hover:text-clay flex items-center justify-center gap-2"
+        >
           <Phone className="text-copper size-4" />
           {businessInfo.phone}
         </a>

@@ -76,7 +76,11 @@ interface BookingMessageInput {
   guestPhone?: string;
 }
 
-export function customerConfirmationMessage({ services, when, reference }: BookingMessageInput): string {
+export function customerConfirmationMessage({
+  services,
+  when,
+  reference,
+}: BookingMessageInput): string {
   return [
     `Hi! Your ${businessInfo.name} booking is confirmed.`,
     `${services}`,
@@ -86,7 +90,12 @@ export function customerConfirmationMessage({ services, when, reference }: Booki
   ].join("\n");
 }
 
-export function ownerAlertMessage({ guestName, services, when, guestPhone }: BookingMessageInput): string {
+export function ownerAlertMessage({
+  guestName,
+  services,
+  when,
+  guestPhone,
+}: BookingMessageInput): string {
   return [`New booking: ${guestName}`, services, when, guestPhone ?? ""].filter(Boolean).join("\n");
 }
 

@@ -53,7 +53,10 @@ export function BusinessHoursForm({ initialHours }: { initialHours: BusinessHour
   return (
     <div className="space-y-3">
       {hours.map((h) => (
-        <div key={h.day_of_week} className="flex flex-wrap items-center gap-3 rounded-xl border p-3">
+        <div
+          key={h.day_of_week}
+          className="flex flex-wrap items-center gap-3 rounded-xl border p-3"
+        >
           <div className="flex w-32 items-center gap-2">
             <Switch
               checked={!h.is_closed}

@@ -10,7 +10,9 @@ export default async function AdminServicesPage() {
   return (
     <div className="mx-auto max-w-3xl">
       <h1 className="font-heading text-2xl font-semibold sm:text-3xl">Services</h1>
-      <p className="text-muted-foreground mt-1">Manage what customers see and book on the website.</p>
+      <p className="text-muted-foreground mt-1">
+        Manage what customers see and book on the website.
+      </p>
       <div className="mt-6">
         <ServicesManager initialServices={services} />
       </div>

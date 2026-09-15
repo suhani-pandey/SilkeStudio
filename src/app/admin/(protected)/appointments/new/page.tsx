@@ -93,13 +93,17 @@ export default function NewAppointmentPage() {
                       onClick={() => toggleService(service.id)}
                       className={cn(
                         "flex w-full items-center gap-3 rounded-md border p-3 text-left transition-colors",
-                        checked ? "border-primary bg-accent/60" : "border-border hover:border-primary/50",
+                        checked
+                          ? "border-primary bg-accent/60"
+                          : "border-border hover:border-primary/50",
                       )}
                     >
                       <span
                         className={cn(
                           "flex size-4.5 shrink-0 items-center justify-center rounded border",
-                          checked ? "border-primary bg-primary text-primary-foreground" : "border-input",
+                          checked
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-input",
                         )}
                       >
                         {checked && <Check className="size-3" />}
@@ -125,13 +129,23 @@ export default function NewAppointmentPage() {
               )}
             </div>
 
-            <SlotPicker serviceIds={serviceIds} selectedSlotISO={slotISO} onSelectSlot={setSlotISO} />
+            <SlotPicker
+              serviceIds={serviceIds}
+              selectedSlotISO={slotISO}
+              onSelectSlot={setSlotISO}
+            />
 
             <div>
               <Label htmlFor="name" className="mb-2 block">
                 Customer name
               </Label>
-              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required className="h-11" />
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="h-11"
+              />
             </div>
             <div>
               <Label htmlFor="phone" className="mb-2 block">
@@ -150,19 +164,32 @@ export default function NewAppointmentPage() {
               <Label htmlFor="email" className="mb-2 block">
                 Email <span className="text-muted-foreground font-normal">(optional)</span>
               </Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-11" />
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="h-11"
+              />
             </div>
             <div>
               <Label htmlFor="notes" className="mb-2 block">
                 Notes <span className="text-muted-foreground font-normal">(optional)</span>
               </Label>
-              <Textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
+              <Textarea
+                id="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={3}
+              />
             </div>
 
             <Button
               type="submit"
               className="h-12 w-full text-base"
-              disabled={isPending || serviceIds.length === 0 || !slotISO || !name.trim() || !phone.trim()}
+              disabled={
+                isPending || serviceIds.length === 0 || !slotISO || !name.trim() || !phone.trim()
+              }
             >
               {isPending ? <Loader2 className="size-4 animate-spin" /> : "Book appointment"}
             </Button>

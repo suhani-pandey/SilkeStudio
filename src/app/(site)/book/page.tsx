@@ -47,9 +47,7 @@ export default async function BookPage({
         <p className="eyebrow">{t.booking.eyebrow}</p>
         <h1 className="font-heading mt-3 text-3xl font-medium sm:text-5xl">{t.booking.title}</h1>
         <div className="rule-copper mx-auto mt-6" />
-        <p className="text-muted-foreground mx-auto mt-6 max-w-md">
-          {t.booking.body}
-        </p>
+        <p className="text-muted-foreground mx-auto mt-6 max-w-md">{t.booking.body}</p>
       </section>
       <div className="py-10 sm:py-14">
         <BookingWizard

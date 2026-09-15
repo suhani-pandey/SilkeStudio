@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { createRecurringTimeOff, deleteRecurringTimeOff } from "@/lib/actions/admin";
 import type { Database } from "@/lib/database.types";
 
@@ -49,7 +55,9 @@ export function RecurringTimeOffManager({ initialBlocks }: { initialBlocks: Recu
               reason: reason.trim() || null,
               created_at: new Date().toISOString(),
             },
-          ].sort((a, b) => a.day_of_week - b.day_of_week || a.start_time.localeCompare(b.start_time)),
+          ].sort(
+            (a, b) => a.day_of_week - b.day_of_week || a.start_time.localeCompare(b.start_time),
+          ),
         );
         setReason("");
         toast.success("Weekly time off added.");
@@ -101,7 +109,12 @@ export function RecurringTimeOffManager({ initialBlocks }: { initialBlocks: Recu
             </div>
             <div>
               <Label className="mb-1.5 block">To</Label>
-              <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="h-11" />
+              <Input
+                type="time"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                className="h-11"
+              />
             </div>
             <div className="sm:col-span-2">
               <Label className="mb-1.5 block">
@@ -115,7 +128,11 @@ export function RecurringTimeOffManager({ initialBlocks }: { initialBlocks: Recu
               />
             </div>
             <Button type="submit" disabled={isPending} className="h-11 sm:col-span-2">
-              {isPending ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
+              {isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Plus className="size-4" />
+              )}
               Add weekly time off
             </Button>
           </form>
@@ -129,7 +146,10 @@ export function RecurringTimeOffManager({ initialBlocks }: { initialBlocks: Recu
           </p>
         )}
         {blocks.map((block) => (
-          <div key={block.id} className="flex items-center justify-between gap-3 rounded-lg border p-3">
+          <div
+            key={block.id}
+            className="flex items-center justify-between gap-3 rounded-lg border p-3"
+          >
             <div className="min-w-0">
               <p className="text-sm font-medium">
                 Every {DAY_NAMES[block.day_of_week]} · {block.start_time.slice(0, 5)}–

@@ -101,21 +101,24 @@ export async function getAvailableSlots(
   const dayStart = startOfDay(zoned);
   const dayEnd = endOfDay(zoned);
 
-  const [{ data: services, error: servicesError }, { data: hours }, { data: busyRows, error: busyError }] =
-    await Promise.all([
-      // Selecting * rather than naming dropoff_minutes: on a database that hasn't had the
-      // tailoring migration applied yet the column simply isn't there, and naming it would fail
-      // the whole query and leave customers staring at a booking page with no times on it.
-      supabase.from("services").select("*").in("id", serviceIds).eq("active", true),
-      supabase.from("business_hours").select("*").eq("day_of_week", dayOfWeek).single(),
-      // Taken slots come from a database function so guests (who can't read appointments) still
-      // see accurate availability instead of every slot looking free.
-      supabase.rpc("busy_intervals", {
-        p_from: dayStart.toISOString(),
-        p_to: dayEnd.toISOString(),
-        p_exclude_appointment: excludeAppointmentId ?? null,
-      }),
-    ]);
+  const [
+    { data: services, error: servicesError },
+    { data: hours },
+    { data: busyRows, error: busyError },
+  ] = await Promise.all([
+    // Selecting * rather than naming dropoff_minutes: on a database that hasn't had the
+    // tailoring migration applied yet the column simply isn't there, and naming it would fail
+    // the whole query and leave customers staring at a booking page with no times on it.
+    supabase.from("services").select("*").in("id", serviceIds).eq("active", true),
+    supabase.from("business_hours").select("*").eq("day_of_week", dayOfWeek).single(),
+    // Taken slots come from a database function so guests (who can't read appointments) still
+    // see accurate availability instead of every slot looking free.
+    supabase.rpc("busy_intervals", {
+      p_from: dayStart.toISOString(),
+      p_to: dayEnd.toISOString(),
+      p_exclude_appointment: excludeAppointmentId ?? null,
+    }),
+  ]);
 
   if (servicesError) throw new Error(servicesError.message);
   if (busyError) throw new Error(busyError.message);

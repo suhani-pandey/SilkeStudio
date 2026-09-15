@@ -44,10 +44,12 @@ const en = {
     title: "Two things, done by the same hands",
     body: "The same pair of hands does both, which is why an appointment here is never rushed and never handed on.",
     beautyTitle: "Beauty",
-    beautyBody: "Nails, threading, facials, hair and waxing — booked by the treatment, with the time it actually takes.",
+    beautyBody:
+      "Nails, threading, facials, hair and waxing — booked by the treatment, with the time it actually takes.",
     beautyFrom: "From 50 kr.",
     tailoringTitle: "Clothing alterations",
-    tailoringBody: "Hemming, taking in, sleeves, sari work and repairs. Wait while it's done, or leave it and collect.",
+    tailoringBody:
+      "Hemming, taking in, sleeves, sari work and repairs. Wait while it's done, or leave it and collect.",
     tailoringFrom: "From 50 kr.",
   },
   story: {
@@ -126,7 +128,8 @@ const en = {
     waitTitle: "While you wait",
     waitBody: "We do the work during your appointment and you take it home the same visit.",
     dropoffTitle: "Drop off & collect",
-    dropoffBody: "A quick slot to hand it over and be measured. We'll agree a collection day while you're here.",
+    dropoffBody:
+      "A quick slot to hand it over and be measured. We'll agree a collection day while you're here.",
     stepServices: "Services",
     stepDateTime: "Date & time",
     stepDetails: "Your details",
@@ -188,8 +191,7 @@ const en = {
     guestLink: "book as a guest",
     guestHintEnd: "without an account.",
     confirmTitle: "Check your email",
-    confirmBody:
-      "We've sent a confirmation link to {email}. Click it, then come back and log in.",
+    confirmBody: "We've sent a confirmation link to {email}. Click it, then come back and log in.",
   },
   lookup: {
     eyebrow: "Your booking",
@@ -204,7 +206,8 @@ const en = {
     cancel: "Cancel this booking",
     cancelConfirm: "Cancel this appointment?",
     cancelConfirmTitle: "Cancel this appointment?",
-    cancelConfirmBody: "This frees the time for someone else. You'll need to book again if you change your mind.",
+    cancelConfirmBody:
+      "This frees the time for someone else. You'll need to book again if you change your mind.",
     cancelConfirmAction: "Yes, cancel it",
     keepAppointment: "Keep it",
     cancelDone: "Your booking has been cancelled.",
@@ -220,7 +223,8 @@ const en = {
     cancel: "Cancel",
     cancelConfirm: "Cancel this appointment?",
     cancelConfirmTitle: "Cancel this appointment?",
-    cancelConfirmBody: "This frees the time for someone else. You'll need to book again if you change your mind.",
+    cancelConfirmBody:
+      "This frees the time for someone else. You'll need to book again if you change your mind.",
     cancelConfirmAction: "Yes, cancel it",
     keepAppointment: "Keep it",
     cancelled: "Appointment cancelled.",
@@ -237,7 +241,8 @@ const en = {
     servicesDescription:
       "Every treatment, alteration and price at Silke Studio in Høje Taastrup — nails, threading, facials, hair, hemming, fittings and sari work.",
     bookTitle: "Book an appointment",
-    bookDescription: "Pick your services and a time. Booking takes under a minute, no account needed.",
+    bookDescription:
+      "Pick your services and a time. Booking takes under a minute, no account needed.",
     lookupTitle: "Find your booking",
     lookupDescription: "Look up or cancel your appointment with your booking code.",
   },
@@ -289,10 +294,12 @@ const da: Dictionary = {
     title: "To ting, lavet af de samme hænder",
     body: "De samme hænder klarer begge dele, og derfor bliver en tid her aldrig forhastet og aldrig sendt videre.",
     beautyTitle: "Skønhed",
-    beautyBody: "Negle, trådning, ansigtsbehandlinger, hår og voksning — booket efter behandling, med den tid den tager.",
+    beautyBody:
+      "Negle, trådning, ansigtsbehandlinger, hår og voksning — booket efter behandling, med den tid den tager.",
     beautyFrom: "Fra 50 kr.",
     tailoringTitle: "Tøjændringer",
-    tailoringBody: "Oplægning, indtagning, ærmer, sari-arbejde og reparationer. Vent imens, eller aflevér og hent.",
+    tailoringBody:
+      "Oplægning, indtagning, ærmer, sari-arbejde og reparationer. Vent imens, eller aflevér og hent.",
     tailoringFrom: "Fra 50 kr.",
   },
   story: {
@@ -313,7 +320,8 @@ const da: Dictionary = {
     eyebrow: "Arbejdet",
     title: "Seneste besøg",
     tiktok: "Se det hele på TikTok →",
-    tiktokNote: "Et udpluk af de seneste negle, bryn og ansigtsbehandlinger. Der er meget mere på TikTok.",
+    tiktokNote:
+      "Et udpluk af de seneste negle, bryn og ansigtsbehandlinger. Der er meget mere på TikTok.",
   },
   testimonials: {
     eyebrow: "Pæne ord",
@@ -371,7 +379,8 @@ const da: Dictionary = {
     waitTitle: "Mens du venter",
     waitBody: "Vi syr det under din tid, og du tager det med hjem samme dag.",
     dropoffTitle: "Aflevér & hent",
-    dropoffBody: "En kort tid til at aflevere og blive målt. Vi aftaler en afhentningsdag, mens du er her.",
+    dropoffBody:
+      "En kort tid til at aflevere og blive målt. Vi aftaler en afhentningsdag, mens du er her.",
     stepServices: "Behandlinger",
     stepDateTime: "Dato & tid",
     stepDetails: "Dine oplysninger",
@@ -412,7 +421,8 @@ const da: Dictionary = {
     notFoundCta: "Book en tid",
     dateFormat: "EEEE d. MMMM 'kl.' HH:mm",
     reference: "Din bookingkode",
-    referenceHint: "Gem den — du skal bruge den sammen med dit telefonnummer for at ændre eller aflyse.",
+    referenceHint:
+      "Gem den — du skal bruge den sammen med dit telefonnummer for at ændre eller aflyse.",
     manageBooking: "Se din booking",
   },
   auth: {
@@ -433,8 +443,7 @@ const da: Dictionary = {
     guestLink: "booke som gæst",
     guestHintEnd: "uden en konto.",
     confirmTitle: "Tjek din e-mail",
-    confirmBody:
-      "Vi har sendt et bekræftelseslink til {email}. Klik på det, og log derefter ind.",
+    confirmBody: "Vi har sendt et bekræftelseslink til {email}. Klik på det, og log derefter ind.",
   },
   lookup: {
     eyebrow: "Din booking",
@@ -482,7 +491,8 @@ const da: Dictionary = {
     servicesDescription:
       "Alle behandlinger, ændringer og priser hos Silke Studio i Høje Taastrup — negle, trådning, ansigtsbehandlinger, hår, oplægning, tilpasning og sari-arbejde.",
     bookTitle: "Book en tid",
-    bookDescription: "Vælg dine behandlinger og et tidspunkt. Det tager under et minut, og du behøver ingen konto.",
+    bookDescription:
+      "Vælg dine behandlinger og et tidspunkt. Det tager under et minut, og du behøver ingen konto.",
     lookupTitle: "Find din booking",
     lookupDescription: "Slå din aftale op eller aflys den med din bookingkode.",
   },

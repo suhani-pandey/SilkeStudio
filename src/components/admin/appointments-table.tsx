@@ -10,7 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { SlotPicker } from "@/components/admin/slot-picker";
 import {
   markReadyForCollection,
@@ -146,7 +152,9 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
                     </Badge>
                   )}
                 </p>
-                <p className="text-muted-foreground mt-1 text-sm">{appointmentServiceNames(appt)}</p>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  {appointmentServiceNames(appt)}
+                </p>
                 <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                   <a
                     href={`tel:${appt.guest_phone.replace(/\s/g, "")}`}
@@ -162,14 +170,19 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
                 {appt.ready_by && (
                   <p className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700">
                     <PackageCheck className="size-4" />
-                    Ready to collect from {format(new Date(`${appt.ready_by}T12:00:00Z`), "EEE d MMM")}
+                    Ready to collect from{" "}
+                    {format(new Date(`${appt.ready_by}T12:00:00Z`), "EEE d MMM")}
                   </p>
                 )}
-                {appt.notes && <p className="text-muted-foreground mt-2 text-sm italic">{appt.notes}</p>}
+                {appt.notes && (
+                  <p className="text-muted-foreground mt-2 text-sm italic">{appt.notes}</p>
+                )}
               </div>
 
               <div className="flex flex-col items-end gap-2">
-                <span className="font-heading text-lg font-semibold">{formatPrice(appt.total_price)}</span>
+                <span className="font-heading text-lg font-semibold">
+                  {formatPrice(appt.total_price)}
+                </span>
                 <Badge
                   variant={
                     appt.status === "cancelled"
@@ -287,8 +300,8 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
                   className="h-11"
                 />
                 <p className="text-muted-foreground mt-2 text-sm">
-                  {readyTarget.guest_name.split(" ")[0]} gets a text with this date and your address.
-                  No second appointment is booked — they call or come by.
+                  {readyTarget.guest_name.split(" ")[0]} gets a text with this date and your
+                  address. No second appointment is booked — they call or come by.
                 </p>
               </div>
             </div>

@@ -93,7 +93,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} ${alexBrush.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col">
         {children}
         <Toaster richColors position="top-center" />
         <RegisterServiceWorker />

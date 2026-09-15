@@ -55,7 +55,9 @@ export default async function MyAppointmentsPage() {
                 <div>
                   <p className="font-medium">{appointmentServiceNames(appt)}</p>
                   <p className="text-muted-foreground text-sm">
-                    {format(new Date(appt.start_at), t.myAppointments.dateFormat, { locale: dateLocale(locale) })}
+                    {format(new Date(appt.start_at), t.myAppointments.dateFormat, {
+                      locale: dateLocale(locale),
+                    })}
                   </p>
                   <p className="text-muted-foreground text-sm">{formatPrice(appt.total_price)}</p>
                 </div>

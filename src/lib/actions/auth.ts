@@ -39,7 +39,10 @@ export async function signUpCustomer(input: {
   redirect("/my-appointments");
 }
 
-export async function signInCustomer(input: { email: string; password: string }): Promise<AuthResult> {
+export async function signInCustomer(input: {
+  email: string;
+  password: string;
+}): Promise<AuthResult> {
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(input);
   if (error) return { error: error.message };
@@ -56,7 +59,11 @@ export async function signInOwner(input: { email: string; password: string }): P
   } = await supabase.auth.getUser();
   if (!user) return { error: "Something went wrong. Please try again." };
 
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
 
   if (profile?.role !== "owner") {
     await supabase.auth.signOut();

@@ -94,7 +94,9 @@ export function BookingWizard({
   );
   const isTailoring = line === "tailoring";
   const canDropOff =
-    isTailoring && selectedServices.length > 0 && selectedServices.every((s) => s.dropoff_minutes != null);
+    isTailoring &&
+    selectedServices.length > 0 &&
+    selectedServices.every((s) => s.dropoff_minutes != null);
 
   function switchLine(next: ServiceLine) {
     if (next === line) return;
@@ -234,12 +236,20 @@ export function BookingWizard({
             <div>
               <h2 className="font-heading text-2xl font-medium">{t.fulfilmentTitle}</h2>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {(
-                  [
-                    { value: "appointment" as const, icon: Timer, title: t.waitTitle, body: t.waitBody },
-                    { value: "dropoff" as const, icon: PackageOpen, title: t.dropoffTitle, body: t.dropoffBody },
-                  ]
-                ).map(({ value, icon: Icon, title, body }) => (
+                {[
+                  {
+                    value: "appointment" as const,
+                    icon: Timer,
+                    title: t.waitTitle,
+                    body: t.waitBody,
+                  },
+                  {
+                    value: "dropoff" as const,
+                    icon: PackageOpen,
+                    title: t.dropoffTitle,
+                    body: t.dropoffBody,
+                  },
+                ].map(({ value, icon: Icon, title, body }) => (
                   <button
                     key={value}
                     type="button"
@@ -279,13 +289,17 @@ export function BookingWizard({
                       onClick={() => toggleService(service.id)}
                       className={cn(
                         "flex w-full items-center gap-4 rounded-lg border p-4 text-left transition-colors active:scale-[0.99]",
-                        checked ? "border-primary bg-accent/60" : "border-border hover:border-primary/50",
+                        checked
+                          ? "border-primary bg-accent/60"
+                          : "border-border hover:border-primary/50",
                       )}
                     >
                       <span
                         className={cn(
                           "flex size-5 shrink-0 items-center justify-center rounded border",
-                          checked ? "border-primary bg-primary text-primary-foreground" : "border-input",
+                          checked
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-input",
                         )}
                       >
                         {checked && <Check className="size-3.5" />}
@@ -350,9 +364,7 @@ export function BookingWizard({
               <Loader2 className="size-4 animate-spin" /> {t.loadingTimes}
             </div>
           ) : slots.length === 0 ? (
-            <p className="text-muted-foreground py-10 text-sm">
-              {t.noTimes}
-            </p>
+            <p className="text-muted-foreground py-10 text-sm">{t.noTimes}</p>
           ) : (
             <div className="mt-4 grid grid-cols-3 gap-2.5 sm:grid-cols-4">
               {slots.map((iso) => (
@@ -400,7 +412,9 @@ export function BookingWizard({
               ))}
             </ul>
             <div className="mt-4 flex justify-between border-t pt-3 font-medium">
-              <span>{t.total} · {formatDuration(totalDuration)}</span>
+              <span>
+                {t.total} · {formatDuration(totalDuration)}
+              </span>
               <span className="font-heading text-lg font-semibold">{formatPrice(totalPrice)}</span>
             </div>
           </div>
@@ -416,7 +430,13 @@ export function BookingWizard({
               <Label htmlFor="name" className="mb-2 block">
                 {t.fullName}
               </Label>
-              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required className="h-12" />
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="h-12"
+              />
             </div>
             <div>
               <Label htmlFor="phone" className="mb-2 block">
@@ -447,7 +467,12 @@ export function BookingWizard({
               <Label htmlFor="notes" className="mb-2 block">
                 {t.notes} <span className="text-muted-foreground font-normal">{t.optional}</span>
               </Label>
-              <Textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
+              <Textarea
+                id="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={3}
+              />
             </div>
 
             <Button
@@ -470,7 +495,7 @@ export function BookingWizard({
 
       {/* Sticky summary bar for steps 1 & 2 */}
       {step < 3 && selectedIds.length > 0 && (
-        <div className="bg-background/95 fixed inset-x-0 bottom-16 z-30 border-t py-4 backdrop-blur md:bottom-0 md:safe-bottom md:pb-0">
+        <div className="bg-background/95 md:safe-bottom fixed inset-x-0 bottom-16 z-30 border-t py-4 backdrop-blur md:bottom-0 md:pb-0">
           <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-5 sm:px-6">
             <div className="min-w-0">
               <p className="truncate text-sm font-medium">
@@ -484,7 +509,12 @@ export function BookingWizard({
                 {t.chooseTime}
               </Button>
             ) : (
-              <Button size="lg" className="h-12 shrink-0 px-6 sm:px-8" disabled={!selectedSlotISO} onClick={() => setStep(3)}>
+              <Button
+                size="lg"
+                className="h-12 shrink-0 px-6 sm:px-8"
+                disabled={!selectedSlotISO}
+                onClick={() => setStep(3)}
+              >
                 {t.continue}
               </Button>
             )}

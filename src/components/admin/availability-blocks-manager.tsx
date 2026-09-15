@@ -21,7 +21,11 @@ function dayKey(iso: string) {
   return formatInTimeZone(new Date(iso), SALON_TIMEZONE, "yyyy-MM-dd");
 }
 
-export function AvailabilityBlocksManager({ initialBlocks }: { initialBlocks: AvailabilityBlock[] }) {
+export function AvailabilityBlocksManager({
+  initialBlocks,
+}: {
+  initialBlocks: AvailabilityBlock[];
+}) {
   const [blocks, setBlocks] = useState(initialBlocks);
   const [date, setDate] = useState(salonToday);
   const [startTime, setStartTime] = useState("14:00");
@@ -38,10 +42,10 @@ export function AvailabilityBlocksManager({ initialBlocks }: { initialBlocks: Av
     }
     return [...map.entries()]
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([key, list]) => [
-        key,
-        [...list].sort((a, b) => a.start_at.localeCompare(b.start_at)),
-      ] as const);
+      .map(
+        ([key, list]) =>
+          [key, [...list].sort((a, b) => a.start_at.localeCompare(b.start_at))] as const,
+      );
   }, [blocks]);
 
   function addRange(from: string, to: string) {
@@ -56,7 +60,12 @@ export function AvailabilityBlocksManager({ initialBlocks }: { initialBlocks: Av
 
     startTransition(async () => {
       try {
-        await blockTimeOnDate({ date, startTime: from, endTime: to, reason: reason.trim() || undefined });
+        await blockTimeOnDate({
+          date,
+          startTime: from,
+          endTime: to,
+          reason: reason.trim() || undefined,
+        });
         toast.success("Time blocked off.");
         // The server revalidates, but reflect it immediately so adding a second range feels instant.
         setBlocks((prev) =>
@@ -155,7 +164,11 @@ export function AvailabilityBlocksManager({ initialBlocks }: { initialBlocks: Av
             </div>
 
             <Button type="submit" disabled={isPending} className="h-11 sm:col-span-2">
-              {isPending ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
+              {isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Plus className="size-4" />
+              )}
               Block this time
             </Button>
 
@@ -178,7 +191,9 @@ export function AvailabilityBlocksManager({ initialBlocks }: { initialBlocks: Av
       </Card>
 
       <div className="space-y-4">
-        {grouped.length === 0 && <p className="text-muted-foreground text-sm">No upcoming time off.</p>}
+        {grouped.length === 0 && (
+          <p className="text-muted-foreground text-sm">No upcoming time off.</p>
+        )}
 
         {grouped.map(([key, list]) => (
           <div key={key}>

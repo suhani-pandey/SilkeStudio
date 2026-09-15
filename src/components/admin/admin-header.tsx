@@ -12,7 +12,11 @@ import { signOut } from "@/lib/actions/auth";
 import type { AppointmentNotification } from "@/lib/database.types";
 import { useState } from "react";
 
-export function AdminHeader({ initialNotifications }: { initialNotifications: AppointmentNotification[] }) {
+export function AdminHeader({
+  initialNotifications,
+}: {
+  initialNotifications: AppointmentNotification[];
+}) {
   const [open, setOpen] = useState(false);
 
   return (

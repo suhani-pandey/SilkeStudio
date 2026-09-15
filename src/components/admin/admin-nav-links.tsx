@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarClock, CalendarDays, LayoutDashboard, ListChecks, MessageSquareQuote, Scissors } from "lucide-react";
+import {
+  CalendarClock,
+  CalendarDays,
+  LayoutDashboard,
+  ListChecks,
+  MessageSquareQuote,
+  Scissors,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -20,7 +27,8 @@ export function AdminNavLinks({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <nav className="flex flex-col gap-1">
       {links.map((link) => {
-        const active = link.href === "/admin" ? pathname === "/admin" : pathname.startsWith(link.href);
+        const active =
+          link.href === "/admin" ? pathname === "/admin" : pathname.startsWith(link.href);
         const Icon = link.icon;
         return (
           <Link

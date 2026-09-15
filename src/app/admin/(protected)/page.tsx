@@ -29,7 +29,9 @@ export default async function AdminDashboardPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-heading text-2xl font-semibold sm:text-3xl">Good day 👋</h1>
-          <p className="text-muted-foreground mt-1">Here&apos;s what&apos;s happening at the salon.</p>
+          <p className="text-muted-foreground mt-1">
+            Here&apos;s what&apos;s happening at the salon.
+          </p>
         </div>
         <Button asChild>
           <Link href="/admin/appointments/new">
@@ -97,7 +99,9 @@ export default async function AdminDashboardPage() {
         </div>
         <div className="mt-4 space-y-3">
           {upcomingActive.length === 0 && (
-            <p className="text-muted-foreground py-8 text-center text-sm">Nothing booked in the next week.</p>
+            <p className="text-muted-foreground py-8 text-center text-sm">
+              Nothing booked in the next week.
+            </p>
           )}
           {upcomingActive.map((appt) => (
             <Card key={appt.id} className="border-border/60">
@@ -108,7 +112,9 @@ export default async function AdminDashboardPage() {
                     {appointmentServiceNames(appt)} ·{" "}
                     {format(
                       new Date(appt.start_at),
-                      isToday(new Date(appt.start_at)) ? "'Today' h:mm a" : "EEE, MMM d 'at' h:mm a",
+                      isToday(new Date(appt.start_at))
+                        ? "'Today' h:mm a"
+                        : "EEE, MMM d 'at' h:mm a",
                     )}
                   </p>
                 </div>

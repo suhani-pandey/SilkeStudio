@@ -2,7 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Clock, MapPin, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getActiveServices, getBusinessHours, getPublishedTestimonials } from "@/lib/actions/booking";
+import {
+  getActiveServices,
+  getBusinessHours,
+  getPublishedTestimonials,
+} from "@/lib/actions/booking";
 import { formatPrice } from "@/lib/format";
 import { categoryImage } from "@/lib/category-images";
 import { businessInfo, mapEmbedSrc, socialLinks } from "@/lib/business-info";
@@ -120,9 +124,7 @@ export default async function HomePage() {
           <h2 className="font-heading mt-3 text-4xl font-medium sm:text-5xl">
             {t.twoTrades.title}
           </h2>
-          <p className="text-muted-foreground mt-4">
-            {t.twoTrades.body}
-          </p>
+          <p className="text-muted-foreground mt-4">{t.twoTrades.body}</p>
         </div>
 
         <div className="mt-10 grid grid-cols-2 gap-3 sm:mt-12 sm:gap-6 lg:grid-cols-4">
@@ -177,13 +179,9 @@ export default async function HomePage() {
           </div>
           <div>
             <p className="eyebrow">{t.story.eyebrow}</p>
-            <h2 className="font-heading mt-3 text-4xl font-medium sm:text-5xl">
-              {t.story.title}
-            </h2>
+            <h2 className="font-heading mt-3 text-4xl font-medium sm:text-5xl">{t.story.title}</h2>
             <div className="rule-copper mt-6" />
-            <p className="text-muted-foreground mt-6 leading-relaxed">
-              {t.story.body}
-            </p>
+            <p className="text-muted-foreground mt-6 leading-relaxed">{t.story.body}</p>
             {/* The heading serif only ships old-style figures in this subset, which turn "10" into
                 something that reads as "IO". These use the sans face, which has lining numerals. */}
             <dl className="mt-10 grid grid-cols-3 gap-6 border-t pt-8">
@@ -206,49 +204,53 @@ export default async function HomePage() {
 
       {/* ---------------- Gallery ---------------- */}
       {galleryImages.length > 0 && (
-      <section className="bg-secondary/60 py-16 sm:py-24">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="eyebrow">{t.gallery.eyebrow}</p>
-              <h2 className="font-heading mt-3 text-4xl font-medium sm:text-5xl">{t.gallery.title}</h2>
+        <section className="bg-secondary/60 py-16 sm:py-24">
+          <div className="mx-auto max-w-6xl px-5 sm:px-6">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="eyebrow">{t.gallery.eyebrow}</p>
+                <h2 className="font-heading mt-3 text-4xl font-medium sm:text-5xl">
+                  {t.gallery.title}
+                </h2>
+              </div>
+              <a
+                href={socialLinks.tiktok}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-clay inline-flex min-h-11 items-center text-sm font-medium underline-offset-4 hover:underline"
+              >
+                {t.gallery.tiktok}
+              </a>
             </div>
-            <a
-              href={socialLinks.tiktok}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-clay inline-flex min-h-11 items-center text-sm font-medium underline-offset-4 hover:underline"
-            >
-              {t.gallery.tiktok}
-            </a>
-          </div>
 
-          <p className="text-muted-foreground mt-4 max-w-xl text-sm leading-relaxed">
-            {t.gallery.tiktokNote}
-          </p>
+            <p className="text-muted-foreground mt-4 max-w-xl text-sm leading-relaxed">
+              {t.gallery.tiktokNote}
+            </p>
 
-          <div className="mt-10 grid grid-cols-2 gap-3 sm:mt-12 sm:gap-4 lg:gap-6">
-            {galleryImages.map((image) => (
-              <Image
-                key={image.src}
-                src={image.src}
-                alt={image.alt}
-                width={1000}
-                height={1000}
-                sizes="(max-width: 1024px) 50vw, 25vw"
-                className="aspect-square w-full rounded-2xl object-cover"
-              />
-            ))}
+            <div className="mt-10 grid grid-cols-2 gap-3 sm:mt-12 sm:gap-4 lg:gap-6">
+              {galleryImages.map((image) => (
+                <Image
+                  key={image.src}
+                  src={image.src}
+                  alt={image.alt}
+                  width={1000}
+                  height={1000}
+                  sizes="(max-width: 1024px) 50vw, 25vw"
+                  className="aspect-square w-full rounded-2xl object-cover"
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
       )}
 
       {testimonials.length > 0 && (
         <section className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
           <div className="text-center">
             <p className="eyebrow">{t.testimonials.eyebrow}</p>
-            <h2 className="font-heading mt-3 text-3xl font-medium sm:text-4xl">{t.testimonials.title}</h2>
+            <h2 className="font-heading mt-3 text-3xl font-medium sm:text-4xl">
+              {t.testimonials.title}
+            </h2>
             <div className="rule-copper mx-auto mt-6" />
           </div>
 
@@ -298,7 +300,10 @@ export default async function HomePage() {
                 <Phone className="text-copper mt-1 size-5 shrink-0" />
                 <div>
                   <p className="font-medium">{t.visit.phone}</p>
-                  <a href={businessInfo.phoneHref} className="text-muted-foreground hover:text-clay mt-1 inline-flex min-h-11 items-center">
+                  <a
+                    href={businessInfo.phoneHref}
+                    className="text-muted-foreground hover:text-clay mt-1 inline-flex min-h-11 items-center"
+                  >
                     {businessInfo.phone}
                   </a>
                 </div>
@@ -310,7 +315,10 @@ export default async function HomePage() {
                   <p className="font-medium">{t.visit.hours}</p>
                   <dl className="text-muted-foreground mt-2 space-y-1 text-sm">
                     {hours.map((hour) => (
-                      <div key={hour.day_of_week} className="flex justify-between gap-6 sm:max-w-xs">
+                      <div
+                        key={hour.day_of_week}
+                        className="flex justify-between gap-6 sm:max-w-xs"
+                      >
                         <dt>{t.days[hour.day_of_week]}</dt>
                         <dd>
                           {hour.is_closed || !hour.open_time || !hour.close_time

@@ -82,8 +82,12 @@ export function BookingLookup({ t, locale }: { t: Dictionary["lookup"]; locale: 
           </div>
           <p className="text-muted-foreground mt-3 text-sm">{booking.services}</p>
           <div className="mt-4 flex items-center justify-between border-t pt-4">
-            <span className="text-muted-foreground text-sm">{formatDuration(booking.durationMinutes)}</span>
-            <span className="font-heading text-lg font-semibold">{formatPrice(booking.totalPrice)}</span>
+            <span className="text-muted-foreground text-sm">
+              {formatDuration(booking.durationMinutes)}
+            </span>
+            <span className="font-heading text-lg font-semibold">
+              {formatPrice(booking.totalPrice)}
+            </span>
           </div>
         </div>
 

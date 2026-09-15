@@ -45,7 +45,12 @@ export function subscribeWithAuth(
     for (const t of tables) {
       next.on(
         "postgres_changes",
-        { event: t.event ?? "*", schema: "public", table: t.table, ...(t.filter ? { filter: t.filter } : {}) },
+        {
+          event: t.event ?? "*",
+          schema: "public",
+          table: t.table,
+          ...(t.filter ? { filter: t.filter } : {}),
+        },
         onChange,
       );
     }

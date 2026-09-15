@@ -17,7 +17,7 @@ export async function SiteFooter() {
               <Logo className="h-12" />
             </Link>
             <p className="text-muted-foreground mt-5 max-w-sm text-sm leading-relaxed">
-{t.footer.tagline}
+              {t.footer.tagline}
             </p>
             <div className="mt-6 flex items-center gap-4">
               <a
@@ -61,7 +61,10 @@ export async function SiteFooter() {
               <Link href="/book" className="text-muted-foreground hover:text-clay py-2.5">
                 {t.footer.bookLink}
               </Link>
-              <Link href="/my-appointments" className="text-muted-foreground hover:text-clay py-2.5">
+              <Link
+                href="/my-appointments"
+                className="text-muted-foreground hover:text-clay py-2.5"
+              >
                 {t.footer.myAppointmentsLink}
               </Link>
               <Link href="/booking" className="text-muted-foreground hover:text-clay py-2.5">
@@ -81,7 +84,10 @@ export async function SiteFooter() {
                   {businessInfo.address.line2}
                 </span>
               </p>
-              <a href={businessInfo.phoneHref} className="hover:text-clay flex items-center gap-2 py-2.5">
+              <a
+                href={businessInfo.phoneHref}
+                className="hover:text-clay flex items-center gap-2 py-2.5"
+              >
                 <Phone className="text-copper size-4 shrink-0" />
                 {businessInfo.phone}
               </a>

@@ -214,13 +214,15 @@ export function MonthCalendar({
                 "flex items-start gap-3 rounded-lg border-l-4 p-3",
                 entry.kind === "booked" && "border-l-emerald-600 bg-emerald-600/5",
                 entry.kind === "blocked" && "border-l-red-600 bg-red-600/5",
-                entry.kind === "cancelled" && "border-l-red-600/40 bg-muted/50",
+                entry.kind === "cancelled" && "bg-muted/50 border-l-red-600/40",
               )}
             >
               <div className="mt-0.5 shrink-0">
                 {entry.kind === "booked" && <Clock className="size-4 text-emerald-700" />}
                 {entry.kind === "blocked" && <Ban className="size-4 text-red-700" />}
-                {entry.kind === "cancelled" && <CalendarX2 className="text-muted-foreground size-4" />}
+                {entry.kind === "cancelled" && (
+                  <CalendarX2 className="text-muted-foreground size-4" />
+                )}
               </div>
 
               <div className="min-w-0 flex-1">
@@ -230,7 +232,12 @@ export function MonthCalendar({
                     <span className="text-muted-foreground ml-2 font-normal">cancelled</span>
                   )}
                 </p>
-                <p className={cn("mt-0.5", entry.kind === "cancelled" && "text-muted-foreground line-through")}>
+                <p
+                  className={cn(
+                    "mt-0.5",
+                    entry.kind === "cancelled" && "text-muted-foreground line-through",
+                  )}
+                >
                   {entry.title}
                 </p>
                 {entry.subtitle && (
@@ -248,7 +255,9 @@ export function MonthCalendar({
               </div>
 
               {entry.price !== undefined && entry.kind === "booked" && (
-                <span className="font-heading shrink-0 font-semibold">{formatPrice(entry.price)}</span>
+                <span className="font-heading shrink-0 font-semibold">
+                  {formatPrice(entry.price)}
+                </span>
               )}
             </div>
           ))}

@@ -38,6 +38,9 @@ yarn-error.log*
 # Original photos supplied by the salon — working copies, not served by the site.
 /photos-from-salon
 
+# local tooling
+.claude
+
 # vercel
 .vercel
 

@@ -7,9 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SALON_TIMEZONE } from "@/lib/business-info";
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import { readyForCollectionMessage, sendSms } from "@/lib/sms";
-import type { AppointmentStatus, BusinessHour, Service,
-  ServiceLine,
-} from "@/lib/database.types";
+import type { AppointmentStatus, BusinessHour, Service, ServiceLine } from "@/lib/database.types";
 
 function revalidateAdmin() {
   revalidatePath("/admin");
@@ -114,7 +112,11 @@ export async function markReadyForCollection(appointmentId: string, readyByDate:
       appointment.guest_phone,
       readyForCollectionMessage({
         services: names,
-        readyFrom: formatInTimeZone(new Date(`${readyByDate}T12:00:00Z`), SALON_TIMEZONE, "EEEE d MMMM"),
+        readyFrom: formatInTimeZone(
+          new Date(`${readyByDate}T12:00:00Z`),
+          SALON_TIMEZONE,
+          "EEEE d MMMM",
+        ),
       }),
     );
   }
@@ -126,7 +128,10 @@ export async function markReadyForCollection(appointmentId: string, readyByDate:
 
 export async function rescheduleAppointment(id: string, startAtISO: string) {
   const supabase = await createClient();
-  const { error } = await supabase.from("appointments").update({ start_at: startAtISO }).eq("id", id);
+  const { error } = await supabase
+    .from("appointments")
+    .update({ start_at: startAtISO })
+    .eq("id", id);
   if (error) {
     if (error.code === "23P01") {
       throw new Error("That time slot overlaps an existing appointment.");
@@ -141,7 +146,10 @@ export async function rescheduleAppointment(id: string, startAtISO: string) {
 
 export async function listAllServices(): Promise<Service[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase.from("services").select("*").order("sort_order", { ascending: true });
+  const { data, error } = await supabase
+    .from("services")
+    .select("*")
+    .order("sort_order", { ascending: true });
   if (error) throw new Error(error.message);
   return data ?? [];
 }
@@ -308,7 +316,11 @@ export async function blockTimeOnDate(input: {
   revalidatePath("/book");
 }
 
-export async function createAvailabilityBlock(input: { startAtISO: string; endAtISO: string; reason?: string }) {
+export async function createAvailabilityBlock(input: {
+  startAtISO: string;
+  endAtISO: string;
+  reason?: string;
+}) {
   const supabase = await createClient();
   const { error } = await supabase.from("availability_blocks").insert({
     start_at: input.startAtISO,

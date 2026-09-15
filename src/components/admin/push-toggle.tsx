@@ -30,7 +30,9 @@ export function PushToggle({ vapidKey }: { vapidKey: string }) {
       typeof navigator !== "undefined" && "serviceWorker" in navigator && "PushManager" in window;
 
     const lookup = supported
-      ? navigator.serviceWorker.ready.then((reg) => reg.pushManager.getSubscription()).then((sub) => !!sub)
+      ? navigator.serviceWorker.ready
+          .then((reg) => reg.pushManager.getSubscription())
+          .then((sub) => !!sub)
       : Promise.resolve(false);
 
     lookup

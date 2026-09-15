@@ -57,7 +57,11 @@ export async function cancelBookingByReference(reference: string, phone: string)
   if (!data) return false;
 
   if (booking) {
-    const when = formatInTimeZone(new Date(booking.startAtISO), SALON_TIMEZONE, "EEEE d MMMM 'at' HH:mm");
+    const when = formatInTimeZone(
+      new Date(booking.startAtISO),
+      SALON_TIMEZONE,
+      "EEEE d MMMM 'at' HH:mm",
+    );
     // Best effort — the cancellation already succeeded, so a failed text must not undo it.
     await Promise.all([
       sendSms(

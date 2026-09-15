@@ -25,7 +25,11 @@ interface NotificationBellProps {
   onMarkRead: (id: string) => Promise<void>;
 }
 
-export function NotificationBell({ initialNotifications, filter, onMarkRead }: NotificationBellProps) {
+export function NotificationBell({
+  initialNotifications,
+  filter,
+  onMarkRead,
+}: NotificationBellProps) {
   // Notifications pushed in over realtime since mount, kept separate from the server-provided
   // initialNotifications so this never needs to sync state from props in an effect.
   const [liveNotifications, setLiveNotifications] = useState<AppointmentNotification[]>([]);
@@ -49,7 +53,10 @@ export function NotificationBell({ initialNotifications, filter, onMarkRead }: N
 
   const notifications = useMemo(() => {
     const existingIds = new Set(initialNotifications.map((n) => n.id));
-    const merged = [...liveNotifications.filter((n) => !existingIds.has(n.id)), ...initialNotifications];
+    const merged = [
+      ...liveNotifications.filter((n) => !existingIds.has(n.id)),
+      ...initialNotifications,
+    ];
     return merged.map((n) => (readIds.has(n.id) ? { ...n, is_read: true } : n));
   }, [initialNotifications, liveNotifications, readIds]);
 
@@ -63,7 +70,12 @@ export function NotificationBell({ initialNotifications, filter, onMarkRead }: N
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative h-11 w-11" aria-label="Notifications">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative h-11 w-11"
+          aria-label="Notifications"
+        >
           <Bell className="size-5" />
           {unreadCount > 0 && (
             <Badge className="absolute -top-1 -right-1 h-5 min-w-5 justify-center rounded-full px-1 text-xs">
@@ -78,7 +90,9 @@ export function NotificationBell({ initialNotifications, filter, onMarkRead }: N
           <DropdownMenuLabel>Notifications</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {notifications.length === 0 && (
-            <p className="text-muted-foreground px-2 py-4 text-center text-sm">No notifications yet.</p>
+            <p className="text-muted-foreground px-2 py-4 text-center text-sm">
+              No notifications yet.
+            </p>
           )}
           <div className="max-h-80 overflow-y-auto">
             {notifications.map((n) => (

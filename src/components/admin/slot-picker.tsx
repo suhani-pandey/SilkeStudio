@@ -33,9 +33,11 @@ export function SlotPicker({
   useEffect(() => {
     if (!requestKey) return;
     let cancelled = false;
-    getAvailableSlots(serviceIds, selectedDate.toISOString(), excludeAppointmentId).then((slots) => {
-      if (!cancelled) setResult({ key: requestKey, slots });
-    });
+    getAvailableSlots(serviceIds, selectedDate.toISOString(), excludeAppointmentId).then(
+      (slots) => {
+        if (!cancelled) setResult({ key: requestKey, slots });
+      },
+    );
     return () => {
       cancelled = true;
     };

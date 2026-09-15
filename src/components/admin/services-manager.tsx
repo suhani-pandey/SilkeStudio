@@ -6,14 +6,25 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { createService, deleteService, updateService, type ServiceInput } from "@/lib/actions/admin";
+import {
+  createService,
+  deleteService,
+  updateService,
+  type ServiceInput,
+} from "@/lib/actions/admin";
 import { formatDuration, formatPrice } from "@/lib/format";
 import type { Service, ServiceLine } from "@/lib/database.types";
 
@@ -81,7 +92,8 @@ export function ServicesManager({ initialServices }: { initialServices: Service[
                     duration_minutes: form.durationMinutes,
                     buffer_minutes: form.bufferMinutes,
                     service_line: form.serviceLine,
-                    dropoff_minutes: form.serviceLine === "tailoring" ? form.dropoffMinutes ?? 15 : null,
+                    dropoff_minutes:
+                      form.serviceLine === "tailoring" ? (form.dropoffMinutes ?? 15) : null,
                     description: form.description || null,
                     name_da: form.nameDa || null,
                     description_da: form.descriptionDa || null,
@@ -144,7 +156,9 @@ export function ServicesManager({ initialServices }: { initialServices: Service[
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <p className="font-heading font-semibold whitespace-nowrap">{formatPrice(service.price)}</p>
+                <p className="font-heading font-semibold whitespace-nowrap">
+                  {formatPrice(service.price)}
+                </p>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -198,7 +212,11 @@ export function ServicesManager({ initialServices }: { initialServices: Service[
           <div className="space-y-4">
             <div>
               <Label className="mb-1.5 block">Part of the business</Label>
-              <div className="bg-muted flex rounded-lg p-1" role="group" aria-label="Part of the business">
+              <div
+                className="bg-muted flex rounded-lg p-1"
+                role="group"
+                aria-label="Part of the business"
+              >
                 {(["beauty", "tailoring"] as ServiceLine[]).map((value) => (
                   <button
                     key={value}
@@ -239,7 +257,11 @@ export function ServicesManager({ initialServices }: { initialServices: Service[
 
             <div>
               <Label className="mb-1.5 block">Name</Label>
-              <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className="h-11" />
+              <Input
+                value={form.name}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                className="h-11"
+              />
             </div>
             <div>
               <Label className="mb-1.5 block">Category</Label>
@@ -269,7 +291,9 @@ export function ServicesManager({ initialServices }: { initialServices: Service[
                   min={5}
                   step={5}
                   value={form.durationMinutes}
-                  onChange={(e) => setForm((f) => ({ ...f, durationMinutes: Number(e.target.value) }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, durationMinutes: Number(e.target.value) }))
+                  }
                   className="h-11"
                 />
               </div>
@@ -331,7 +355,10 @@ export function ServicesManager({ initialServices }: { initialServices: Service[
             </div>
 
             <div className="flex items-center gap-2">
-              <Switch checked={form.active} onCheckedChange={(checked) => setForm((f) => ({ ...f, active: checked }))} />
+              <Switch
+                checked={form.active}
+                onCheckedChange={(checked) => setForm((f) => ({ ...f, active: checked }))}
+              />
               <Label>Visible to customers</Label>
             </div>
           </div>
@@ -345,7 +372,10 @@ export function ServicesManager({ initialServices }: { initialServices: Service[
             >
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={isPending || !form.name.trim() || !form.category.trim()}>
+            <Button
+              onClick={handleSave}
+              disabled={isPending || !form.name.trim() || !form.category.trim()}
+            >
               {isPending ? <Loader2 className="size-4 animate-spin" /> : "Save"}
             </Button>
           </DialogFooter>

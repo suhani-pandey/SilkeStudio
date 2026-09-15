@@ -64,7 +64,12 @@ export async function SiteHeader() {
 
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="size-11 md:hidden" aria-label={t.nav.menu}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-11 md:hidden"
+                aria-label={t.nav.menu}
+              >
                 <Menu className="size-5" />
               </Button>
             </SheetTrigger>

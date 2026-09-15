@@ -143,12 +143,24 @@ stock entries as real photos replace them.
 Originals supplied by the salon live in `photos-from-salon/` (not published, not committed) so
 they can be re-edited later without asking for the files again.
 
+## Scripts
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run test` | Unit tests (Vitest) |
+| `npm run typecheck` | TypeScript, no emit |
+| `npm run lint` | ESLint |
+| `npm run format` | Prettier across the repo |
+
 ## How it's organized
 
 - `src/app/(site)` — public customer-facing pages (home, services, booking flow, optional login)
 - `src/app/admin` — owner-only dashboard (calendar, appointments, availability, services), protected by `src/middleware.ts`
 - `src/lib/actions` — all server actions (data reads/writes) — the only place that talks to Supabase
 - `src/lib/availability.ts` — the slot-computation logic shared by the customer booking flow and the owner's manual booking form
+- `src/lib/availability.test.ts` — unit tests for the slot engine, including the timezone and daylight-saving cases
 - `supabase/schema.sql` — full database schema, security rules, and seed data
 
 ## Notes

@@ -11,8 +11,8 @@ export default function OfflinePage() {
       </div>
       <h1 className="font-heading mt-6 text-3xl font-medium">You&apos;re offline</h1>
       <p className="text-muted-foreground mt-3 max-w-xs">
-        We can&apos;t reach Silke Studio right now. Check your connection and try again — or give us a
-        call and we&apos;ll book you in.
+        We can&apos;t reach Silke Studio right now. Check your connection and try again — or give us
+        a call and we&apos;ll book you in.
       </p>
       <a
         href={businessInfo.phoneHref}
