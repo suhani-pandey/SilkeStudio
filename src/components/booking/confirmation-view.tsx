@@ -2,11 +2,12 @@
 
 import { useSyncExternalStore } from "react";
 import Link from "next/link";
-import { format } from "date-fns";
-import { Check, MapPin, Phone } from "lucide-react";
+import { formatInTimeZone } from "date-fns-tz";
+import { CalendarPlus, Check, MapPin, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatDuration, formatPrice } from "@/lib/format";
-import { businessInfo } from "@/lib/business-info";
+import { businessInfo, SALON_TIMEZONE } from "@/lib/business-info";
+import { buildIcs } from "@/lib/calendar-file";
 import type { BookingSummary } from "@/lib/booking-summary";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
@@ -22,6 +23,37 @@ function getSnapshot() {
 
 function getServerSnapshot() {
   return null;
+}
+
+/**
+ * Hands the booking to the customer's own calendar. The code travels with it, so this doubles as
+ * the most reliable way not to lose it — nothing else reaches them while SMS and email are off.
+ */
+function addToCalendar(booking: BookingSummary, reminderLabel: string) {
+  const services = booking.serviceNames.join(", ");
+  const ics = buildIcs({
+    uid: `${booking.reference || booking.startAtISO}@silke-studio`,
+    title: `${businessInfo.name} — ${booking.fulfilment === "dropoff" ? `Drop-off: ${services}` : services}`,
+    startISO: booking.startAtISO,
+    durationMinutes: booking.durationMinutes,
+    location: `${businessInfo.address.line1}, ${businessInfo.address.line2}`,
+    description: [
+      booking.reference ? `${reminderLabel}: ${booking.reference}` : "",
+      `${businessInfo.phone}`,
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    alarmMinutesBefore: 120,
+  });
+
+  const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `silke-studio-${booking.reference || "booking"}.ics`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export function ConfirmationView({ t, locale }: { t: Dictionary["confirmation"]; locale: Locale }) {
@@ -61,10 +93,22 @@ export function ConfirmationView({ t, locale }: { t: Dictionary["confirmation"];
         </div>
       )}
 
+      <Button
+        variant="outline"
+        size="lg"
+        className="mt-4 h-12 w-full"
+        onClick={() => addToCalendar(booking, t.reference)}
+      >
+        <CalendarPlus className="size-4" />
+        {t.addToCalendar}
+      </Button>
+
       <div className="mt-6 border p-6 text-left">
         <p className="eyebrow">{t.appointment}</p>
         <p className="font-heading mt-2 text-2xl font-medium">
-          {format(new Date(booking.startAtISO), t.dateFormat, { locale: dateLocale(locale) })}
+          {formatInTimeZone(new Date(booking.startAtISO), SALON_TIMEZONE, t.dateFormat, {
+            locale: dateLocale(locale),
+          })}
         </p>
 
         <ul className="text-muted-foreground mt-5 space-y-1.5 text-sm">

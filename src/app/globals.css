@@ -54,14 +54,16 @@
 
 :root {
   /* Silke Studio — warm sand, terracotta and soft copper. Neutral enough to sit behind both
-     sides of the business: skin and fabric both read true against a warm ground. */
+     sides of the business: skin and fabric both read true against a warm ground.
+     The terracotta is #ad5238 rather than a lighter shade so it passes WCAG AA both as text on
+     the page (4.8:1) and with white text on top of it (5.2:1). */
   --background: #faf6f1;
   --foreground: #2e2622;
   --card: #ffffff;
   --card-foreground: #2e2622;
   --popover: #ffffff;
   --popover-foreground: #2e2622;
-  --primary: #b95a41;
+  --primary: #ad5238;
   --primary-foreground: #ffffff;
   --secondary: #f3ebe2;
   --secondary-foreground: #2e2622;
@@ -72,7 +74,7 @@
   --destructive: #b3261e;
   --border: #e6dbcf;
   --input: #d8c9b8;
-  --ring: #b95a41;
+  --ring: #ad5238;
   --chart-1: #c4674f;
   --chart-2: #d9a273;
   --chart-3: #8f7a68;
@@ -81,16 +83,16 @@
   --radius: 0.5rem;
   --sidebar: #ffffff;
   --sidebar-foreground: #2e2622;
-  --sidebar-primary: #b95a41;
+  --sidebar-primary: #ad5238;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #f3ebe2;
   --sidebar-accent-foreground: #2e2622;
   --sidebar-border: #e6dbcf;
-  --sidebar-ring: #b95a41;
+  --sidebar-ring: #ad5238;
   /* Decorative copper for rules and icons; copper-deep is the tone that stays readable as text. */
   --copper: #d9a273;
   --copper-deep: #9a6237;
-  --clay: #b95a41;
+  --clay: #ad5238;
 }
 
 @layer base {

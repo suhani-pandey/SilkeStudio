@@ -21,6 +21,7 @@ export async function SiteHeader() {
   const navLinks = [
     { href: "/", label: t.nav.home },
     { href: "/services", label: t.nav.services },
+    { href: "/designs", label: t.nav.designs },
     { href: "/book", label: t.nav.book },
   ];
 

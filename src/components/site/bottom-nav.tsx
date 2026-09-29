@@ -2,26 +2,25 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarPlus, Home, Sparkles, User } from "lucide-react";
+import { CalendarPlus, Home, Palette, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 /**
  * Thumb-reachable tab bar — the primary navigation on phones, where the top nav is out of reach.
  * Hidden from tablet up, where the header nav takes over.
+ *
+ * Four places a customer actually goes. Logging in is optional for customers, so it lives in the
+ * menu rather than spending a quarter of the bar on something most visitors never use.
  */
-export function BottomNav({ isLoggedIn, t }: { isLoggedIn: boolean; t: Dictionary["nav"] }) {
+export function BottomNav({ t }: { t: Dictionary["nav"] }) {
   const pathname = usePathname();
 
   const tabs = [
     { href: "/", label: t.home, icon: Home },
     { href: "/services", label: t.services, icon: Sparkles },
+    { href: "/designs", label: t.designs, icon: Palette },
     { href: "/book", label: t.book, icon: CalendarPlus },
-    {
-      href: isLoggedIn ? "/my-appointments" : "/login",
-      label: isLoggedIn ? t.myAppointments : t.login,
-      icon: User,
-    },
   ];
 
   return (

@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Silke Studio">
-  <rect width="64" height="64" rx="15" fill="#b95a41"/>
+  <rect width="64" height="64" rx="15" fill="#ad5238"/>
   <!-- A single thread drawn into an S: the studio's initial and its material at once. -->
   <path d="M42 20.5 C 36 14.5, 24.5 16, 24 24 C 23.6 31, 40.4 33, 40 40 C 39.5 48, 28 49.5, 22 43.5"
         fill="none" stroke="#fbeee6" stroke-width="5.6" stroke-linecap="round"/>

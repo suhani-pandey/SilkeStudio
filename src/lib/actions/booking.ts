@@ -15,6 +15,8 @@ import {
 } from "@/lib/sms";
 import { sendPushToOwners } from "@/lib/push";
 import { CACHE_TAGS } from "@/lib/cache-tags";
+import { confirmationEmail, sendEmail } from "@/lib/email";
+import { verifyTurnstile } from "@/lib/turnstile";
 import { createPublicClient } from "@/lib/supabase/public";
 
 const APPOINTMENT_SELECT = "*, appointment_services(service:services(*))";
@@ -78,6 +80,31 @@ const loadBusinessHours = unstable_cache(
   ["business-hours"],
   { tags: [CACHE_TAGS.businessHours], revalidate: 3600 },
 );
+
+const loadNailDesigns = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from("nail_designs")
+      .select("*")
+      .eq("active", true)
+      .order("sort_order", { ascending: true });
+
+    // The catalogue is a shop window, not part of booking: if the table isn't there yet the rest
+    // of the site must still work.
+    if (error) {
+      console.error("Could not load nail designs", error.message);
+      return [];
+    }
+    return data ?? [];
+  },
+  ["nail-designs"],
+  { tags: [CACHE_TAGS.nailDesigns], revalidate: 3600 },
+);
+
+export async function getNailDesigns() {
+  return loadNailDesigns();
+}
 
 export async function getBusinessHours() {
   return loadBusinessHours();
@@ -160,9 +187,15 @@ export interface CreateBookingInput {
   notes?: string;
   /** Alterations only: whether the customer waits for the work or leaves the garment. */
   fulfilment?: Fulfilment;
+  /** Bot-check token from the booking form; ignored while Turnstile isn't configured. */
+  turnstileToken?: string;
 }
 
 export async function createBooking(input: CreateBookingInput): Promise<{ reference: string }> {
+  if (!(await verifyTurnstile(input.turnstileToken))) {
+    throw new Error("We couldn't confirm you're not a bot. Please try again.");
+  }
+
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc("create_booking", {
@@ -187,9 +220,11 @@ export async function createBooking(input: CreateBookingInput): Promise<{ refere
   await notifyNewBooking({
     guestName: input.guestName,
     guestPhone: input.guestPhone,
+    guestEmail: input.guestEmail,
     serviceIds: input.serviceIds,
     startAtISO: input.startAtISO,
     reference,
+    dropoff: input.fulfilment === "dropoff",
   });
 
   revalidatePath("/admin");
@@ -205,9 +240,11 @@ export async function createBooking(input: CreateBookingInput): Promise<{ refere
 async function notifyNewBooking(booking: {
   guestName: string;
   guestPhone: string;
+  guestEmail?: string;
   serviceIds: string[];
   startAtISO: string;
   reference: string;
+  dropoff?: boolean;
 }) {
   try {
     const supabase = await createClient();
@@ -233,8 +270,12 @@ async function notifyNewBooking(booking: {
     };
 
     const ownerPhone = ownerAlertPhone();
+    const email = booking.guestEmail
+      ? confirmationEmail({ ...payload, dropoff: booking.dropoff })
+      : null;
     await Promise.all([
       sendSms(booking.guestPhone, customerConfirmationMessage(payload)),
+      email ? sendEmail({ to: booking.guestEmail!, ...email }) : Promise.resolve(false),
       ownerPhone ? sendSms(ownerPhone, ownerAlertMessage(payload)) : Promise.resolve(false),
       sendPushToOwners("New booking", `${booking.guestName} — ${serviceNames}, ${when}`),
     ]);

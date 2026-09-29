@@ -9,7 +9,8 @@ import {
 } from "@/lib/actions/booking";
 import { formatPrice } from "@/lib/format";
 import { categoryImage } from "@/lib/category-images";
-import { businessInfo, mapEmbedSrc, socialLinks } from "@/lib/business-info";
+import { businessInfo, mapEmbedSrc, mapLinkUrl, socialLinks } from "@/lib/business-info";
+import { MapEmbed } from "@/components/site/map-embed";
 import { galleryImages } from "@/lib/gallery";
 import { LocalBusinessSchema } from "@/components/site/local-business-schema";
 import { getLocale, getT } from "@/lib/i18n/server";
@@ -334,11 +335,12 @@ export default async function HomePage() {
           </div>
 
           <div className="min-h-[380px]">
-            <iframe
-              title={t.visit.mapTitle}
+            <MapEmbed
               src={mapEmbedSrc}
-              className="size-full min-h-[380px]"
-              loading="lazy"
+              title={t.visit.mapTitle}
+              address={`${businessInfo.address.line1}, ${businessInfo.address.line2}`}
+              mapsUrl={mapLinkUrl}
+              t={{ show: t.visit.showMap, notice: t.visit.mapNotice, open: t.visit.openMaps }}
             />
           </div>
         </div>

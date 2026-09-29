@@ -769,6 +769,8 @@ where lower(s.name) = lower(v.name);
 --
 --      supabase/add-tailoring.sql
 --      supabase/add-ready-for-collection.sql
+--      supabase/add-nail-designs.sql
+--      supabase/add-hardening.sql
 --
 --  It adds services.service_line and services.dropoff_minutes, appointments.fulfilment and
 --  appointments.ready_by, seeds the alterations menu, and replaces create_booking() with the

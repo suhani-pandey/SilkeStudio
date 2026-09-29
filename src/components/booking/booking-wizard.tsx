@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { createBooking, getAvailableSlots } from "@/lib/actions/booking";
+import { TurnstileWidget, turnstileEnabled } from "@/components/booking/turnstile-widget";
 import { nextBookableDays } from "@/lib/dates";
 import type { BookingSummary } from "@/lib/booking-summary";
 import type { Fulfilment, Service, ServiceLine } from "@/lib/database.types";
@@ -29,6 +30,8 @@ interface BookingWizardProps {
   initialCategory?: string;
   /** Which side of the business to open on, when the visitor arrived from a specific card. */
   initialLine?: ServiceLine;
+  /** A design chosen from the catalogue, carried into the note so she knows what to prepare. */
+  initialDesign?: string;
 }
 
 type Step = 1 | 2 | 3;
@@ -40,6 +43,7 @@ export function BookingWizard({
   locale,
   initialCategory,
   initialLine,
+  initialDesign,
 }: BookingWizardProps) {
   const df = { locale: dateLocale(locale) };
   const steps: { id: Step; label: string }[] = [
@@ -60,8 +64,10 @@ export function BookingWizard({
   const [name, setName] = useState(defaultContact?.fullName ?? "");
   const [phone, setPhone] = useState(defaultContact?.phone ?? "");
   const [email, setEmail] = useState(defaultContact?.email ?? "");
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState(initialDesign ? `Design: ${initialDesign}` : "");
   const [isSubmitting, startSubmit] = useTransition();
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileReset, setTurnstileReset] = useState(0);
 
   const days = useMemo(() => nextBookableDays(21), []);
 
@@ -154,6 +160,7 @@ export function BookingWizard({
           guestEmail: email.trim() || undefined,
           notes: notes.trim() || undefined,
           fulfilment,
+          turnstileToken: turnstileToken ?? undefined,
         });
         const summary: BookingSummary = {
           fulfilment,
@@ -168,6 +175,9 @@ export function BookingWizard({
         router.push("/book/confirmation");
       } catch (err) {
         toast.error(err instanceof Error ? err.message : t.submitError);
+        // A bot-check token is single-use, so a failed attempt needs a fresh one.
+        setTurnstileToken(null);
+        setTurnstileReset((n) => n + 1);
         loadSlots(selectedIds, selectedDate);
       }
     });
@@ -472,14 +482,22 @@ export function BookingWizard({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
+                maxLength={1000}
               />
             </div>
+
+            <TurnstileWidget onToken={setTurnstileToken} resetSignal={turnstileReset} />
 
             <Button
               type="submit"
               size="lg"
               className="h-13 w-full text-base"
-              disabled={isSubmitting || !name.trim() || !phone.trim()}
+              disabled={
+                isSubmitting ||
+                !name.trim() ||
+                !phone.trim() ||
+                (turnstileEnabled && !turnstileToken)
+              }
             >
               {isSubmitting ? (
                 <>

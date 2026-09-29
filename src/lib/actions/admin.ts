@@ -7,7 +7,13 @@ import { createClient } from "@/lib/supabase/server";
 import { SALON_TIMEZONE } from "@/lib/business-info";
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import { readyForCollectionMessage, sendSms } from "@/lib/sms";
-import type { AppointmentStatus, BusinessHour, Service, ServiceLine } from "@/lib/database.types";
+import type {
+  AppointmentStatus,
+  BusinessHour,
+  Service,
+  ServiceLine,
+  NailDesign,
+} from "@/lib/database.types";
 
 function revalidateAdmin() {
   revalidatePath("/admin");
@@ -445,4 +451,80 @@ export async function deleteTestimonial(id: string) {
   updateTag(CACHE_TAGS.testimonials);
   revalidatePath("/");
   revalidatePath("/admin/testimonials");
+}
+
+// ---------- Nail design catalogue ----------
+
+export interface NailDesignInput {
+  name: string;
+  nameDa?: string;
+  category: string;
+  categoryDa?: string;
+  description?: string;
+  descriptionDa?: string;
+  imagePath: string;
+  colourHex?: string | null;
+  serviceId?: string | null;
+  active: boolean;
+  sortOrder: number;
+}
+
+export async function listNailDesigns(): Promise<NailDesign[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("nail_designs")
+    .select("*")
+    .order("sort_order", { ascending: true });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+function toRow(input: NailDesignInput) {
+  return {
+    name: input.name,
+    name_da: input.nameDa || null,
+    category: input.category,
+    category_da: input.categoryDa || null,
+    description: input.description || null,
+    description_da: input.descriptionDa || null,
+    image_path: input.imagePath,
+    colour_hex: input.colourHex || null,
+    service_id: input.serviceId || null,
+    active: input.active,
+    sort_order: input.sortOrder,
+  };
+}
+
+function revalidateDesigns() {
+  updateTag(CACHE_TAGS.nailDesigns);
+  revalidatePath("/admin/designs");
+  revalidatePath("/designs");
+  revalidatePath("/book");
+}
+
+export async function createNailDesign(input: NailDesignInput) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("nail_designs").insert(toRow(input));
+  if (error) throw new Error(error.message);
+  revalidateDesigns();
+}
+
+export async function updateNailDesign(id: string, input: NailDesignInput) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("nail_designs").update(toRow(input)).eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidateDesigns();
+}
+
+export async function deleteNailDesign(id: string, imagePath: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("nail_designs").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
+  // The row is what customers see, so a failed file cleanup must not fail the delete — it only
+  // leaves an orphaned image in the bucket.
+  const { error: storageError } = await supabase.storage.from("nail-designs").remove([imagePath]);
+  if (storageError) console.error("Could not remove design image", storageError.message);
+
+  revalidateDesigns();
 }

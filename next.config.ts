@@ -18,6 +18,11 @@ const securityHeaders = [
   },
 ];
 
+/** Host of the Supabase project, so uploaded design photos can be optimised by next/image. */
+const supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+  : "*.supabase.co";
+
 const nextConfig: NextConfig = {
   // Don't advertise the framework version to anyone scanning for known issues.
   poweredByHeader: false,
@@ -25,6 +30,14 @@ const nextConfig: NextConfig = {
     // 75 is the default; 68 is for the full-screen hero, where soft folds hide the extra
     // compression and the saving is worth far more than the detail.
     qualities: [68, 75],
+    // Design photos are uploaded by the owner and served from Supabase Storage.
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: supabaseHostname,
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

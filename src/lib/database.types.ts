@@ -71,6 +71,40 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["services"]["Insert"]>;
         Relationships: [];
       };
+      nail_designs: {
+        Row: {
+          id: string;
+          name: string;
+          name_da: string | null;
+          category: string;
+          category_da: string | null;
+          description: string | null;
+          description_da: string | null;
+          image_path: string;
+          colour_hex: string | null;
+          service_id: string | null;
+          active: boolean;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          name_da?: string | null;
+          category: string;
+          category_da?: string | null;
+          description?: string | null;
+          description_da?: string | null;
+          image_path: string;
+          colour_hex?: string | null;
+          service_id?: string | null;
+          active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["nail_designs"]["Insert"]>;
+        Relationships: [];
+      };
       business_hours: {
         Row: {
           id: string;
@@ -124,6 +158,7 @@ export interface Database {
           booked_by: BookedBy;
           fulfilment: Fulfilment;
           ready_by: string | null;
+          reminder_sent_at: string | null;
           notes: string | null;
           created_at: string;
         };
@@ -137,6 +172,7 @@ export interface Database {
           end_at?: string;
           fulfilment?: Fulfilment;
           ready_by?: string | null;
+          reminder_sent_at?: string | null;
           duration_minutes?: number;
           buffer_minutes?: number;
           total_price?: number;
@@ -302,6 +338,10 @@ export interface Database {
         Args: { p_reference: string; p_phone: string };
         Returns: boolean;
       };
+      anonymise_old_appointments: {
+        Args: { p_months?: number };
+        Returns: number;
+      };
       mark_ready_for_collection: {
         Args: { p_appointment_id: string; p_ready_by: string };
         Returns: undefined;
@@ -319,6 +359,7 @@ export type AvailabilityBlock = Database["public"]["Tables"]["availability_block
 export type Appointment = Database["public"]["Tables"]["appointments"]["Row"];
 export type AppointmentNotification = Database["public"]["Tables"]["notifications"]["Row"];
 export type Testimonial = Database["public"]["Tables"]["testimonials"]["Row"];
+export type NailDesign = Database["public"]["Tables"]["nail_designs"]["Row"];
 
 /** Shape returned by `select("*, appointment_services(service:services(*))")`. */
 export type AppointmentWithServices = Appointment & {

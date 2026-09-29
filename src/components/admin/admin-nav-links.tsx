@@ -9,6 +9,7 @@ import {
   ListChecks,
   MessageSquareQuote,
   Scissors,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,7 @@ const links = [
   { href: "/admin/appointments", label: "Appointments", icon: ListChecks },
   { href: "/admin/availability", label: "Availability", icon: CalendarClock },
   { href: "/admin/services", label: "Services", icon: Scissors },
+  { href: "/admin/designs", label: "Designs", icon: Sparkles },
   { href: "/admin/testimonials", label: "Reviews", icon: MessageSquareQuote },
 ];
 

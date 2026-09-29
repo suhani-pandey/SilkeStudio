@@ -65,8 +65,8 @@ export default async function PrivacyPage() {
           </h2>
           <p className="mt-2">
             {da
-              ? "Kun salonens ejer. Vores databehandlere er Supabase (database og login) og GatewayAPI (afsendelse af SMS). De behandler kun oplysningerne på vores vegne."
-              : "Only the salon owner. Our processors are Supabase (database and sign-in) and GatewayAPI (sending text messages). They process the data only on our behalf."}
+              ? "Kun studiets ejer. Vores databehandlere er Supabase (database, login og billeder), GatewayAPI (sms), Resend (e-mail) og Cloudflare Turnstile, som på bookingsiden tjekker, at du ikke er en robot — uden sporingscookies. De behandler kun oplysningerne på vores vegne. Kortet på forsiden hentes først fra Google, når du selv trykker på “Vis kort”; indtil da sendes intet til Google."
+              : "Only the studio owner. Our processors are Supabase (database, sign-in and images), GatewayAPI (text messages), Resend (email) and Cloudflare Turnstile, which checks on the booking page that you're not a bot — without tracking cookies. They process the data only on our behalf. The map on the home page is loaded from Google only when you tap “Show map”; until then nothing is sent to Google."}
           </p>
         </section>
 
@@ -76,8 +76,8 @@ export default async function PrivacyPage() {
           </h2>
           <p className="mt-2">
             {da
-              ? "Vi gemmer bookinger, så længe det er nødvendigt for at drive salonen og opfylde bogføringskrav. Du kan altid bede os om at slette dine oplysninger."
-              : "We keep bookings for as long as we need them to run the salon and meet bookkeeping requirements. You can ask us to delete your data at any time."}
+              ? "24 måneder efter din tid fjernes dit navn, telefonnummer, din e-mail og dine bemærkninger automatisk. Selve bookingen — dato, behandling og pris — beholdes af bogføringshensyn, men kan ikke længere føres tilbage til dig. Du kan altid bede os om at slette dine oplysninger tidligere."
+              : "Twenty-four months after your appointment, your name, phone number, email and notes are removed automatically. The booking itself — date, service and price — is kept for bookkeeping but can no longer be traced back to you. You can ask us to delete your data sooner at any time."}
           </p>
         </section>
 
@@ -98,8 +98,8 @@ export default async function PrivacyPage() {
           </h2>
           <p className="mt-2">
             {da
-              ? "Vi bruger kun nødvendige cookies: én der husker dit valgte sprog, og — hvis du opretter en konto — én der holder dig logget ind. Vi bruger ikke sporing eller reklamecookies."
-              : "We use only essential cookies: one that remembers your chosen language, and — if you create an account — one that keeps you signed in. There is no tracking or advertising."}
+              ? "Vi bruger kun én nødvendig cookie: den, der holder dig logget ind, hvis du opretter en konto. De negledesign, du gemmer, ligger kun på din egen telefon og sendes aldrig til os. Vi bruger ikke sporing eller reklamecookies."
+              : "We use one essential cookie: the one that keeps you signed in, if you create an account. Nail designs you save are kept only on your own phone and never sent to us. There is no tracking or advertising."}
           </p>
         </section>
       </div>

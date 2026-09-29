@@ -56,7 +56,9 @@ export function LocalBusinessSchema({
     <script
       type="application/ld+json"
       // Values come from our own database, not user input.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      // JSON.stringify leaves "<" alone, so a service name containing "</script>" could close
+      // the tag early. Escaping it keeps the data inert whatever the admin types.
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }}
     />
   );
 }

@@ -26,7 +26,7 @@ export default async function OpengraphImage() {
           SILKE
         </div>
       </div>
-      <div style={{ fontSize: 40, color: "#b95a41", marginTop: 18 }}>Studio</div>
+      <div style={{ fontSize: 40, color: "#ad5238", marginTop: 18 }}>Studio</div>
       <div style={{ fontSize: 30, marginTop: 42, color: "#6b5f56" }}>
         Beauty · Nails · Threading · Alterations · Sari
       </div>

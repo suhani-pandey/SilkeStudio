@@ -117,6 +117,13 @@ export function readyForCollectionMessage({
   ].join("\n");
 }
 
+export function reminderMessage({ services, when }: { services: string; when: string }): string {
+  return [
+    `Reminder: ${services}, ${when} at ${businessInfo.name}.`,
+    `Can't make it? Cancel here so someone else can have the slot: ${bookingLookupUrl()}`,
+  ].join("\n");
+}
+
 export function bookingLookupUrl(): string {
   const base = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "";
   return `${base}/booking`;

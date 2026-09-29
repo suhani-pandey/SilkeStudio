@@ -35,3 +35,8 @@ export function siteUrl(): string {
 export const mapEmbedSrc = `https://www.google.com/maps?q=${encodeURIComponent(
   `${businessInfo.address.line1}, ${businessInfo.address.line2}`,
 )}&output=embed`;
+
+/** A plain link to the address in Google Maps — opens their site, sends nothing from ours. */
+export const mapLinkUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  `${businessInfo.address.line1}, ${businessInfo.address.line2}`,
+)}`;

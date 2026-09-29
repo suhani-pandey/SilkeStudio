@@ -13,9 +13,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function BookPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; line?: string }>;
+  searchParams: Promise<{ category?: string; line?: string; design?: string }>;
 }) {
-  const { category, line } = await searchParams;
+  const { category, line, design } = await searchParams;
   // Arriving from "Book alterations" should open on that side of the menu, not on nails.
   const initialLine: ServiceLine | undefined =
     line === "tailoring" || line === "beauty" ? line : undefined;
@@ -57,6 +57,7 @@ export default async function BookPage({
           locale={locale}
           initialCategory={category}
           initialLine={initialLine}
+          initialDesign={design}
         />
       </div>
     </div>

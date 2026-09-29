@@ -69,8 +69,13 @@ Deploy to Vercel (import the repo, it detects Next.js), and keep Supabase as the
 
 ### What's already handled
 
-- Security headers (`X-Frame-Options`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, HSTS)
-  and no `X-Powered-By`, set in `next.config.ts`.
+- A nonce-based Content-Security-Policy (`src/lib/csp.ts`, applied in `src/proxy.ts`): only
+  scripts carrying the request's nonce run. Plus `X-Frame-Options`, `nosniff`, `Referrer-Policy`,
+  `Permissions-Policy`, HSTS, and no `X-Powered-By`.
+- Booking abuse limits in the database (per phone, and a site-wide hourly cap), with optional
+  Cloudflare Turnstile in front.
+- Customer details anonymised 24 months after the appointment by the daily job.
+- Google Maps loads only when the visitor asks for it, so nothing reaches Google by default.
 - Row-level security on every table; customers can never read another customer's booking, and
   free/busy times are exposed through a `busy_intervals()` function that returns times only —
   no names, phone numbers or reasons.

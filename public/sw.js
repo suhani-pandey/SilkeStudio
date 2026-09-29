@@ -1,7 +1,7 @@
 // Silke Studio service worker.
 // Booking data must always be fresh, so pages and API calls go to the network first and only
 // fall back to a cached shell when the phone is offline. Static assets are cached on first use.
-const CACHE = "silke-v1"; // Bump this whenever a cached asset is replaced in place.
+const CACHE = "silke-v2"; // Bump this whenever a cached asset is replaced in place.
 const OFFLINE_URL = "/offline";
 
 self.addEventListener("install", (event) => {

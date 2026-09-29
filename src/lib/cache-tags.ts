@@ -10,4 +10,5 @@ export const CACHE_TAGS = {
   services: "services",
   businessHours: "business-hours",
   testimonials: "testimonials",
+  nailDesigns: "nail-designs",
 } as const;

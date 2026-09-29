@@ -3,11 +3,26 @@ import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/lib/database.types";
 import { getCachedJwks } from "@/lib/supabase/jwks";
 
-export async function updateSession(request: NextRequest) {
+/**
+ * Refreshes the session and gates the admin area.
+ *
+ * `forwardHeaders` are added to the request the page renders with — the CSP nonce, here. They're
+ * rebuilt after any cookie refresh so the page sees both the new session and the nonce.
+ */
+export async function updateSession(
+  request: NextRequest,
+  forwardHeaders: Record<string, string> = {},
+) {
   const { pathname } = request.nextUrl;
   const isAdminRoute = pathname.startsWith("/admin");
 
-  let supabaseResponse = NextResponse.next({ request });
+  const requestHeaders = () => {
+    const headers = new Headers(request.headers);
+    for (const [name, value] of Object.entries(forwardHeaders)) headers.set(name, value);
+    return headers;
+  };
+
+  let supabaseResponse = NextResponse.next({ request: { headers: requestHeaders() } });
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,7 +34,7 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          supabaseResponse = NextResponse.next({ request });
+          supabaseResponse = NextResponse.next({ request: { headers: requestHeaders() } });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
           );

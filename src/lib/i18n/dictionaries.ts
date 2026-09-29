@@ -4,6 +4,7 @@ const en = {
   nav: {
     home: "Home",
     services: "Services",
+    designs: "Designs",
     book: "Book",
     login: "Log in",
     myAppointments: "My appointments",
@@ -72,6 +73,19 @@ const en = {
     tiktok: "See it all on TikTok →",
     tiktokNote: "A few of our recent sets, brows and facials. There is plenty more on TikTok.",
   },
+  designs: {
+    eyebrow: "Nail designs",
+    title: "Find the one you want before you arrive",
+    body: "Shapes, colours and finishes actually done in this studio. Save the ones you like, then bring your pick to the appointment.",
+    all: "All",
+    favourites: "Saved",
+    favourite: "Save",
+    unfavourite: "Remove from saved",
+    bookThis: "Book this design",
+    close: "Close",
+    empty: "Designs are being added — call and we'll talk you through the options.",
+    noneInCategory: "Nothing here yet.",
+  },
   testimonials: {
     eyebrow: "Kind words",
     title: "What clients say",
@@ -84,6 +98,9 @@ const en = {
     hours: "Opening hours",
     closed: "Closed",
     mapTitle: "Silke Studio location",
+    showMap: "Show map",
+    openMaps: "Open in Google Maps",
+    mapNotice: "The map is provided by Google, which receives your IP address when it loads.",
   },
   closing: {
     script: "See you soon",
@@ -171,6 +188,7 @@ const en = {
     dateFormat: "EEEE d MMMM 'at' HH:mm",
     reference: "Your booking code",
     referenceHint: "Keep this — you'll need it (with your phone number) to change or cancel.",
+    addToCalendar: "Add to calendar",
     manageBooking: "Manage booking",
   },
   auth: {
@@ -243,6 +261,9 @@ const en = {
     bookTitle: "Book an appointment",
     bookDescription:
       "Pick your services and a time. Booking takes under a minute, no account needed.",
+    designsTitle: "Nail designs",
+    designsDescription:
+      "Nail shapes, colours and finishes done at Silke Studio in Høje Taastrup. Save what you like and bring it to your appointment.",
     lookupTitle: "Find your booking",
     lookupDescription: "Look up or cancel your appointment with your booking code.",
   },
@@ -254,6 +275,7 @@ const da: Dictionary = {
   nav: {
     home: "Hjem",
     services: "Behandlinger",
+    designs: "Design",
     book: "Book",
     login: "Log ind",
     myAppointments: "Mine aftaler",
@@ -323,6 +345,19 @@ const da: Dictionary = {
     tiktokNote:
       "Et udpluk af de seneste negle, bryn og ansigtsbehandlinger. Der er meget mere på TikTok.",
   },
+  designs: {
+    eyebrow: "Negledesign",
+    title: "Find det, du vil have, inden du kommer",
+    body: "Former, farver og finish, der rent faktisk er lavet i studiet. Gem dem, du kan lide, og tag dit valg med til tiden.",
+    all: "Alle",
+    favourites: "Gemte",
+    favourite: "Gem",
+    unfavourite: "Fjern fra gemte",
+    bookThis: "Book dette design",
+    close: "Luk",
+    empty: "Designene er på vej — ring, så gennemgår vi mulighederne.",
+    noneInCategory: "Ikke noget her endnu.",
+  },
   testimonials: {
     eyebrow: "Pæne ord",
     title: "Det siger kunderne",
@@ -335,6 +370,9 @@ const da: Dictionary = {
     hours: "Åbningstider",
     closed: "Lukket",
     mapTitle: "Silke Studio placering",
+    showMap: "Vis kort",
+    openMaps: "Åbn i Google Maps",
+    mapNotice: "Kortet leveres af Google, som modtager din IP-adresse, når det indlæses.",
   },
   closing: {
     script: "Vi ses snart",
@@ -423,6 +461,7 @@ const da: Dictionary = {
     reference: "Din bookingkode",
     referenceHint:
       "Gem den — du skal bruge den sammen med dit telefonnummer for at ændre eller aflyse.",
+    addToCalendar: "Tilføj til kalender",
     manageBooking: "Se din booking",
   },
   auth: {
@@ -493,6 +532,9 @@ const da: Dictionary = {
     bookTitle: "Book en tid",
     bookDescription:
       "Vælg dine behandlinger og et tidspunkt. Det tager under et minut, og du behøver ingen konto.",
+    designsTitle: "Negledesign",
+    designsDescription:
+      "Negleformer, farver og finish lavet hos Silke Studio i Høje Taastrup. Gem det, du kan lide, og tag det med til din tid.",
     lookupTitle: "Find din booking",
     lookupDescription: "Slå din aftale op eller aflys den med din bookingkode.",
   },
