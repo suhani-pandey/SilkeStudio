@@ -54,6 +54,7 @@ export default async function BookPage({
           services={services}
           defaultContact={defaultContact}
           t={t.booking}
+          policy={t.policy}
           locale={locale}
           initialCategory={category}
           initialLine={initialLine}

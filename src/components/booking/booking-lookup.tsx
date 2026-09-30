@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { CalendarCheck, Loader2, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { cancelBookingByReference, findBooking, type FoundBooking } from "@/lib/actions/lookup";
+import { canCancelOnline } from "@/lib/booking-policy";
+import { businessInfo, SALON_TIMEZONE } from "@/lib/business-info";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import { dateLocale } from "@/lib/date-locale";
@@ -42,8 +44,12 @@ export function BookingLookup({ t, locale }: { t: Dictionary["lookup"]; locale: 
 
     startTransition(async () => {
       try {
-        const ok = await cancelBookingByReference(reference.trim(), phone.trim());
-        if (ok) {
+        const result = await cancelBookingByReference(reference.trim(), phone.trim());
+        if (!result.ok) {
+          // e.g. inside the 24-hour window: the message says to call, with the number.
+          toast.error(result.error);
+          setConfirmOpen(false);
+        } else if (result.data) {
           setBooking({ ...booking, status: "cancelled" });
           setConfirmOpen(false);
           toast.success(t.cancelDone);
@@ -65,7 +71,10 @@ export function BookingLookup({ t, locale }: { t: Dictionary["lookup"]; locale: 
 
   if (booking) {
     const past = new Date(booking.startAtISO) < new Date();
-    const cancellable = booking.status === "confirmed" && !past;
+    const active = booking.status === "confirmed" && !past;
+    // Inside the notice period the database refuses online cancellation, so offer the phone.
+    const cancellable = active && canCancelOnline(booking.startAtISO);
+    const tooLateOnline = active && !cancellable;
 
     return (
       <div className="mx-auto max-w-md px-5 py-14 sm:px-6">
@@ -77,7 +86,9 @@ export function BookingLookup({ t, locale }: { t: Dictionary["lookup"]; locale: 
           <div className="flex items-center gap-2">
             <CalendarCheck className="text-copper size-5 shrink-0" />
             <p className="font-heading text-xl font-medium">
-              {format(new Date(booking.startAtISO), t.dateFormat, { locale: dateLocale(locale) })}
+              {formatInTimeZone(new Date(booking.startAtISO), SALON_TIMEZONE, t.dateFormat, {
+                locale: dateLocale(locale),
+              })}
             </p>
           </div>
           <p className="text-muted-foreground mt-3 text-sm">{booking.services}</p>
@@ -96,6 +107,18 @@ export function BookingLookup({ t, locale }: { t: Dictionary["lookup"]; locale: 
         )}
         {booking.status === "completed" && (
           <p className="text-muted-foreground mt-5 text-center text-sm">{t.completed}</p>
+        )}
+
+        {tooLateOnline && (
+          <p className="bg-secondary/60 mt-5 rounded-lg p-4 text-center text-sm">
+            {t.lateCancelNotice}{" "}
+            <a
+              href={businessInfo.phoneHref}
+              className="text-clay font-medium underline underline-offset-2"
+            >
+              {businessInfo.phone}
+            </a>
+          </p>
         )}
 
         <div className="mt-8 flex flex-col gap-3">
@@ -118,7 +141,9 @@ export function BookingLookup({ t, locale }: { t: Dictionary["lookup"]; locale: 
             <>
               <p className="font-medium">{booking.services}</p>
               <p className="text-muted-foreground mt-1 text-sm">
-                {format(new Date(booking.startAtISO), t.dateFormat, { locale: dateLocale(locale) })}
+                {formatInTimeZone(new Date(booking.startAtISO), SALON_TIMEZONE, t.dateFormat, {
+                  locale: dateLocale(locale),
+                })}
               </p>
             </>
           }

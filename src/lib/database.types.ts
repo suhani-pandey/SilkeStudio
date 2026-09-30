@@ -8,6 +8,8 @@ export type ServiceLine = "beauty" | "tailoring";
  * handed over in a short slot and collected once it's finished. Beauty work is always the former.
  */
 export type Fulfilment = "appointment" | "dropoff";
+/** Whether the customer was sent a confirmation. Null for bookings the owner made herself. */
+export type ConfirmationStatus = "sent" | "failed" | "unavailable";
 export type NotificationAudience = "owner" | "customer";
 
 export interface Database {
@@ -159,6 +161,7 @@ export interface Database {
           fulfilment: Fulfilment;
           ready_by: string | null;
           reminder_sent_at: string | null;
+          confirmation_status: ConfirmationStatus | null;
           notes: string | null;
           created_at: string;
         };
@@ -173,6 +176,7 @@ export interface Database {
           fulfilment?: Fulfilment;
           ready_by?: string | null;
           reminder_sent_at?: string | null;
+          confirmation_status?: ConfirmationStatus | null;
           duration_minutes?: number;
           buffer_minutes?: number;
           total_price?: number;
@@ -341,6 +345,14 @@ export interface Database {
       anonymise_old_appointments: {
         Args: { p_months?: number };
         Returns: number;
+      };
+      record_confirmation_status: {
+        Args: { p_appointment_id: string; p_reference: string; p_status: ConfirmationStatus };
+        Returns: undefined;
+      };
+      cancel_own_appointment: {
+        Args: { p_appointment_id: string };
+        Returns: undefined;
       };
       mark_ready_for_collection: {
         Args: { p_appointment_id: string; p_ready_by: string };

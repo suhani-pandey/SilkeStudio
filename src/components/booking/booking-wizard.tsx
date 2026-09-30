@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { format, isSameDay } from "date-fns";
+import { formatSalon } from "@/lib/salon-time";
 import { Check, ChevronLeft, Loader2, PackageOpen, Timer } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { createBooking, getAvailableSlots } from "@/lib/actions/booking";
+import { checkPhone, isEmailSyntaxValid, suggestEmailFix } from "@/lib/contact-validation";
 import { TurnstileWidget, turnstileEnabled } from "@/components/booking/turnstile-widget";
+import { BookingPolicy } from "@/components/booking/booking-policy";
 import { nextBookableDays } from "@/lib/dates";
 import type { BookingSummary } from "@/lib/booking-summary";
 import type { Fulfilment, Service, ServiceLine } from "@/lib/database.types";
@@ -25,6 +28,8 @@ interface BookingWizardProps {
   services: Service[];
   defaultContact?: { fullName: string; phone: string; email: string };
   t: Dictionary["booking"];
+  /** House rules, shown just before the customer confirms. */
+  policy: Dictionary["policy"];
   locale: Locale;
   /** Category to show first, when the visitor arrived from a category card. */
   initialCategory?: string;
@@ -40,6 +45,7 @@ export function BookingWizard({
   services,
   defaultContact,
   t,
+  policy,
   locale,
   initialCategory,
   initialLine,
@@ -67,6 +73,9 @@ export function BookingWizard({
   const [notes, setNotes] = useState(initialDesign ? `Design: ${initialDesign}` : "");
   const [isSubmitting, startSubmit] = useTransition();
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  // Errors appear once a field has been left, not while someone is still typing into it.
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  const [emailTouched, setEmailTouched] = useState(false);
   const [turnstileReset, setTurnstileReset] = useState(0);
 
   const days = useMemo(() => nextBookableDays(21), []);
@@ -98,6 +107,10 @@ export function BookingWizard({
     (sum, s) => sum + (fulfilment === "dropoff" ? (s.dropoff_minutes ?? 15) : s.duration_minutes),
     0,
   );
+  const phoneValid = checkPhone(phone).valid;
+  const emailValid = isEmailSyntaxValid(email);
+  const emailSuggestion = emailValid ? suggestEmailFix(email) : null;
+  const detailsComplete = name.trim().length > 0 && phoneValid && emailValid;
   const isTailoring = line === "tailoring";
   const canDropOff =
     isTailoring &&
@@ -147,23 +160,48 @@ export function BookingWizard({
     loadSlots(selectedIds, date);
   }
 
+  function failBooking(message: string, code?: string) {
+    toast.error(message);
+    // A bot-check token is single-use, so a failed attempt needs a fresh one.
+    setTurnstileToken(null);
+    setTurnstileReset((n) => n + 1);
+
+    // The details form only shows while a slot is chosen, and reloading slots clears the choice —
+    // so only do that when the slot itself was the problem, and step back to pick a new one.
+    // Anything else (a bad email, a booking limit) keeps them on the form with what they typed.
+    if (code === "SLOT_TAKEN") {
+      setStep(2);
+      loadSlots(selectedIds, selectedDate);
+    }
+  }
+
   function handleSubmit() {
-    if (!selectedSlotISO || !name.trim() || !phone.trim()) return;
+    if (!selectedSlotISO || !detailsComplete) {
+      setPhoneTouched(true);
+      setEmailTouched(true);
+      return;
+    }
 
     startSubmit(async () => {
       try {
-        const { reference } = await createBooking({
+        const result = await createBooking({
           serviceIds: selectedIds,
           startAtISO: selectedSlotISO,
           guestName: name.trim(),
           guestPhone: phone.trim(),
-          guestEmail: email.trim() || undefined,
+          guestEmail: email.trim(),
           notes: notes.trim() || undefined,
           fulfilment,
           turnstileToken: turnstileToken ?? undefined,
         });
+        if (!result.ok) {
+          failBooking(result.error, result.code);
+          return;
+        }
+        const { reference, confirmation } = result.data;
         const summary: BookingSummary = {
           fulfilment,
+          confirmation,
           serviceNames: selectedServices.map((s) => serviceName(s, locale)),
           totalPrice,
           durationMinutes: totalDuration,
@@ -173,12 +211,9 @@ export function BookingWizard({
         };
         sessionStorage.setItem("lastBooking", JSON.stringify(summary));
         router.push("/book/confirmation");
-      } catch (err) {
-        toast.error(err instanceof Error ? err.message : t.submitError);
-        // A bot-check token is single-use, so a failed attempt needs a fresh one.
-        setTurnstileToken(null);
-        setTurnstileReset((n) => n + 1);
-        loadSlots(selectedIds, selectedDate);
+      } catch {
+        // Only reached if the request itself failed, e.g. no connection.
+        failBooking(t.submitError);
       }
     });
   }
@@ -389,7 +424,7 @@ export function BookingWizard({
                       : "border-border hover:border-primary/50",
                   )}
                 >
-                  {format(new Date(iso), "HH:mm")}
+                  {formatSalon(iso, "HH:mm")}
                 </button>
               ))}
             </div>
@@ -411,7 +446,7 @@ export function BookingWizard({
           <div className="bg-secondary/60 rounded-md p-5">
             <p className="eyebrow">{t.yourBooking}</p>
             <p className="font-heading mt-2 text-2xl font-medium">
-              {format(new Date(selectedSlotISO), t.dateFormat, df)}
+              {formatSalon(selectedSlotISO, t.dateFormat, df)}
             </p>
             <ul className="text-muted-foreground mt-4 space-y-1 text-sm">
               {selectedServices.map((s) => (
@@ -436,42 +471,104 @@ export function BookingWizard({
               handleSubmit();
             }}
           >
+            <p className="text-muted-foreground text-sm">
+              <span aria-hidden className="text-clay">
+                *
+              </span>{" "}
+              {t.requiredNote}
+            </p>
+
             <div>
               <Label htmlFor="name" className="mb-2 block">
-                {t.fullName}
+                {t.fullName}{" "}
+                <span aria-hidden className="text-clay">
+                  *
+                </span>
               </Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                aria-required="true"
+                autoComplete="name"
+                maxLength={120}
                 className="h-12"
               />
             </div>
             <div>
               <Label htmlFor="phone" className="mb-2 block">
-                {t.phone}
+                {t.phone}{" "}
+                <span aria-hidden className="text-clay">
+                  *
+                </span>
               </Label>
               <Input
                 id="phone"
                 type="tel"
+                inputMode="tel"
+                autoComplete="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                onBlur={() => setPhoneTouched(true)}
                 required
+                aria-required="true"
+                aria-invalid={phoneTouched && !phoneValid}
+                aria-describedby={phoneTouched && !phoneValid ? "phone-error" : undefined}
                 className="h-12"
               />
+              {phoneTouched && !phoneValid && (
+                <p id="phone-error" role="alert" className="text-destructive mt-1.5 text-sm">
+                  {t.phoneInvalid}
+                </p>
+              )}
             </div>
             <div>
               <Label htmlFor="email" className="mb-2 block">
-                {t.email} <span className="text-muted-foreground font-normal">{t.optional}</span>
+                {t.email}{" "}
+                <span aria-hidden className="text-clay">
+                  *
+                </span>
               </Label>
               <Input
                 id="email"
                 type="email"
+                inputMode="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => setEmailTouched(true)}
+                required
+                aria-required="true"
+                aria-invalid={emailTouched && !emailValid}
+                aria-describedby={
+                  emailTouched && !emailValid
+                    ? "email-error"
+                    : emailSuggestion
+                      ? "email-suggestion"
+                      : undefined
+                }
                 className="h-12"
               />
+              {emailTouched && !emailValid && (
+                <p id="email-error" role="alert" className="text-destructive mt-1.5 text-sm">
+                  {t.emailInvalid}
+                </p>
+              )}
+              {/* A nudge, not a block: an unusual address is still accepted as typed. */}
+              {emailValid && emailSuggestion && (
+                <p id="email-suggestion" className="text-muted-foreground mt-1.5 text-sm">
+                  {t.emailDidYouMean}{" "}
+                  <button
+                    type="button"
+                    onClick={() => setEmail(emailSuggestion)}
+                    className="text-clay font-medium underline underline-offset-2"
+                  >
+                    {emailSuggestion}
+                  </button>
+                  ?
+                </p>
+              )}
             </div>
             <div>
               <Label htmlFor="notes" className="mb-2 block">
@@ -486,18 +583,15 @@ export function BookingWizard({
               />
             </div>
 
+            <BookingPolicy t={policy} />
+
             <TurnstileWidget onToken={setTurnstileToken} resetSignal={turnstileReset} />
 
             <Button
               type="submit"
               size="lg"
               className="h-13 w-full text-base"
-              disabled={
-                isSubmitting ||
-                !name.trim() ||
-                !phone.trim() ||
-                (turnstileEnabled && !turnstileToken)
-              }
+              disabled={isSubmitting || !detailsComplete || (turnstileEnabled && !turnstileToken)}
             >
               {isSubmitting ? (
                 <>

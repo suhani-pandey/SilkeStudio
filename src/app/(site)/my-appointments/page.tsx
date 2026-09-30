@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
-import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import type { Metadata } from "next";
 import { CalendarCheck } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { CancelAppointmentButton } from "@/components/booking/cancel-appointment-button";
 import { getUpcomingAppointmentsForCustomer } from "@/lib/actions/booking";
 import { formatPrice } from "@/lib/format";
+import { SALON_TIMEZONE } from "@/lib/business-info";
 import { appointmentServiceNames } from "@/lib/database.types";
 import { getLocale, getT } from "@/lib/i18n/server";
 import { dateLocale } from "@/lib/date-locale";
@@ -55,9 +56,14 @@ export default async function MyAppointmentsPage() {
                 <div>
                   <p className="font-medium">{appointmentServiceNames(appt)}</p>
                   <p className="text-muted-foreground text-sm">
-                    {format(new Date(appt.start_at), t.myAppointments.dateFormat, {
-                      locale: dateLocale(locale),
-                    })}
+                    {formatInTimeZone(
+                      new Date(appt.start_at),
+                      SALON_TIMEZONE,
+                      t.myAppointments.dateFormat,
+                      {
+                        locale: dateLocale(locale),
+                      },
+                    )}
                   </p>
                   <p className="text-muted-foreground text-sm">{formatPrice(appt.total_price)}</p>
                 </div>

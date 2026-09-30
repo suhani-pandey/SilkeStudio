@@ -164,6 +164,11 @@ const en = {
     phone: "Phone number",
     email: "Email",
     optional: "(optional)",
+    requiredNote: "Required",
+    phoneInvalid:
+      "That doesn't look like a valid phone number. Check the digits, or add the country code if it isn't Danish.",
+    emailInvalid: "Please enter a valid email address — your confirmation goes there.",
+    emailDidYouMean: "Did you mean",
     notes: "Anything we should know?",
     confirm: "Confirm booking",
     booking: "Booking…",
@@ -173,6 +178,16 @@ const en = {
     loadError: "Couldn't load available times. Please try again.",
     submitError: "Something went wrong. Please try again.",
     dateFormat: "EEEE d MMMM 'at' HH:mm",
+  },
+  policy: {
+    title: "Good to know",
+    trouble: "Problem booking online? Call us and we'll book you in.",
+    late: "Running late? Please call to let us know.",
+    cancel:
+      "Need to cancel? Do it at least 24 hours before — online with your booking code, or by phone. Within 24 hours, please call.",
+    payment:
+      "You pay at the studio after your appointment. Treatments can't be refunded once they're done, but if anything isn't right, tell us — we welcome feedback and will put it right.",
+    call: "Call",
   },
   confirmation: {
     thanks: "Thank you",
@@ -189,6 +204,13 @@ const en = {
     reference: "Your booking code",
     referenceHint: "Keep this — you'll need it (with your phone number) to change or cancel.",
     addToCalendar: "Add to calendar",
+    sentByEmail: "We've emailed your confirmation to",
+    andText: " and sent you a text",
+    sentByText: "We've texted you your confirmation.",
+    spamHint: "Not there in a few minutes? Check your spam folder.",
+    notSentTitle: "No confirmation message was sent",
+    notSentBody:
+      "Please save your booking code or add the booking to your calendar now — this screen is your record of it. If you lose the code, just call us.",
     manageBooking: "Manage booking",
   },
   auth: {
@@ -212,6 +234,8 @@ const en = {
     confirmBody: "We've sent a confirmation link to {email}. Click it, then come back and log in.",
   },
   lookup: {
+    lateCancelNotice:
+      "Less than 24 hours to go, so this booking can't be cancelled online. To cancel, please call",
     eyebrow: "Your booking",
     title: "Find your appointment",
     body: "Enter the booking code from your confirmation, plus the phone number you booked with.",
@@ -234,6 +258,7 @@ const en = {
     dateFormat: "EEEE d MMMM 'at' HH:mm",
   },
   myAppointments: {
+    callToCancel: "Call to cancel",
     eyebrow: "Your visits",
     title: "My appointments",
     logOut: "Log out",
@@ -435,6 +460,11 @@ const da: Dictionary = {
     fullName: "Fulde navn",
     phone: "Telefonnummer",
     email: "E-mail",
+    requiredNote: "Skal udfyldes",
+    phoneInvalid:
+      "Det ligner ikke et gyldigt telefonnummer. Tjek cifrene, eller tilføj landekoden, hvis det ikke er dansk.",
+    emailInvalid: "Skriv en gyldig e-mailadresse — din bekræftelse sendes dertil.",
+    emailDidYouMean: "Mente du",
     optional: "(valgfrit)",
     notes: "Noget vi skal vide?",
     confirm: "Bekræft booking",
@@ -445,6 +475,16 @@ const da: Dictionary = {
     loadError: "Kunne ikke hente ledige tider. Prøv igen.",
     submitError: "Noget gik galt. Prøv igen.",
     dateFormat: "EEEE d. MMMM 'kl.' HH:mm",
+  },
+  policy: {
+    title: "Godt at vide",
+    trouble: "Problemer med at booke online? Ring, så booker vi dig ind.",
+    late: "Bliver du forsinket? Ring venligst og giv besked.",
+    cancel:
+      "Skal du aflyse? Gør det senest 24 timer før — online med din bookingkode eller på telefon. Inden for 24 timer skal du ringe.",
+    payment:
+      "Du betaler i studiet efter din tid. Behandlinger kan ikke refunderes, når de er udført, men er der noget, du ikke er tilfreds med, så sig det — vi tager imod feedback og retter op på det.",
+    call: "Ring",
   },
   confirmation: {
     thanks: "Tak",
@@ -462,6 +502,13 @@ const da: Dictionary = {
     referenceHint:
       "Gem den — du skal bruge den sammen med dit telefonnummer for at ændre eller aflyse.",
     addToCalendar: "Tilføj til kalender",
+    sentByEmail: "Vi har sendt din bekræftelse til",
+    andText: " og sendt dig en sms",
+    sentByText: "Vi har sendt din bekræftelse på sms.",
+    spamHint: "Er den ikke kommet om et par minutter? Tjek din spam-mappe.",
+    notSentTitle: "Der blev ikke sendt en bekræftelse",
+    notSentBody:
+      "Gem din bookingkode, eller tilføj tiden til din kalender nu — denne side er din dokumentation. Mister du koden, så ring bare til os.",
     manageBooking: "Se din booking",
   },
   auth: {
@@ -485,6 +532,8 @@ const da: Dictionary = {
     confirmBody: "Vi har sendt et bekræftelseslink til {email}. Klik på det, og log derefter ind.",
   },
   lookup: {
+    lateCancelNotice:
+      "Der er under 24 timer til din tid, så den kan ikke aflyses online. Ring for at aflyse på",
     eyebrow: "Din booking",
     title: "Find din aftale",
     body: "Indtast bookingkoden fra din bekræftelse samt det telefonnummer, du bookede med.",
@@ -506,6 +555,7 @@ const da: Dictionary = {
     dateFormat: "EEEE d. MMMM 'kl.' HH:mm",
   },
   myAppointments: {
+    callToCancel: "Ring for at aflyse",
     eyebrow: "Dine besøg",
     title: "Mine aftaler",
     logOut: "Log ud",

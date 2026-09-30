@@ -16,41 +16,51 @@ export default async function TermsPage() {
   const locale = await getLocale();
   const da = locale === "da";
 
+  // Kept in step with the short version in BookingPolicy, and with the database, which is what
+  // actually enforces the 24-hour cancellation rule.
   const sections = da
     ? [
         {
           title: "Booking",
-          body: `En tid er bekræftet, når du har modtaget din bookingkode. Kontrollér venligst tidspunkt og behandlinger, og kontakt os på ${businessInfo.phone}, hvis noget ikke stemmer.`,
-        },
-        {
-          title: "Aflysning og ændring",
-          body: "Du kan aflyse selv via siden “Find din aftale” med din bookingkode og dit telefonnummer. Giv os gerne besked i god tid, så tiden kan tilbydes til en anden.",
+          body: `En tid er bekræftet, når du har modtaget din bookingkode. Tjek tidspunkt og behandlinger. Har du problemer med at booke online, så ring på ${businessInfo.phone} — så booker vi dig ind.`,
         },
         {
           title: "Forsinkelse",
-          body: "Kommer du for sent, når vi måske ikke hele behandlingen inden for den afsatte tid. Vi gør, hvad vi kan.",
+          body: `Bliver du forsinket, så ring venligst på ${businessInfo.phone} og giv besked. Kommer du meget for sent, kan vi måske ikke nå hele behandlingen i den afsatte tid, men vi gør, hvad vi kan.`,
         },
         {
-          title: "Betaling",
-          body: "Betaling sker i salonen efter behandlingen. Priserne på siden er vejledende og kan variere, hvis dit ønske kræver længere tid.",
+          title: "Aflysning",
+          body: `Aflys senest 24 timer før din tid — enten online under “Find din booking” med din bookingkode og dit telefonnummer, eller ved at ringe på ${businessInfo.phone}. Inden for de sidste 24 timer kan en tid kun aflyses på telefon.`,
+        },
+        {
+          title: "Betaling og refusion",
+          body: "Du betaler i studiet efter behandlingen. Priserne på siden er vejledende og kan variere, hvis dit ønske kræver længere tid. Behandlinger refunderes ikke, når de er udført. Det påvirker ikke dine rettigheder efter dansk forbrugerlovgivning.",
+        },
+        {
+          title: "Feedback",
+          body: `Er der noget, du ikke er tilfreds med, så sig det — i studiet eller på ${businessInfo.phone}. Vi tager imod al feedback og gør vores bedste for at rette op på det.`,
         },
       ]
     : [
         {
           title: "Booking",
-          body: `An appointment is confirmed once you have your booking code. Please check the time and services, and call ${businessInfo.phone} if anything looks wrong.`,
-        },
-        {
-          title: "Cancelling or changing",
-          body: "You can cancel yourself from the “Find your booking” page using your booking code and phone number. Please give as much notice as you can, so the time can go to someone else.",
+          body: `An appointment is confirmed once you have your booking code. Please check the time and services. If you have any trouble booking online, call ${businessInfo.phone} and we'll book you in.`,
         },
         {
           title: "Running late",
-          body: "If you arrive late we may not be able to complete the full treatment within the time set aside. We'll do what we can.",
+          body: `If you're running late, please call ${businessInfo.phone} to let us know. If you arrive very late we may not be able to finish the full treatment in the time set aside, but we'll do what we can.`,
         },
         {
-          title: "Payment",
-          body: "Payment is taken in the salon after your treatment. Listed prices are a guide and may vary if what you want takes longer.",
+          title: "Cancellation",
+          body: `Please cancel at least 24 hours before your appointment — online under “Find your booking” with your booking code and phone number, or by calling ${businessInfo.phone}. Within the last 24 hours, an appointment can only be cancelled by phone.`,
+        },
+        {
+          title: "Payment and refunds",
+          body: "You pay at the studio after your treatment. Prices on the site are a guide and may vary if what you'd like takes longer. Treatments aren't refunded once they've been carried out. This doesn't affect your rights under Danish consumer law.",
+        },
+        {
+          title: "Feedback",
+          body: `If anything isn't right, tell us — at the studio or on ${businessInfo.phone}. We welcome all feedback and will do our best to put it right.`,
         },
       ];
 

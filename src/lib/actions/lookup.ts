@@ -1,5 +1,7 @@
 "use server";
 
+import { LATE_CANCELLATION_CODE, lateCancellationMessage } from "@/lib/booking-policy";
+import { isUserFacingDbError, runAction, UserError, type ActionResult } from "@/lib/action-result";
 import { revalidatePath } from "next/cache";
 import { formatInTimeZone } from "date-fns-tz";
 import { createClient } from "@/lib/supabase/server";
@@ -44,7 +46,14 @@ export async function findBooking(reference: string, phone: string): Promise<Fou
   };
 }
 
-export async function cancelBookingByReference(reference: string, phone: string): Promise<boolean> {
+export async function cancelBookingByReference(
+  reference: string,
+  phone: string,
+): Promise<ActionResult<boolean>> {
+  return runAction(() => cancelBookingByReferenceOrThrow(reference, phone));
+}
+
+async function cancelBookingByReferenceOrThrow(reference: string, phone: string): Promise<boolean> {
   const supabase = await createClient();
 
   const booking = await findBooking(reference, phone);
@@ -53,7 +62,11 @@ export async function cancelBookingByReference(reference: string, phone: string)
     p_phone: phone,
   });
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (error.code === LATE_CANCELLATION_CODE) throw new UserError(lateCancellationMessage());
+    if (isUserFacingDbError(error)) throw new UserError(error.message);
+    throw new Error(error.message);
+  }
   if (!data) return false;
 
   if (booking) {

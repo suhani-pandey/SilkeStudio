@@ -67,6 +67,11 @@ begin
   end if;
 
   if p_booked_by = 'customer' then
+    if p_guest_email is null
+       or p_guest_email !~* '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]{2,}$' then
+      raise exception 'Please enter a valid email address';
+    end if;
+
     if (
       select count(*) from public.appointments
       where right(regexp_replace(guest_phone, '[^0-9]', '', 'g'), 8) = v_phone
@@ -198,5 +203,128 @@ update storage.buckets
 set allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp'],
     file_size_limit = 5242880
 where id = 'nail-designs';
+
+-- ---------- 5. Customers can no longer edit bookings directly ----------
+-- The previous policy let a signed-in customer update ANY column of their own booking through
+-- the API: move it into a taken slot, set the price to zero, mark it completed. Now only the
+-- owner updates bookings directly; customers cancel through cancel_own_appointment() below,
+-- which checks the rules first.
+drop policy if exists "appointments_update" on public.appointments;
+create policy "appointments_update" on public.appointments
+  for update using (public.is_owner()) with check (public.is_owner());
+
+-- ---------- 6. The 24-hour cancellation rule ----------
+-- Online cancellation closes 24 hours before the appointment; after that it's a phone call.
+-- Raised with SQLSTATE P0024 so the app can recognise it and show the phone number.
+
+create or replace function public.cancel_own_appointment(p_appointment_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_appointment public.appointments%rowtype;
+begin
+  select * into v_appointment
+  from public.appointments
+  where id = p_appointment_id and customer_id = auth.uid();
+
+  if not found then
+    raise exception 'Booking not found';
+  end if;
+
+  if v_appointment.status <> 'confirmed' or v_appointment.start_at <= now() then
+    raise exception 'This booking can no longer be cancelled';
+  end if;
+
+  if v_appointment.start_at <= now() + interval '24 hours' then
+    raise exception using
+      errcode = 'P0024',
+      message = 'Cancellations within 24 hours of the appointment must be made by phone.';
+  end if;
+
+  update public.appointments set status = 'cancelled' where id = p_appointment_id;
+
+  insert into public.notifications (audience, type, message, appointment_id)
+  values (
+    'owner',
+    'appointment_cancelled',
+    v_appointment.guest_name || ' cancelled '
+      || coalesce(public.appointment_service_names(p_appointment_id), 'their booking') || ' on '
+      || to_char(v_appointment.start_at at time zone public.salon_timezone(), 'Mon DD, HH24:MI'),
+    p_appointment_id
+  );
+end;
+$$;
+
+revoke execute on function public.cancel_own_appointment(uuid) from public, anon;
+grant execute on function public.cancel_own_appointment(uuid) to authenticated;
+
+-- Guest cancellation by booking code. Phones are now stored in international format
+-- (+4591719063), so both sides are compared on their last eight digits.
+create or replace function public.cancel_booking(p_reference text, p_phone text)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_id uuid;
+  v_start timestamptz;
+begin
+  select a.id, a.start_at into v_id, v_start
+  from public.appointments a
+  where upper(a.reference) = upper(trim(p_reference))
+    and right(regexp_replace(a.guest_phone, '[^0-9]', '', 'g'), 8)
+        = right(regexp_replace(p_phone, '[^0-9]', '', 'g'), 8)
+    and a.status = 'confirmed'
+    and a.start_at > now();
+
+  if v_id is null then
+    return false;
+  end if;
+
+  if v_start <= now() + interval '24 hours' then
+    raise exception using
+      errcode = 'P0024',
+      message = 'Cancellations within 24 hours of the appointment must be made by phone.';
+  end if;
+
+  update public.appointments set status = 'cancelled' where id = v_id;
+
+  insert into public.notifications (audience, type, message, appointment_id)
+  select 'owner', 'appointment_cancelled',
+         a.guest_name || ' cancelled ' || public.appointment_service_names(a.id) || ' on ' ||
+           to_char(a.start_at at time zone public.salon_timezone(), 'Mon DD, HH24:MI'),
+         a.id
+  from public.appointments a where a.id = v_id;
+
+  return true;
+end;
+$$;
+
+create or replace function public.find_booking(p_reference text, p_phone text)
+returns table (
+  reference text,
+  guest_name text,
+  start_at timestamptz,
+  duration_minutes int,
+  total_price numeric,
+  status text,
+  services text
+)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select a.reference, a.guest_name, a.start_at, a.duration_minutes, a.total_price, a.status,
+         public.appointment_service_names(a.id)
+  from public.appointments a
+  where upper(a.reference) = upper(trim(p_reference))
+    and right(regexp_replace(a.guest_phone, '[^0-9]', '', 'g'), 8)
+        = right(regexp_replace(p_phone, '[^0-9]', '', 'g'), 8);
+$$;
 
 select 'hardening installed' as result;

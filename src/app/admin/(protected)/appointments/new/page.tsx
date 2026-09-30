@@ -50,7 +50,7 @@ export default function NewAppointmentPage() {
 
     startTransition(async () => {
       try {
-        await adminCreateAppointment({
+        const result = await adminCreateAppointment({
           serviceIds,
           startAtISO: slotISO,
           guestName: name.trim(),
@@ -58,10 +58,14 @@ export default function NewAppointmentPage() {
           guestEmail: email.trim() || undefined,
           notes: notes.trim() || undefined,
         });
+        if (!result.ok) {
+          toast.error(result.error);
+          return;
+        }
         toast.success("Appointment booked.");
         router.push("/admin/appointments");
-      } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Something went wrong.");
+      } catch {
+        toast.error("Couldn't reach the server. Please try again.");
       }
     });
   }

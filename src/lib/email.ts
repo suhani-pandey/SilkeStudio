@@ -3,6 +3,7 @@ import "server-only";
 import { businessInfo } from "@/lib/business-info";
 import { bookingLookupUrl } from "@/lib/sms";
 import { escapeHtml } from "@/lib/escape-html";
+import { fetchWithRetry } from "@/lib/fetch-retry";
 
 /**
  * Email via Resend (resend.com). Like SMS, it stays switched off until RESEND_API_KEY is set, and
@@ -29,7 +30,8 @@ export async function sendEmail(message: {
   if (!key || !from || !message.to) return false;
 
   try {
-    const response = await fetch(API_URL, {
+    // A momentary network or provider hiccup is retried; a rejected address is not.
+    const response = await fetchWithRetry(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
       body: JSON.stringify({
@@ -82,12 +84,14 @@ export function confirmationEmail(b: BookingEmail) {
       b.when,
       `Booking code: ${b.reference}`,
       `Change or cancel: ${bookingLookupUrl()}`,
+      `Please cancel at least 24 hours before. Within 24 hours, or if you're running late, call ${businessInfo.phone}.`,
     ].join("\n"),
     html: layout("You're booked in", [
       `Hi ${first}, your booking is confirmed.`,
       `<strong>${escapeHtml(what)}</strong><br>${escapeHtml(b.when)}`,
       `Booking code: <strong style="letter-spacing:2px">${escapeHtml(b.reference)}</strong>`,
       `Need to change or cancel? <a href="${bookingLookupUrl()}" style="color:#ad5238">Manage your booking</a> with your code and phone number.`,
+      `Please cancel at least 24 hours before. Within 24 hours, or if you're running late, call ${escapeHtml(businessInfo.phone)}.`,
     ]),
   };
 }

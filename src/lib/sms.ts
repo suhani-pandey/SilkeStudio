@@ -1,6 +1,7 @@
 import "server-only";
 
 import { businessInfo } from "@/lib/business-info";
+import { fetchWithRetry } from "@/lib/fetch-retry";
 
 /**
  * SMS via GatewayAPI (gatewayapi.com) — a Danish provider, so messages to Danish numbers are
@@ -39,7 +40,8 @@ export async function sendSms(phone: string, message: string): Promise<boolean> 
   if (!msisdn) return false;
 
   try {
-    const response = await fetch(API_URL, {
+    // A momentary network or provider hiccup is retried; a rejected number is not.
+    const response = await fetchWithRetry(API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

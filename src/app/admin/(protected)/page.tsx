@@ -1,24 +1,25 @@
 import Link from "next/link";
-import { format, isToday } from "date-fns";
 import type { Metadata } from "next";
 import { CalendarPlus, Clock, Phone, Scissors } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { listAppointmentsForDay, listAppointments } from "@/lib/actions/admin";
 import { formatPrice } from "@/lib/format";
+import { ConfirmationFlag } from "@/components/admin/confirmation-flag";
+import { formatSalon, salonDayKeyOffset, salonDayRange } from "@/lib/salon-time";
 import { appointmentServiceNames } from "@/lib/database.types";
-import { addDays, endOfDay, startOfDay } from "date-fns";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
 export default async function AdminDashboardPage() {
+  // "Today" and the next seven days are the studio's days. The server runs in UTC, which would
+  // otherwise put the day boundary at 01:00 or 02:00 in Høje Taastrup.
   const now = new Date();
+  const upcomingFrom = salonDayRange(salonDayKeyOffset(now, 1)).from;
+  const upcomingTo = salonDayRange(salonDayKeyOffset(now, 7)).to;
   const [today, upcoming] = await Promise.all([
     listAppointmentsForDay(now),
-    listAppointments({
-      fromISO: startOfDay(addDays(now, 1)).toISOString(),
-      toISO: endOfDay(addDays(now, 7)).toISOString(),
-    }),
+    listAppointments({ fromISO: upcomingFrom.toISOString(), toISO: upcomingTo.toISOString() }),
   ]);
 
   const todayActive = today.filter((a) => a.status !== "cancelled");
@@ -71,7 +72,7 @@ export default async function AdminDashboardPage() {
                   </div>
                   <div>
                     <p className="font-medium">
-                      {format(new Date(appt.start_at), "h:mm a")} — {appt.guest_name}
+                      {formatSalon(appt.start_at, "HH:mm")} — {appt.guest_name}
                     </p>
                     <p className="text-muted-foreground flex items-center gap-3 text-sm">
                       <span className="flex items-center gap-1">
@@ -81,6 +82,10 @@ export default async function AdminDashboardPage() {
                         <Phone className="size-3.5" /> {appt.guest_phone}
                       </span>
                     </p>
+                    <ConfirmationFlag
+                      status={appt.confirmation_status}
+                      guestName={appt.guest_name}
+                    />
                   </div>
                 </div>
                 <p className="font-heading font-semibold">{formatPrice(appt.total_price)}</p>
@@ -110,12 +115,7 @@ export default async function AdminDashboardPage() {
                   <p className="font-medium">{appt.guest_name}</p>
                   <p className="text-muted-foreground text-sm">
                     {appointmentServiceNames(appt)} ·{" "}
-                    {format(
-                      new Date(appt.start_at),
-                      isToday(new Date(appt.start_at))
-                        ? "'Today' h:mm a"
-                        : "EEE, MMM d 'at' h:mm a",
-                    )}
+                    {formatSalon(appt.start_at, "EEE d MMM 'at' HH:mm")}
                   </p>
                 </div>
                 <p className="font-heading font-semibold">{formatPrice(appt.total_price)}</p>

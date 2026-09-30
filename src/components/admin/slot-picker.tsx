@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { formatSalon } from "@/lib/salon-time";
 import { format, isSameDay } from "date-fns";
 import { Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
@@ -93,7 +94,7 @@ export function SlotPicker({
                   : "border-border hover:border-primary/50",
               )}
             >
-              {format(new Date(iso), "HH:mm")}
+              {formatSalon(iso, "HH:mm")}
             </button>
           ))}
         </div>

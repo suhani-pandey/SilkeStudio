@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { format } from "date-fns";
-import { X } from "lucide-react";
+import { formatInTimeZone } from "date-fns-tz";
+import { Phone, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { cancelOwnAppointment } from "@/lib/actions/booking";
 import { dateLocale } from "@/lib/date-locale";
+import { canCancelOnline } from "@/lib/booking-policy";
+import { businessInfo, SALON_TIMEZONE } from "@/lib/business-info";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 
@@ -30,13 +32,30 @@ export function CancelAppointmentButton({
   function handleConfirm() {
     startTransition(async () => {
       try {
-        await cancelOwnAppointment(appointmentId);
+        const result = await cancelOwnAppointment(appointmentId);
+        if (!result.ok) {
+          toast.error(result.error);
+          return;
+        }
         toast.success(t.cancelled);
         setOpen(false);
-      } catch (err) {
-        toast.error(err instanceof Error ? err.message : t.cancelError);
+      } catch {
+        // Only reached if the request itself failed, e.g. no connection.
+        toast.error(t.cancelError);
       }
     });
+  }
+
+  // Inside the notice period the database refuses online cancellation, so offer the phone.
+  if (!canCancelOnline(startAtISO)) {
+    return (
+      <Button asChild variant="outline" size="sm" className="h-10">
+        <a href={businessInfo.phoneHref}>
+          <Phone className="size-4" />
+          {t.callToCancel}
+        </a>
+      </Button>
+    );
   }
 
   return (
@@ -55,7 +74,9 @@ export function CancelAppointmentButton({
           <>
             <p className="font-medium">{serviceNames}</p>
             <p className="text-muted-foreground mt-1 text-sm">
-              {format(new Date(startAtISO), t.dateFormat, { locale: dateLocale(locale) })}
+              {formatInTimeZone(new Date(startAtISO), SALON_TIMEZONE, t.dateFormat, {
+                locale: dateLocale(locale),
+              })}
             </p>
           </>
         }

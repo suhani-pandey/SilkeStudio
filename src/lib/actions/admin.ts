@@ -1,11 +1,12 @@
 "use server";
 
-import { endOfDay, startOfDay } from "date-fns";
 import { revalidatePath, updateTag } from "next/cache";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { createClient } from "@/lib/supabase/server";
 import { SALON_TIMEZONE } from "@/lib/business-info";
+import { salonDayKey, salonDayRange } from "@/lib/salon-time";
 import { CACHE_TAGS } from "@/lib/cache-tags";
+import { isUserFacingDbError, runAction, UserError, type ActionResult } from "@/lib/action-result";
 import { readyForCollectionMessage, sendSms } from "@/lib/sms";
 import type {
   AppointmentStatus,
@@ -39,11 +40,10 @@ export async function listAppointments(range?: { fromISO: string; toISO: string 
   return data ?? [];
 }
 
+/** Everything on the studio's calendar day containing `date` — not the server's UTC day. */
 export async function listAppointmentsForDay(date: Date) {
-  return listAppointments({
-    fromISO: startOfDay(date).toISOString(),
-    toISO: endOfDay(date).toISOString(),
-  });
+  const { from, to } = salonDayRange(salonDayKey(date));
+  return listAppointments({ fromISO: from.toISOString(), toISO: to.toISOString() });
 }
 
 export interface AdminCreateAppointmentInput {
@@ -55,7 +55,16 @@ export interface AdminCreateAppointmentInput {
   notes?: string;
 }
 
-export async function adminCreateAppointment(input: AdminCreateAppointmentInput) {
+export async function adminCreateAppointment(
+  input: AdminCreateAppointmentInput,
+): Promise<ActionResult> {
+  return runAction(async () => {
+    await adminCreateAppointmentOrThrow(input);
+    return null;
+  });
+}
+
+async function adminCreateAppointmentOrThrow(input: AdminCreateAppointmentInput) {
   const supabase = await createClient();
   const { error } = await supabase.rpc("create_booking", {
     p_service_ids: input.serviceIds,
@@ -69,8 +78,9 @@ export async function adminCreateAppointment(input: AdminCreateAppointmentInput)
 
   if (error) {
     if (error.code === "23P01") {
-      throw new Error("That time slot overlaps an existing appointment.");
+      throw new UserError("That time slot overlaps an existing appointment.");
     }
+    if (isUserFacingDbError(error)) throw new UserError(error.message);
     throw new Error(error.message);
   }
 
@@ -90,14 +100,24 @@ export async function updateAppointmentStatus(id: string, status: AppointmentSta
  * mean guessing a date at drop-off and cluttering the calendar with two-minute slots, so the
  * collection itself stays informal — this just makes sure they know.
  */
-export async function markReadyForCollection(appointmentId: string, readyByDate: string) {
+export async function markReadyForCollection(
+  appointmentId: string,
+  readyByDate: string,
+): Promise<ActionResult<{ texted: boolean }>> {
+  return runAction(() => markReadyForCollectionOrThrow(appointmentId, readyByDate));
+}
+
+async function markReadyForCollectionOrThrow(appointmentId: string, readyByDate: string) {
   const supabase = await createClient();
 
   const { error } = await supabase.rpc("mark_ready_for_collection", {
     p_appointment_id: appointmentId,
     p_ready_by: readyByDate,
   });
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (isUserFacingDbError(error)) throw new UserError(error.message);
+    throw new Error(error.message);
+  }
 
   // Most customers book as guests and have no account to be notified in, so the text is the
   // channel that actually reaches them. A failure here must not undo the state change above.
@@ -107,6 +127,7 @@ export async function markReadyForCollection(appointmentId: string, readyByDate:
     .eq("id", appointmentId)
     .single();
 
+  let texted = false;
   if (appointment?.guest_phone) {
     const names =
       appointment.appointment_services
@@ -114,7 +135,7 @@ export async function markReadyForCollection(appointmentId: string, readyByDate:
         .filter(Boolean)
         .join(", ") || "alteration";
 
-    await sendSms(
+    texted = await sendSms(
       appointment.guest_phone,
       readyForCollectionMessage({
         services: names,
@@ -130,9 +151,17 @@ export async function markReadyForCollection(appointmentId: string, readyByDate:
   revalidateAdmin();
   revalidatePath("/booking");
   revalidatePath("/my-appointments");
+  return { texted };
 }
 
-export async function rescheduleAppointment(id: string, startAtISO: string) {
+export async function rescheduleAppointment(id: string, startAtISO: string): Promise<ActionResult> {
+  return runAction(async () => {
+    await rescheduleAppointmentOrThrow(id, startAtISO);
+    return null;
+  });
+}
+
+async function rescheduleAppointmentOrThrow(id: string, startAtISO: string) {
   const supabase = await createClient();
   const { error } = await supabase
     .from("appointments")
@@ -140,7 +169,7 @@ export async function rescheduleAppointment(id: string, startAtISO: string) {
     .eq("id", id);
   if (error) {
     if (error.code === "23P01") {
-      throw new Error("That time slot overlaps an existing appointment.");
+      throw new UserError("That time slot overlaps an existing appointment.");
     }
     throw new Error(error.message);
   }

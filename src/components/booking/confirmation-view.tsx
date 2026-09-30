@@ -3,11 +3,12 @@
 import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { formatInTimeZone } from "date-fns-tz";
-import { CalendarPlus, Check, MapPin, Phone } from "lucide-react";
+import { AlertTriangle, CalendarPlus, Check, MailCheck, MapPin, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { businessInfo, SALON_TIMEZONE } from "@/lib/business-info";
 import { buildIcs } from "@/lib/calendar-file";
+import { BookingPolicy } from "@/components/booking/booking-policy";
 import type { BookingSummary } from "@/lib/booking-summary";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
@@ -56,9 +57,19 @@ function addToCalendar(booking: BookingSummary, reminderLabel: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function ConfirmationView({ t, locale }: { t: Dictionary["confirmation"]; locale: Locale }) {
+export function ConfirmationView({
+  t,
+  policy,
+  locale,
+}: {
+  t: Dictionary["confirmation"];
+  policy: Dictionary["policy"];
+  locale: Locale;
+}) {
   const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const booking = raw ? (JSON.parse(raw) as BookingSummary) : null;
+  const notSent =
+    booking?.confirmation?.status === "failed" || booking?.confirmation?.status === "unavailable";
 
   if (!booking) {
     return (
@@ -93,8 +104,43 @@ export function ConfirmationView({ t, locale }: { t: Dictionary["confirmation"];
         </div>
       )}
 
+      {/* Honest about whether a copy actually reached them, while this screen is still open. */}
+      {booking.confirmation?.status === "sent" && (
+        <div className="mt-4 flex gap-3 rounded-lg border p-4 text-left text-sm">
+          <MailCheck className="text-copper-deep mt-0.5 size-4 shrink-0" aria-hidden />
+          <div>
+            <p>
+              {booking.confirmation.email ? (
+                <>
+                  {t.sentByEmail} <strong>{booking.confirmation.email}</strong>
+                  {booking.confirmation.byText ? t.andText : ""}.
+                </>
+              ) : (
+                t.sentByText
+              )}
+            </p>
+            {booking.confirmation.email && (
+              <p className="text-muted-foreground mt-1">{t.spamHint}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {notSent && (
+        <div
+          role="status"
+          className="border-clay/40 bg-accent/60 mt-4 flex gap-3 rounded-lg border p-4 text-left text-sm"
+        >
+          <AlertTriangle className="text-clay mt-0.5 size-4 shrink-0" aria-hidden />
+          <div>
+            <p className="font-medium">{t.notSentTitle}</p>
+            <p className="text-muted-foreground mt-1">{t.notSentBody}</p>
+          </div>
+        </div>
+      )}
+
       <Button
-        variant="outline"
+        variant={notSent ? "default" : "outline"}
         size="lg"
         className="mt-4 h-12 w-full"
         onClick={() => addToCalendar(booking, t.reference)}
@@ -102,6 +148,10 @@ export function ConfirmationView({ t, locale }: { t: Dictionary["confirmation"];
         <CalendarPlus className="size-4" />
         {t.addToCalendar}
       </Button>
+
+      <div className="mt-6">
+        <BookingPolicy t={policy} />
+      </div>
 
       <div className="mt-6 border p-6 text-left">
         <p className="eyebrow">{t.appointment}</p>

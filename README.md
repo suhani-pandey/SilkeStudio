@@ -74,6 +74,14 @@ Deploy to Vercel (import the repo, it detects Next.js), and keep Supabase as the
   `Permissions-Policy`, HSTS, and no `X-Powered-By`.
 - Booking abuse limits in the database (per phone, and a site-wide hourly cap), with optional
   Cloudflare Turnstile in front.
+- Contact details checked without adding a step: phone numbers against the real numbering plan,
+  email domains for a working mail server and against 120,000 throwaway-address services, with a
+  "did you mean gmail.com?" nudge for typos.
+- Online cancellation closes 24 hours before the appointment, enforced in the database for both
+  guests and account holders. Customers can no longer update bookings directly at all.
+- Server Actions return expected failures instead of throwing them, because Next.js hides thrown
+  messages in production. Only messages written for customers reach the browser
+  (`src/lib/action-result.ts`).
 - Customer details anonymised 24 months after the appointment by the daily job.
 - Google Maps loads only when the visitor asks for it, so nothing reaches Google by default.
 - Row-level security on every table; customers can never read another customer's booking, and

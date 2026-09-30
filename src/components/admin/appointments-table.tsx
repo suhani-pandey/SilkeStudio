@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { format, isPast } from "date-fns";
+import { isPast } from "date-fns";
 import { CalendarClock, Check, Loader2, PackageCheck, Phone, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { SlotPicker } from "@/components/admin/slot-picker";
+import { ConfirmationFlag } from "@/components/admin/confirmation-flag";
+import { formatSalon, salonDayKey } from "@/lib/salon-time";
 import {
   markReadyForCollection,
   rescheduleAppointment,
@@ -77,11 +79,20 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
     if (!readyTarget || !readyDate) return;
     startTransition(async () => {
       try {
-        await markReadyForCollection(readyTarget.id, readyDate);
-        toast.success("Marked ready — the customer has been texted.");
+        const result = await markReadyForCollection(readyTarget.id, readyDate);
+        if (!result.ok) {
+          toast.error(result.error);
+          return;
+        }
+        // Only claim a text went out if one actually did — SMS may not be switched on yet.
+        toast.success(
+          result.data.texted
+            ? "Marked ready — the customer has been texted."
+            : "Marked ready. No text was sent, so let the customer know yourself.",
+        );
         setReadyTarget(null);
-      } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Something went wrong.");
+      } catch {
+        toast.error("Couldn't reach the server. Please try again.");
       }
     });
   }
@@ -90,12 +101,16 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
     if (!rescheduleTarget || !newSlotISO) return;
     startTransition(async () => {
       try {
-        await rescheduleAppointment(rescheduleTarget.id, newSlotISO);
+        const result = await rescheduleAppointment(rescheduleTarget.id, newSlotISO);
+        if (!result.ok) {
+          toast.error(result.error);
+          return;
+        }
         toast.success("Appointment rescheduled.");
         setRescheduleTarget(null);
         setNewSlotISO(null);
-      } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Something went wrong.");
+      } catch {
+        toast.error("Couldn't reach the server. Please try again.");
       }
     });
   }
@@ -142,7 +157,7 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="font-heading text-lg font-medium">
-                  {format(new Date(appt.start_at), "EEE d MMM 'at' HH:mm")}
+                  {formatSalon(appt.start_at, "EEE d MMM 'at' HH:mm")}
                 </p>
                 <p className="mt-0.5 font-medium">
                   {appt.guest_name}
@@ -152,6 +167,9 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
                     </Badge>
                   )}
                 </p>
+                {appt.status === "confirmed" && (
+                  <ConfirmationFlag status={appt.confirmation_status} guestName={appt.guest_name} />
+                )}
                 <p className="text-muted-foreground mt-1 text-sm">
                   {appointmentServiceNames(appt)}
                 </p>
@@ -170,8 +188,7 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
                 {appt.ready_by && (
                   <p className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700">
                     <PackageCheck className="size-4" />
-                    Ready to collect from{" "}
-                    {format(new Date(`${appt.ready_by}T12:00:00Z`), "EEE d MMM")}
+                    Ready to collect from {formatSalon(`${appt.ready_by}T12:00:00Z`, "EEE d MMM")}
                   </p>
                 )}
                 {appt.notes && (
@@ -218,7 +235,7 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
                     disabled={isPending}
                     onClick={() => {
                       setReadyTarget(appt);
-                      setReadyDate(appt.ready_by ?? format(new Date(), "yyyy-MM-dd"));
+                      setReadyDate(appt.ready_by ?? salonDayKey(new Date()));
                     }}
                   >
                     <PackageCheck className="size-4" />
@@ -260,7 +277,7 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
               <p className="font-medium">{cancelTarget.guest_name}</p>
               <p className="text-muted-foreground mt-1 text-sm">
                 {appointmentServiceNames(cancelTarget)} ·{" "}
-                {format(new Date(cancelTarget.start_at), "EEE d MMM 'at' HH:mm")}
+                {formatSalon(cancelTarget.start_at, "EEE d MMM 'at' HH:mm")}
               </p>
             </>
           )
