@@ -1,11 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { getActiveServices } from "@/lib/actions/booking";
 import { formatDuration, formatPrice } from "@/lib/format";
-import { categoryImage } from "@/lib/category-images";
 import { getLocale, getT } from "@/lib/i18n/server";
 import { categoryLabelFor, serviceDescription, serviceName } from "@/lib/service-locale";
 import type { Service, ServiceLine } from "@/lib/database.types";
@@ -56,15 +53,18 @@ export default async function ServicesPage() {
         <p className="text-muted-foreground mx-auto mt-6 max-w-lg">{t.servicesPage.body}</p>
       </section>
 
-      <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20">
-        <div className="space-y-16 sm:space-y-24">
+      {/* One column, top to bottom: the eye only ever moves down the page, never side to side. */}
+      <div className="mx-auto max-w-3xl px-5 py-14 sm:px-6 sm:py-20">
+        <div className="space-y-16 sm:space-y-20">
           {groupedByLine.map((group, groupIndex) => (
-            <div key={group.line} className="space-y-16 sm:space-y-24">
+            <div key={group.line} className="space-y-6 sm:space-y-8">
               {groupedByLine.length > 1 && (
                 <div
                   id={group.line}
                   className={
-                    groupIndex > 0 ? "scroll-mt-24 border-t pt-14 sm:pt-20" : "scroll-mt-24"
+                    groupIndex > 0
+                      ? "scroll-mt-24 border-t pt-14 pb-2 sm:pt-20"
+                      : "scroll-mt-24 pb-2"
                   }
                 >
                   <h2 className="font-heading text-3xl font-medium sm:text-4xl">{group.heading}</h2>
@@ -73,57 +73,33 @@ export default async function ServicesPage() {
                 </div>
               )}
               {group.categories.map(([category, items], index) => (
-                <section
-                  key={category}
-                  className="grid items-start gap-7 sm:gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16"
-                >
-                  <div className={index % 2 === 1 ? "lg:order-2" : undefined}>
-                    <Image
-                      src={categoryImage(category)}
-                      alt={category}
-                      width={1200}
-                      height={1500}
-                      sizes="(max-width: 1024px) 100vw, 40vw"
-                      className="aspect-[4/3] w-full rounded-2xl object-cover sm:aspect-[4/5]"
-                    />
-                  </div>
+                <section key={category} className="surface rounded-2xl p-6 sm:p-8">
+                  <p className="eyebrow">{String(index + 1).padStart(2, "0")}</p>
+                  <h2 className="font-heading mt-3 text-2xl font-medium sm:text-3xl">
+                    {categoryLabelFor(services, category, locale)}
+                  </h2>
+                  <div className="rule-highlight mt-5" />
 
-                  <div
-                    className={cn(
-                      "surface rounded-2xl p-6 sm:p-8",
-                      index % 2 === 1 && "lg:order-1",
-                    )}
-                  >
-                    <p className="eyebrow">{String(index + 1).padStart(2, "0")}</p>
-                    <h2 className="font-heading mt-3 text-3xl font-medium sm:text-4xl">
-                      {categoryLabelFor(services, category, locale)}
-                    </h2>
-                    <div className="rule-highlight mt-5" />
-
-                    <ul className="mt-6 divide-y">
-                      {items.map((service) => (
-                        <li
-                          key={service.id}
-                          className="flex items-start justify-between gap-6 py-4"
-                        >
-                          <div>
-                            <p className="font-medium">{serviceName(service, locale)}</p>
-                            {serviceDescription(service, locale) && (
-                              <p className="text-muted-foreground mt-1 text-sm">
-                                {serviceDescription(service, locale)}
-                              </p>
-                            )}
-                            <p className="text-muted-foreground mt-1.5 text-xs tracking-wide uppercase">
-                              {formatDuration(service.duration_minutes)}
+                  <ul className="mt-6 divide-y">
+                    {items.map((service) => (
+                      <li key={service.id} className="flex items-start justify-between gap-6 py-4">
+                        <div>
+                          <p className="font-medium">{serviceName(service, locale)}</p>
+                          {serviceDescription(service, locale) && (
+                            <p className="text-muted-foreground mt-1 text-sm">
+                              {serviceDescription(service, locale)}
                             </p>
-                          </div>
-                          <p className="font-heading text-xl font-semibold whitespace-nowrap">
-                            {formatPrice(service.price)}
+                          )}
+                          <p className="text-muted-foreground mt-1.5 text-xs tracking-wide uppercase">
+                            {formatDuration(service.duration_minutes)}
                           </p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                        </div>
+                        <p className="font-heading text-xl font-semibold whitespace-nowrap">
+                          {formatPrice(service.price)}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
                 </section>
               ))}
             </div>
