@@ -86,16 +86,16 @@ export function ConfirmationView({
   return (
     <div className="mx-auto max-w-lg px-6 py-20 text-center">
       <div className="bg-accent mx-auto flex size-16 items-center justify-center rounded-full">
-        <Check className="text-clay size-7" />
+        <Check className="text-highlight size-7" />
       </div>
-      <p className="font-script text-clay mt-6 text-4xl leading-none">{t.thanks}</p>
+      <p className="font-heading text-highlight mt-6 text-4xl leading-none italic">{t.thanks}</p>
       <h1 className="font-heading mt-3 text-4xl font-medium">{t.title}</h1>
       <p className="text-muted-foreground mt-3">
         {t.body} {booking.guestName.split(" ")[0]}.
       </p>
 
       {booking.reference && (
-        <div className="border-copper/50 bg-secondary/50 mt-8 rounded-lg border border-dashed p-4">
+        <div className="surface border-ink/40 mt-8 rounded-lg border-2 border-dashed p-4">
           <p className="eyebrow">{t.reference}</p>
           <p className="font-heading mt-1 text-3xl font-semibold tracking-[0.2em]">
             {booking.reference}
@@ -107,7 +107,7 @@ export function ConfirmationView({
       {/* Honest about whether a copy actually reached them, while this screen is still open. */}
       {booking.confirmation?.status === "sent" && (
         <div className="mt-4 flex gap-3 rounded-lg border p-4 text-left text-sm">
-          <MailCheck className="text-copper-deep mt-0.5 size-4 shrink-0" aria-hidden />
+          <MailCheck className="text-highlight mt-0.5 size-4 shrink-0" aria-hidden />
           <div>
             <p>
               {booking.confirmation.email ? (
@@ -129,9 +129,9 @@ export function ConfirmationView({
       {notSent && (
         <div
           role="status"
-          className="border-clay/40 bg-accent/60 mt-4 flex gap-3 rounded-lg border p-4 text-left text-sm"
+          className="border-highlight/60 bg-accent/60 mt-4 flex gap-3 rounded-lg border p-4 text-left text-sm"
         >
-          <AlertTriangle className="text-clay mt-0.5 size-4 shrink-0" aria-hidden />
+          <AlertTriangle className="text-highlight mt-0.5 size-4 shrink-0" aria-hidden />
           <div>
             <p className="font-medium">{t.notSentTitle}</p>
             <p className="text-muted-foreground mt-1">{t.notSentBody}</p>
@@ -153,7 +153,7 @@ export function ConfirmationView({
         <BookingPolicy t={policy} />
       </div>
 
-      <div className="mt-6 border p-6 text-left">
+      <div className="surface mt-6 rounded-lg p-6 text-left">
         <p className="eyebrow">{t.appointment}</p>
         <p className="font-heading mt-2 text-2xl font-medium">
           {formatInTimeZone(new Date(booking.startAtISO), SALON_TIMEZONE, t.dateFormat, {
@@ -164,7 +164,7 @@ export function ConfirmationView({
         <ul className="text-muted-foreground mt-5 space-y-1.5 text-sm">
           {booking.serviceNames.map((name) => (
             <li key={name} className="flex items-center gap-2">
-              <span className="bg-copper size-1 rounded-full" />
+              <span className="bg-highlight size-1 rounded-full" />
               {name}
             </li>
           ))}
@@ -182,14 +182,14 @@ export function ConfirmationView({
 
       <div className="text-muted-foreground mt-8 space-y-2 text-sm">
         <p className="flex items-center justify-center gap-2">
-          <MapPin className="text-copper size-4" />
+          <MapPin className="text-highlight size-4" />
           {businessInfo.address.line1}, {businessInfo.address.line2}
         </p>
         <a
           href={businessInfo.phoneHref}
-          className="hover:text-clay flex items-center justify-center gap-2"
+          className="hover:text-highlight flex items-center justify-center gap-2"
         >
-          <Phone className="text-copper size-4" />
+          <Phone className="text-highlight size-4" />
           {businessInfo.phone}
         </a>
       </div>

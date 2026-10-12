@@ -37,7 +37,7 @@ export async function SiteHeader() {
             <Link
               key={link.href}
               href={link.href}
-              className="hover:text-clay text-xs font-semibold tracking-[0.18em] uppercase transition-colors"
+              className="hover:text-highlight text-xs font-semibold tracking-[0.18em] uppercase transition-colors"
             >
               {link.label}
             </Link>

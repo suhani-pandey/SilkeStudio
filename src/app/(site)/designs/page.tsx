@@ -18,7 +18,7 @@ export default async function DesignsPage() {
         <h1 className="font-heading mx-auto mt-3 max-w-2xl text-4xl font-medium text-balance sm:text-6xl">
           {t.designs.title}
         </h1>
-        <div className="rule-copper mx-auto mt-6" />
+        <div className="rule-highlight mx-auto mt-6" />
         <p className="text-muted-foreground mx-auto mt-6 max-w-lg">{t.designs.body}</p>
       </section>
 

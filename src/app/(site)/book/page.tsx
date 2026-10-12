@@ -46,7 +46,7 @@ export default async function BookPage({
       <section className="bg-secondary/60 px-5 py-12 text-center sm:px-6 sm:py-16">
         <p className="eyebrow">{t.booking.eyebrow}</p>
         <h1 className="font-heading mt-3 text-3xl font-medium sm:text-5xl">{t.booking.title}</h1>
-        <div className="rule-copper mx-auto mt-6" />
+        <div className="rule-highlight mx-auto mt-6" />
         <p className="text-muted-foreground mx-auto mt-6 max-w-md">{t.booking.body}</p>
       </section>
       <div className="py-10 sm:py-14">

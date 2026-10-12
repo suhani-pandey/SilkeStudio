@@ -204,7 +204,7 @@ export function AvailabilityBlocksManager({
               {list.map((b) => (
                 <div
                   key={b.id}
-                  className="flex items-center justify-between rounded-xl border border-l-4 border-l-red-600 p-3"
+                  className="border-l-destructive flex items-center justify-between rounded-xl border border-l-4 p-3"
                 >
                   <div>
                     <p className="text-sm font-medium">

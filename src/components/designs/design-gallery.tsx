@@ -124,8 +124,8 @@ export function DesignGallery({
             className={cn(
               "min-h-11 rounded-full border px-4 text-sm font-medium transition-colors",
               category === filter.value
-                ? "border-clay bg-clay text-primary-foreground"
-                : "border-border text-muted-foreground hover:border-clay/50 hover:text-foreground",
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground",
             )}
           >
             {filter.label}
@@ -139,9 +139,9 @@ export function DesignGallery({
             <button
               type="button"
               onClick={() => setSelected(design)}
-              className="block w-full text-left"
+              className="surface block w-full overflow-hidden rounded-2xl text-left"
             >
-              <div className="bg-muted relative aspect-square overflow-hidden rounded-2xl">
+              <div className="bg-muted relative aspect-square overflow-hidden">
                 <Image
                   src={designImageUrl(design.image_path)}
                   alt={label(design)}
@@ -150,8 +150,10 @@ export function DesignGallery({
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
-              <p className="mt-2.5 text-sm font-medium">{label(design)}</p>
-              <p className="text-muted-foreground text-xs">{categoryLabel(design.category)}</p>
+              <div className="px-3 py-2.5 sm:px-4 sm:py-3">
+                <p className="text-sm font-semibold">{label(design)}</p>
+                <p className="text-muted-foreground text-xs">{categoryLabel(design.category)}</p>
+              </div>
             </button>
 
             <button
@@ -159,12 +161,12 @@ export function DesignGallery({
               onClick={() => toggleFavourite(design.id)}
               aria-pressed={favourites.includes(design.id)}
               aria-label={`${favourites.includes(design.id) ? t.unfavourite : t.favourite}: ${label(design)}`}
-              className="absolute top-2 right-2 flex size-11 items-center justify-center rounded-full bg-black/25 backdrop-blur-sm transition-colors hover:bg-black/40"
+              className="bg-ink/40 hover:bg-ink/60 absolute top-2 right-2 flex size-11 items-center justify-center rounded-full backdrop-blur-sm transition-colors"
             >
               <Heart
                 className={cn(
-                  "size-5 text-white transition-colors",
-                  favourites.includes(design.id) && "fill-white",
+                  "text-foreground size-5 transition-colors",
+                  favourites.includes(design.id) && "fill-highlight text-highlight",
                 )}
               />
             </button>
@@ -192,7 +194,7 @@ export function DesignGallery({
                 />
                 <DialogClose
                   aria-label={t.close}
-                  className="absolute top-3 right-3 flex size-11 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm"
+                  className="bg-ink/50 text-foreground absolute top-3 right-3 flex size-11 items-center justify-center rounded-full backdrop-blur-sm"
                 >
                   <X className="size-5" />
                 </DialogClose>

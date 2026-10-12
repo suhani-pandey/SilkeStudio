@@ -31,9 +31,9 @@ export function MapEmbed({
   }
 
   return (
-    <div className="bg-secondary/60 flex size-full min-h-[380px] flex-col items-center justify-center gap-4 p-8 text-center">
+    <div className="surface flex size-full min-h-[380px] flex-col items-center justify-center gap-4 rounded-2xl p-8 text-center">
       <div className="bg-accent flex size-14 items-center justify-center rounded-full">
-        <MapPin className="text-clay size-6" />
+        <MapPin className="text-highlight size-6" />
       </div>
       <p className="font-medium">{address}</p>
       <div className="flex flex-col gap-2 sm:flex-row">

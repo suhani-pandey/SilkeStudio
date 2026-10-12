@@ -34,11 +34,11 @@ export function AdminBottomNav() {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex min-h-16 flex-col items-center justify-center gap-1 px-1",
-                  active ? "text-clay" : "text-muted-foreground",
+                  active ? "text-highlight" : "text-muted-foreground",
                 )}
               >
                 <Icon className={cn("size-5", active && "stroke-[2.25]")} />
-                <span className="w-full truncate text-center text-[0.65rem] leading-none font-medium">
+                <span className="w-full truncate text-center text-[0.8rem] leading-none font-semibold">
                   {tab.label}
                 </span>
               </Link>

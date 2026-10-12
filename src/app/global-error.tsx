@@ -24,9 +24,9 @@ export default function GlobalError({
           gap: "1rem",
           padding: "1.5rem",
           textAlign: "center",
-          fontFamily: "system-ui, sans-serif",
-          background: "#fdfaf6",
-          color: "#2a2226",
+          fontFamily: "'EB Garamond', Garamond, Georgia, serif",
+          background: "#1f3d36",
+          color: "#fbf4ea",
         }}
       >
         <h1 style={{ fontSize: "1.5rem", fontWeight: 500, margin: 0 }}>Something went wrong</h1>
@@ -40,8 +40,8 @@ export default function GlobalError({
             padding: "0 2rem",
             borderRadius: "0.5rem",
             border: "none",
-            background: "#5b2a4e",
-            color: "#fff",
+            background: "#fcca45",
+            color: "#1f3d36",
             fontSize: "1rem",
             cursor: "pointer",
           }}

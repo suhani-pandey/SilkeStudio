@@ -98,7 +98,7 @@ export default function NewAppointmentPage() {
                       className={cn(
                         "flex w-full items-center gap-3 rounded-md border p-3 text-left transition-colors",
                         checked
-                          ? "border-primary bg-accent/60"
+                          ? "surface-selected border-transparent"
                           : "border-border hover:border-primary/50",
                       )}
                     >

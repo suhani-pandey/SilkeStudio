@@ -47,7 +47,7 @@ export function ConfirmDialog({
             }
           >
             <AlertTriangle
-              className={destructive ? "text-destructive size-6" : "text-clay size-6"}
+              className={destructive ? "text-destructive size-6" : "text-highlight size-6"}
             />
           </div>
           <h2 className="font-heading mt-5 text-2xl font-medium">{title}</h2>

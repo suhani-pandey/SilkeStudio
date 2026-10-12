@@ -153,7 +153,7 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
       {/* One card per booking — reads far better on a phone than a scrolling table. */}
       <div className="mt-4 space-y-3">
         {filtered.map((appt) => (
-          <div key={appt.id} className="rounded-lg border p-4">
+          <div key={appt.id} className="surface rounded-lg p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="font-heading text-lg font-medium">
@@ -176,7 +176,7 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
                 <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
                   <a
                     href={`tel:${appt.guest_phone.replace(/\s/g, "")}`}
-                    className="hover:text-clay inline-flex min-h-9 items-center gap-1.5"
+                    className="hover:text-highlight inline-flex min-h-9 items-center gap-1.5"
                   >
                     <Phone className="size-3.5" />
                     {appt.guest_phone}
@@ -186,7 +186,7 @@ export function AppointmentsTable({ appointments }: { appointments: AppointmentW
                   )}
                 </div>
                 {appt.ready_by && (
-                  <p className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700">
+                  <p className="text-highlight mt-2 inline-flex items-center gap-1.5 text-sm font-semibold">
                     <PackageCheck className="size-4" />
                     Ready to collect from {formatSalon(`${appt.ready_by}T12:00:00Z`, "EEE d MMM")}
                   </p>

@@ -25,14 +25,14 @@ export function BookingPolicy({ t }: { t: Dictionary["policy"] }) {
       <ul className="mt-4 space-y-3">
         {points.map(({ icon: Icon, text }) => (
           <li key={text} className="flex gap-3 text-sm leading-relaxed">
-            <Icon className="text-copper-deep mt-0.5 size-4 shrink-0" aria-hidden />
+            <Icon className="text-highlight mt-0.5 size-4 shrink-0" aria-hidden />
             <span>{text}</span>
           </li>
         ))}
       </ul>
       <a
         href={businessInfo.phoneHref}
-        className="text-clay mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-medium"
+        className="text-highlight mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-medium"
       >
         <Phone className="size-4" aria-hidden />
         {t.call} {businessInfo.phone}

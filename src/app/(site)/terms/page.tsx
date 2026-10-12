@@ -70,7 +70,7 @@ export default async function TermsPage() {
       <h1 className="font-heading mt-3 text-4xl font-medium">
         {da ? "Booking­betingelser" : "Booking terms"}
       </h1>
-      <div className="rule-copper mt-6" />
+      <div className="rule-highlight mt-6" />
 
       <div className="text-muted-foreground mt-10 space-y-8 leading-relaxed">
         {sections.map((section) => (

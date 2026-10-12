@@ -20,7 +20,7 @@ export function ConfirmationFlag({
 
   const first = guestName.split(" ")[0] || guestName;
   return (
-    <p className="text-clay mt-1.5 flex items-start gap-1.5 text-sm">
+    <p className="surface-selected mt-2 flex w-fit items-start gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium">
       <MessageSquareWarning className="mt-0.5 size-4 shrink-0" aria-hidden />
       <span>
         {status === "failed"

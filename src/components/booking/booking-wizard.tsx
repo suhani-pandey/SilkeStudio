@@ -229,7 +229,7 @@ export function BookingWizard({
                 className={cn(
                   "flex size-8 items-center justify-center rounded-full border text-xs font-semibold",
                   step === id && "border-primary bg-primary text-primary-foreground",
-                  step > id && "border-copper text-copper-deep",
+                  step > id && "border-highlight text-highlight",
                   step < id && "text-muted-foreground border-border",
                 )}
               >
@@ -265,7 +265,7 @@ export function BookingWizard({
                   className={cn(
                     "flex-1 rounded-md px-4 py-3 text-sm font-medium transition-colors",
                     line === value
-                      ? "bg-background text-foreground shadow-sm"
+                      ? "bg-primary text-primary-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground",
                   )}
                 >
@@ -301,13 +301,13 @@ export function BookingWizard({
                     aria-pressed={fulfilment === value}
                     onClick={() => chooseFulfilment(value)}
                     className={cn(
-                      "flex gap-3 rounded-lg border p-4 text-left transition-colors",
+                      "surface flex gap-3 rounded-lg border-2 p-4 text-left transition-colors",
                       fulfilment === value
-                        ? "border-primary bg-accent/60"
-                        : "border-border hover:border-primary/50",
+                        ? "surface-selected border-transparent"
+                        : "hover:border-ink/40 border-transparent",
                     )}
                   >
-                    <Icon className="text-copper-deep mt-0.5 size-5 shrink-0" />
+                    <Icon className="text-highlight mt-0.5 size-5 shrink-0" />
                     <span>
                       <span className="block font-medium">{title}</span>
                       <span className="text-muted-foreground text-sm">{body}</span>
@@ -320,7 +320,7 @@ export function BookingWizard({
 
           {Object.entries(grouped).map(([category, items]) => (
             <div key={category}>
-              <h2 className="font-heading border-copper/40 border-b pb-3 text-2xl font-medium">
+              <h2 className="font-heading border-highlight/50 border-b pb-3 text-2xl font-medium">
                 {categoryLabelFor(services, category, locale)}
               </h2>
               <div className="mt-4 space-y-2">
@@ -333,10 +333,10 @@ export function BookingWizard({
                       aria-pressed={checked}
                       onClick={() => toggleService(service.id)}
                       className={cn(
-                        "flex w-full items-center gap-4 rounded-lg border p-4 text-left transition-colors active:scale-[0.99]",
+                        "surface flex w-full items-center gap-4 rounded-lg border-2 p-4 text-left transition-colors active:scale-[0.99]",
                         checked
-                          ? "border-primary bg-accent/60"
-                          : "border-border hover:border-primary/50",
+                          ? "surface-selected border-transparent"
+                          : "hover:border-ink/40 border-transparent",
                       )}
                     >
                       <span
@@ -383,7 +383,7 @@ export function BookingWizard({
           </button>
 
           <Label className="eyebrow">{t.pickDay}</Label>
-          <div className="snap-row -mx-5 mt-4 flex gap-2 overflow-x-auto px-5 pb-2 sm:mx-0 sm:px-0">
+          <div className="snap-row -mx-5 mt-4 flex scroll-px-5 gap-2 overflow-x-auto px-5 pb-2 sm:mx-0 sm:scroll-px-0 sm:px-0">
             {days.map((day) => (
               <button
                 key={day.toISOString()}
@@ -443,7 +443,7 @@ export function BookingWizard({
             <ChevronLeft className="size-4" /> {t.changeDateTime}
           </button>
 
-          <div className="bg-secondary/60 rounded-md p-5">
+          <div className="surface rounded-lg p-5">
             <p className="eyebrow">{t.yourBooking}</p>
             <p className="font-heading mt-2 text-2xl font-medium">
               {formatSalon(selectedSlotISO, t.dateFormat, df)}
@@ -472,7 +472,7 @@ export function BookingWizard({
             }}
           >
             <p className="text-muted-foreground text-sm">
-              <span aria-hidden className="text-clay">
+              <span aria-hidden className="text-highlight">
                 *
               </span>{" "}
               {t.requiredNote}
@@ -481,7 +481,7 @@ export function BookingWizard({
             <div>
               <Label htmlFor="name" className="mb-2 block">
                 {t.fullName}{" "}
-                <span aria-hidden className="text-clay">
+                <span aria-hidden className="text-highlight">
                   *
                 </span>
               </Label>
@@ -499,7 +499,7 @@ export function BookingWizard({
             <div>
               <Label htmlFor="phone" className="mb-2 block">
                 {t.phone}{" "}
-                <span aria-hidden className="text-clay">
+                <span aria-hidden className="text-highlight">
                   *
                 </span>
               </Label>
@@ -526,7 +526,7 @@ export function BookingWizard({
             <div>
               <Label htmlFor="email" className="mb-2 block">
                 {t.email}{" "}
-                <span aria-hidden className="text-clay">
+                <span aria-hidden className="text-highlight">
                   *
                 </span>
               </Label>
@@ -562,7 +562,7 @@ export function BookingWizard({
                   <button
                     type="button"
                     onClick={() => setEmail(emailSuggestion)}
-                    className="text-clay font-medium underline underline-offset-2"
+                    className="text-highlight font-medium underline underline-offset-2"
                   >
                     {emailSuggestion}
                   </button>

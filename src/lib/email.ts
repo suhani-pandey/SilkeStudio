@@ -56,12 +56,15 @@ export async function sendEmail(message: {
 /** Shared frame so every email looks like it came from the same place. */
 function layout(title: string, lines: string[]): string {
   const body = lines.map((line) => `<p style="margin:0 0 12px">${line}</p>`).join("");
-  return `<!doctype html><html><body style="margin:0;background:#faf6f1;font-family:system-ui,sans-serif;color:#2e2622">
-<div style="max-width:520px;margin:0 auto;padding:32px 24px">
-<p style="margin:0 0 24px;font-size:13px;letter-spacing:3px;color:#9a6237">SILKE STUDIO</p>
-<h1 style="margin:0 0 20px;font-size:22px;font-weight:600">${title}</h1>
+  // Same colour roles as the site: forest-green ground, the message on an ivory card, yellow for the name.
+  return `<!doctype html><html><body style="margin:0;background:#1f3d36;font-family:'EB Garamond',Garamond,Georgia,serif;font-size:17px;line-height:1.55;color:#0e201b">
+<div style="max-width:520px;margin:0 auto;padding:32px 20px">
+<p style="margin:0 0 20px;font-size:14px;letter-spacing:4px;color:#fcca45">SILKE STUDIO</p>
+<div style="background:#f5efe3;color:#1f3d36;border-radius:12px;padding:28px 24px">
+<h1 style="margin:0 0 20px;font-size:24px;font-weight:600">${title}</h1>
 ${body}
-<p style="margin:28px 0 0;font-size:13px;color:#6b5f56">${escapeHtml(businessInfo.address.line1)}, ${escapeHtml(businessInfo.address.line2)} · ${escapeHtml(businessInfo.phone)}</p>
+</div>
+<p style="margin:24px 0 0;font-size:14px;color:#fbf4ea">${escapeHtml(businessInfo.address.line1)}, ${escapeHtml(businessInfo.address.line2)} · ${escapeHtml(businessInfo.phone)}</p>
 </div></body></html>`;
 }
 
@@ -90,7 +93,7 @@ export function confirmationEmail(b: BookingEmail) {
       `Hi ${first}, your booking is confirmed.`,
       `<strong>${escapeHtml(what)}</strong><br>${escapeHtml(b.when)}`,
       `Booking code: <strong style="letter-spacing:2px">${escapeHtml(b.reference)}</strong>`,
-      `Need to change or cancel? <a href="${bookingLookupUrl()}" style="color:#ad5238">Manage your booking</a> with your code and phone number.`,
+      `Need to change or cancel? <a href="${bookingLookupUrl()}" style="color:#0e201b;font-weight:600">Manage your booking</a> with your code and phone number.`,
       `Please cancel at least 24 hours before. Within 24 hours, or if you're running late, call ${escapeHtml(businessInfo.phone)}.`,
     ]),
   };
@@ -110,7 +113,7 @@ export function reminderEmail(b: BookingEmail) {
     html: layout("See you tomorrow", [
       `Hi ${first}, a quick reminder of your booking.`,
       `<strong>${escapeHtml(what)}</strong><br>${escapeHtml(b.when)}`,
-      `Can't make it? <a href="${bookingLookupUrl()}" style="color:#ad5238">Cancel here</a> so someone else can have the slot.`,
+      `Can't make it? <a href="${bookingLookupUrl()}" style="color:#0e201b;font-weight:600">Cancel here</a> so someone else can have the slot.`,
     ]),
   };
 }

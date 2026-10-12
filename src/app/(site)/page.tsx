@@ -61,45 +61,46 @@ export default async function HomePage() {
           className="object-cover"
         />
         {/* The photograph is pale, so the type needs a real scrim behind it rather than a hint of
-            one: an overall wash, plus a soft dark centre where the headline actually sits. */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/65" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.42)_0%,rgba(0,0,0,0.12)_55%,transparent_80%)]" />
+            one: an overall green wash that ties it to the rest of the site, plus a deeper centre
+            where the headline actually sits. */}
+        <div className="from-ink/70 via-ink/55 to-background absolute inset-0 bg-gradient-to-b" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(14,32,27,0.55)_0%,rgba(14,32,27,0.15)_55%,transparent_80%)]" />
 
         <div className="relative mx-auto w-full max-w-3xl px-6 py-24 text-center sm:py-28">
-          <p className="font-script text-3xl leading-none text-white/90 sm:text-4xl">
+          <p className="font-heading text-highlight text-3xl leading-none italic sm:text-4xl">
             {t.hero.welcome}
           </p>
-          <h1 className="font-heading mt-5 text-[2.8rem] leading-[1.03] font-medium tracking-tight text-balance text-white sm:text-6xl lg:text-7xl">
+          <h1 className="font-heading mt-5 text-[2.8rem] leading-[1.03] font-medium tracking-tight text-balance sm:text-6xl lg:text-7xl">
             {t.hero.title}
           </h1>
-          <p className="mx-auto mt-7 max-w-lg leading-relaxed text-white/85 sm:text-lg">
+          <p className="text-foreground/90 mx-auto mt-7 max-w-lg leading-relaxed sm:text-lg">
             {t.hero.body}
           </p>
 
           <div className="mt-11 flex flex-col items-center justify-center gap-x-12 gap-y-5 sm:flex-row">
             <Link
               href="/book?line=beauty"
-              className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold tracking-[0.2em] text-white uppercase"
+              className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold tracking-[0.2em] uppercase"
             >
-              <span className="border-b border-white/50 pb-1.5 transition-colors group-hover:border-white">
+              <span className="border-highlight/60 group-hover:border-highlight border-b-2 pb-1.5 transition-colors">
                 {t.hero.bookBeautyCta}
               </span>
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              <ArrowRight className="text-highlight size-4 transition-transform group-hover:translate-x-1" />
             </Link>
             <Link
               href="/book?line=tailoring"
-              className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold tracking-[0.2em] text-white uppercase"
+              className="group inline-flex min-h-11 items-center gap-2 text-sm font-semibold tracking-[0.2em] uppercase"
             >
-              <span className="border-b border-white/50 pb-1.5 transition-colors group-hover:border-white">
+              <span className="border-highlight/60 group-hover:border-highlight border-b-2 pb-1.5 transition-colors">
                 {t.hero.bookTailoringCta}
               </span>
-              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              <ArrowRight className="text-highlight size-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
 
           <a
             href={businessInfo.phoneHref}
-            className="mt-10 inline-flex min-h-11 items-center gap-2 text-sm text-white/70 transition-colors hover:text-white"
+            className="text-foreground/75 hover:text-foreground mt-10 inline-flex min-h-11 items-center gap-2 text-sm transition-colors"
           >
             <Phone className="size-4" />
             {t.hero.call} {businessInfo.phone}
@@ -108,10 +109,10 @@ export default async function HomePage() {
       </section>
 
       {/* ---------------- Trust strip ---------------- */}
-      <section className="bg-clay text-primary-foreground">
-        <div className="mx-auto grid max-w-6xl gap-3 px-6 py-5 text-center text-sm sm:grid-cols-3 sm:gap-6">
+      <section className="surface">
+        <div className="mx-auto grid max-w-6xl gap-3 px-6 py-5 text-center text-sm font-medium sm:grid-cols-3 sm:gap-6">
           <p>{t.trust.one}</p>
-          <p className="border-primary-foreground/20 sm:border-x">{t.trust.two}</p>
+          <p className="sm:border-x">{t.trust.two}</p>
           <p>{t.trust.three}</p>
         </div>
       </section>
@@ -133,9 +134,9 @@ export default async function HomePage() {
             <Link
               key={category.name}
               href={`/book?category=${encodeURIComponent(category.name)}`}
-              className="group block"
+              className="group surface flex flex-col overflow-hidden rounded-2xl"
             >
-              <div className="relative aspect-[3/4] overflow-hidden rounded-2xl sm:aspect-[4/5]">
+              <div className="relative aspect-square overflow-hidden sm:aspect-[4/5]">
                 <Image
                   src={category.image}
                   alt={category.label}
@@ -143,15 +144,16 @@ export default async function HomePage() {
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
-                <div className="absolute right-3 bottom-3 left-3 text-white sm:right-5 sm:bottom-5 sm:left-5">
-                  <h3 className="font-heading text-xl font-medium sm:text-2xl">{category.label}</h3>
-                  <p className="mt-0.5 text-xs text-white/85 sm:mt-1 sm:text-sm">
-                    {category.count}{" "}
-                    {category.count === 1 ? t.categories.service : t.categories.services} ·{" "}
-                    {t.categories.from} {formatPrice(category.from)}
-                  </p>
-                </div>
+              </div>
+              <div className="flex-1 px-3 py-3 sm:px-5 sm:py-4">
+                <h3 className="font-heading text-xl leading-tight font-semibold sm:text-2xl">
+                  {category.label}
+                </h3>
+                <p className="text-muted-foreground mt-1 text-xs sm:text-sm">
+                  {category.count}{" "}
+                  {category.count === 1 ? t.categories.service : t.categories.services} ·{" "}
+                  {t.categories.from} {formatPrice(category.from)}
+                </p>
               </div>
             </Link>
           ))}
@@ -165,10 +167,10 @@ export default async function HomePage() {
       </section>
 
       {/* ---------------- Story ---------------- */}
-      <section className="bg-secondary/60">
+      <section className="surface">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 sm:gap-14 sm:px-6 sm:py-24 lg:grid-cols-2 lg:gap-20">
           <div className="relative">
-            <div className="border-copper/50 absolute -top-5 -left-5 hidden h-full w-full border sm:block" />
+            <div className="border-highlight/60 absolute -top-5 -left-5 hidden h-full w-full rounded-2xl border sm:block" />
             <Image
               src="/images/about.jpg"
               alt={t.story.imageAlt}
@@ -181,10 +183,8 @@ export default async function HomePage() {
           <div>
             <p className="eyebrow">{t.story.eyebrow}</p>
             <h2 className="font-heading mt-3 text-4xl font-medium sm:text-5xl">{t.story.title}</h2>
-            <div className="rule-copper mt-6" />
+            <div className="rule-highlight mt-6" />
             <p className="text-muted-foreground mt-6 leading-relaxed">{t.story.body}</p>
-            {/* The heading serif only ships old-style figures in this subset, which turn "10" into
-                something that reads as "IO". These use the sans face, which has lining numerals. */}
             <dl className="mt-10 grid grid-cols-3 gap-6 border-t pt-8">
               {[
                 { value: String(services.length), label: t.story.stat1 },
@@ -192,7 +192,7 @@ export default async function HomePage() {
                 { value: "60s", label: t.story.stat3 },
               ].map((stat) => (
                 <div key={stat.label}>
-                  <dt className="text-clay font-sans text-3xl font-semibold tracking-tight">
+                  <dt className="text-highlight font-heading text-4xl font-semibold tracking-tight">
                     {stat.value}
                   </dt>
                   <dd className="text-muted-foreground mt-1 text-sm">{stat.label}</dd>
@@ -205,7 +205,7 @@ export default async function HomePage() {
 
       {/* ---------------- Gallery ---------------- */}
       {galleryImages.length > 0 && (
-        <section className="bg-secondary/60 py-16 sm:py-24">
+        <section className="py-16 sm:py-24">
           <div className="mx-auto max-w-6xl px-5 sm:px-6">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
@@ -218,7 +218,7 @@ export default async function HomePage() {
                 href={socialLinks.tiktok}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-clay inline-flex min-h-11 items-center text-sm font-medium underline-offset-4 hover:underline"
+                className="text-highlight inline-flex min-h-11 items-center text-sm font-medium underline-offset-4 hover:underline"
               >
                 {t.gallery.tiktok}
               </a>
@@ -252,17 +252,17 @@ export default async function HomePage() {
             <h2 className="font-heading mt-3 text-3xl font-medium sm:text-4xl">
               {t.testimonials.title}
             </h2>
-            <div className="rule-copper mx-auto mt-6" />
+            <div className="rule-highlight mx-auto mt-6" />
           </div>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {testimonials.map((testimonial) => (
-              <figure key={testimonial.id} className="bg-card flex h-full flex-col border p-6">
-                <Quote className="text-copper size-6" aria-hidden />
+              <figure key={testimonial.id} className="surface flex h-full flex-col rounded-2xl p-6">
+                <Quote className="text-highlight size-6" aria-hidden />
                 {testimonial.rating && (
                   <div className="mt-3 flex gap-0.5" aria-label={`${testimonial.rating} out of 5`}>
                     {Array.from({ length: testimonial.rating }).map((_, i) => (
-                      <Star key={i} className="fill-gold text-copper size-4" aria-hidden />
+                      <Star key={i} className="fill-highlight text-highlight size-4" aria-hidden />
                     ))}
                   </div>
                 )}
@@ -282,11 +282,11 @@ export default async function HomePage() {
           <div>
             <p className="eyebrow">{t.visit.eyebrow}</p>
             <h2 className="font-heading mt-3 text-4xl font-medium sm:text-5xl">{t.visit.title}</h2>
-            <div className="rule-copper mt-6" />
+            <div className="rule-highlight mt-6" />
 
             <div className="mt-10 space-y-8">
               <div className="flex gap-4">
-                <MapPin className="text-copper mt-1 size-5 shrink-0" />
+                <MapPin className="text-highlight mt-1 size-5 shrink-0" />
                 <div>
                   <p className="font-medium">{t.visit.address}</p>
                   <p className="text-muted-foreground mt-1">
@@ -298,12 +298,12 @@ export default async function HomePage() {
               </div>
 
               <div className="flex gap-4">
-                <Phone className="text-copper mt-1 size-5 shrink-0" />
+                <Phone className="text-highlight mt-1 size-5 shrink-0" />
                 <div>
                   <p className="font-medium">{t.visit.phone}</p>
                   <a
                     href={businessInfo.phoneHref}
-                    className="text-muted-foreground hover:text-clay mt-1 inline-flex min-h-11 items-center"
+                    className="text-muted-foreground hover:text-highlight mt-1 inline-flex min-h-11 items-center"
                   >
                     {businessInfo.phone}
                   </a>
@@ -311,7 +311,7 @@ export default async function HomePage() {
               </div>
 
               <div className="flex gap-4">
-                <Clock className="text-copper mt-1 size-5 shrink-0" />
+                <Clock className="text-highlight mt-1 size-5 shrink-0" />
                 <div className="min-w-0 flex-1">
                   <p className="font-medium">{t.visit.hours}</p>
                   <dl className="text-muted-foreground mt-2 space-y-1 text-sm">
@@ -357,12 +357,12 @@ export default async function HomePage() {
           sizes="100vw"
           className="h-80 w-full object-cover"
         />
-        <div className="bg-clay/85 absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-          <p className="font-script text-3xl text-white/90">{t.closing.script}</p>
-          <h2 className="font-heading mt-2 max-w-2xl text-4xl font-medium text-white sm:text-5xl">
+        <div className="surface bg-card/90 absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+          <p className="font-heading text-3xl italic">{t.closing.script}</p>
+          <h2 className="font-heading mt-2 max-w-2xl text-4xl font-medium sm:text-5xl">
             {t.closing.title}
           </h2>
-          <Button asChild size="lg" variant="secondary" className="mt-8 h-13 px-10 text-base">
+          <Button asChild size="lg" className="mt-8 h-13 px-10 text-base">
             <Link href="/book">
               {t.closing.cta}
               <ArrowRight className="size-4" />

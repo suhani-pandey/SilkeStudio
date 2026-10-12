@@ -23,7 +23,7 @@ export default async function PrivacyPage() {
       <h1 className="font-heading mt-3 text-4xl font-medium">
         {da ? "Privatlivspolitik" : "Privacy policy"}
       </h1>
-      <div className="rule-copper mt-6" />
+      <div className="rule-highlight mt-6" />
 
       <div className="prose-sm text-muted-foreground mt-10 space-y-8 leading-relaxed">
         <section>

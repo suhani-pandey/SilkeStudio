@@ -6,8 +6,8 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#faf6f1",
-  "theme_color": "#faf6f1",
+  "background_color": "#1f3d36",
+  "theme_color": "#1f3d36",
   "categories": ["lifestyle", "beauty", "shopping"],
   "icons": [
     { "src": "/images/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

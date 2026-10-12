@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { getActiveServices } from "@/lib/actions/booking";
@@ -51,7 +52,7 @@ export default async function ServicesPage() {
         <h1 className="font-heading mx-auto mt-3 max-w-2xl text-4xl font-medium text-balance sm:text-6xl">
           {t.servicesPage.title}
         </h1>
-        <div className="rule-copper mx-auto mt-6" />
+        <div className="rule-highlight mx-auto mt-6" />
         <p className="text-muted-foreground mx-auto mt-6 max-w-lg">{t.servicesPage.body}</p>
       </section>
 
@@ -67,7 +68,7 @@ export default async function ServicesPage() {
                   }
                 >
                   <h2 className="font-heading text-3xl font-medium sm:text-4xl">{group.heading}</h2>
-                  <div className="rule-copper mt-5" />
+                  <div className="rule-highlight mt-5" />
                   <p className="text-muted-foreground mt-5 max-w-xl">{group.blurb}</p>
                 </div>
               )}
@@ -87,18 +88,23 @@ export default async function ServicesPage() {
                     />
                   </div>
 
-                  <div className={index % 2 === 1 ? "lg:order-1" : undefined}>
+                  <div
+                    className={cn(
+                      "surface rounded-2xl p-6 sm:p-8",
+                      index % 2 === 1 && "lg:order-1",
+                    )}
+                  >
                     <p className="eyebrow">{String(index + 1).padStart(2, "0")}</p>
                     <h2 className="font-heading mt-3 text-3xl font-medium sm:text-4xl">
                       {categoryLabelFor(services, category, locale)}
                     </h2>
-                    <div className="rule-copper mt-5" />
+                    <div className="rule-highlight mt-5" />
 
-                    <ul className="mt-8 divide-y">
+                    <ul className="mt-6 divide-y">
                       {items.map((service) => (
                         <li
                           key={service.id}
-                          className="flex items-start justify-between gap-6 py-5"
+                          className="flex items-start justify-between gap-6 py-4"
                         >
                           <div>
                             <p className="font-medium">{serviceName(service, locale)}</p>
@@ -128,7 +134,7 @@ export default async function ServicesPage() {
           <p className="text-muted-foreground py-20 text-center">{t.servicesPage.empty}</p>
         )}
 
-        <div className="border-copper/40 mt-16 border-t pt-12 text-center sm:mt-24 sm:pt-16">
+        <div className="border-highlight/40 mt-16 border-t pt-12 text-center sm:mt-24 sm:pt-16">
           <h2 className="font-heading text-3xl font-medium sm:text-4xl">
             {t.servicesPage.readyTitle}
           </h2>

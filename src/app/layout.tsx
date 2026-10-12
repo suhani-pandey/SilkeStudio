@@ -1,31 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import { Alex_Brush, Cormorant_Garamond, Geist, Geist_Mono } from "next/font/google";
+import { EB_Garamond } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { RegisterServiceWorker } from "@/components/register-service-worker";
 import { siteUrl } from "@/lib/business-info";
 import { getLocale, getT } from "@/lib/i18n/server";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// One typeface for the whole site. Garamond is a book face, so unlike Bodoni or Didot it holds up
+// at form-label and price-list sizes as well as in headlines, and on a dark ground where hairline
+// serifs would break up.
+const garamond = EB_Garamond({
+  variable: "--font-garamond",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const cormorant = Cormorant_Garamond({
-  variable: "--font-heading",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const alexBrush = Alex_Brush({
-  variable: "--font-script",
-  subsets: ["latin"],
-  weight: "400",
+  style: ["normal", "italic"],
 });
 
 /**
@@ -77,7 +64,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#faf6f1",
+  themeColor: "#1f3d36",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -89,10 +76,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const locale = await getLocale();
 
   return (
-    <html
-      lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} ${alexBrush.variable} h-full antialiased`}
-    >
+    <html lang={locale} className={`${garamond.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         {children}
         <Toaster richColors position="top-center" />

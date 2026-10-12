@@ -33,7 +33,7 @@ export function SignupForm({ t }: { t: Dictionary["auth"] }) {
     return (
       <div className="mx-auto max-w-sm px-6 py-20 text-center">
         <div className="bg-accent mx-auto flex size-14 items-center justify-center rounded-full">
-          <MailCheck className="text-clay size-6" />
+          <MailCheck className="text-highlight size-6" />
         </div>
         <h1 className="font-heading mt-6 text-3xl font-medium">{t.confirmTitle}</h1>
         <p className="text-muted-foreground mt-3 text-sm">
@@ -47,7 +47,7 @@ export function SignupForm({ t }: { t: Dictionary["auth"] }) {
     <div className="mx-auto max-w-sm px-6 py-20">
       <p className="eyebrow text-center">{t.accountEyebrow}</p>
       <h1 className="font-heading mt-3 text-center text-4xl font-medium">{t.signupTitle}</h1>
-      <div className="rule-copper mx-auto mt-5" />
+      <div className="rule-highlight mx-auto mt-5" />
       <p className="text-muted-foreground mt-5 text-center text-sm">{t.signupBody}</p>
 
       <Card className="border-border/60 mt-8">

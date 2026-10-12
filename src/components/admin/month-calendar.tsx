@@ -125,13 +125,13 @@ export function MonthCalendar({
       {/* Legend */}
       <div className="text-muted-foreground mb-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
         <span className="flex items-center gap-1.5">
-          <span className="size-2.5 rounded-full bg-emerald-600" /> Booked
+          <span className="bg-highlight size-2.5 rounded-full" /> Booked
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="size-2.5 rounded-full bg-red-600" /> Blocked / busy
+          <span className="bg-destructive size-2.5 rounded-full" /> Blocked / busy
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="size-2.5 rounded-full border-2 border-red-600" /> Cancelled
+          <span className="border-destructive size-2.5 rounded-full border-2" /> Cancelled
         </span>
       </div>
 
@@ -178,14 +178,14 @@ export function MonthCalendar({
 
                 <span className="mt-1 flex flex-wrap gap-1">
                   {booked.slice(0, 3).map((entry, i) => (
-                    <span key={`b${i}`} className="size-2 rounded-full bg-emerald-600" />
+                    <span key={`b${i}`} className="bg-highlight size-2 rounded-full" />
                   ))}
-                  {blocked.length > 0 && <span className="size-2 rounded-full bg-red-600" />}
+                  {blocked.length > 0 && <span className="bg-destructive size-2 rounded-full" />}
                   {cancelled.length > 0 && (
-                    <span className="size-2 rounded-full border-2 border-red-600" />
+                    <span className="border-destructive size-2 rounded-full border-2" />
                   )}
                   {booked.length > 3 && (
-                    <span className="text-muted-foreground text-[0.6rem] leading-none">
+                    <span className="text-muted-foreground text-[0.7rem] leading-none">
                       +{booked.length - 3}
                     </span>
                   )}
@@ -212,14 +212,14 @@ export function MonthCalendar({
               key={index}
               className={cn(
                 "flex items-start gap-3 rounded-lg border-l-4 p-3",
-                entry.kind === "booked" && "border-l-emerald-600 bg-emerald-600/5",
-                entry.kind === "blocked" && "border-l-red-600 bg-red-600/5",
-                entry.kind === "cancelled" && "bg-muted/50 border-l-red-600/40",
+                entry.kind === "booked" && "surface border-l-highlight",
+                entry.kind === "blocked" && "border-l-destructive bg-destructive/10",
+                entry.kind === "cancelled" && "bg-muted/50 border-l-destructive/40",
               )}
             >
               <div className="mt-0.5 shrink-0">
-                {entry.kind === "booked" && <Clock className="size-4 text-emerald-700" />}
-                {entry.kind === "blocked" && <Ban className="size-4 text-red-700" />}
+                {entry.kind === "booked" && <Clock className="text-highlight size-4" />}
+                {entry.kind === "blocked" && <Ban className="text-destructive size-4" />}
                 {entry.kind === "cancelled" && (
                   <CalendarX2 className="text-muted-foreground size-4" />
                 )}
@@ -246,7 +246,7 @@ export function MonthCalendar({
                 {entry.phone && (
                   <a
                     href={`tel:${entry.phone.replace(/\s/g, "")}`}
-                    className="text-muted-foreground hover:text-clay mt-1 inline-flex min-h-9 items-center gap-1.5 text-sm"
+                    className="text-muted-foreground hover:text-highlight mt-1 inline-flex min-h-9 items-center gap-1.5 text-sm"
                   >
                     <Phone className="size-3.5" />
                     {entry.phone}
